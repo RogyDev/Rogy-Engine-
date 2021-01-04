@@ -14,3 +14,7 @@ My 3D game engine source code.
 - Grass rendering
 - Particle system
 - Lightmapping (no uv mapping for now)
+
+# Note :
+This is source code only, not a project.
+libraries used: OpenAL, Opengl (GLEW), GLFW, imgui, Bullet, Soloud, Lua, LuaBridge, FreeType, ImGuiFileDialog, stb_image, cereal, assimp, debug_draw, imguizmo, lightmapper.
