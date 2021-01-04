@@ -14,6 +14,7 @@ My 3D game engine source code.
 - Grass rendering
 - Particle system
 - Lightmapping (no uv mapping for now)
+- Text rendering and ui in progress
 
 # Note :
 This is source code only, not a project.
