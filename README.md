@@ -15,12 +15,13 @@ My 3D game engine source code.
 - Particle system
 - Lightmapping (no auto uv mapping for now)
 - Game-UI in progress
+- Skeletal Animation
 
-# Note : 
+# Notes : 
 - Requires Visual studio 2015 (If you have higher version you will need to recompile dependencies for you version)
 - Build in Release/84x 
 - Do not conatin example game projects. - some will be uploaded soon :) -
 
 # Screenshot : 
-![alt text](https://github.com/FOLOME/Rogy-Engine-/blob/main/Rogy/Screenshot/rscren.jpg?raw=true)
+![alt text](https://github.com/FOLOME/Rogy-Engine-/blob/main/Rogy/Screenshot/rscren.png?raw=true)
 
