@@ -1,0 +1,9 @@
+﻿  SkeletalMeshComponent.cpp
+c:\backup\github\rogy\rogy\engine\animation\Skeleton.h(68): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+c:\backup\github\rogy\rogy\engine\mesh\mesh.h(69): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  SkeletalModel.cpp
+c:\backup\github\rogy\rogy\engine\animation\Skeleton.h(68): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+Engine\animation\SkeletalModel.cpp(84): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  AudioClip.cpp
+  AudioManager.cpp
+  AudioSource.cpp

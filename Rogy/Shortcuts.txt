@@ -1,0 +1,7 @@
+Ctrl+N : New Scene
+Ctrl+S : Save
+Ctrl+D : Duplicate entity
+Ctrl+C : Copy entity
+Ctrl+V : Paste entity
+Delete : Remove entity
+Ctrl+A : Apply a material selected in the project browser to selected entity
