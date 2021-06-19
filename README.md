@@ -22,4 +22,5 @@ My 3D game engine source code.
 - Do not conatin example game projects. - some will be uploaded soon :) -
 
 # Screenshot : 
-![alt text](https://github.com/FOLOME/Rogy-Engine-/blob/main/Rogy/Screenshot/rscren.png?raw=true)
+![alt text](https://github.com/FOLOME/Rogy-Engine-/blob/main/Rogy/Screenshot/rscren.jpg?raw=true)
+
