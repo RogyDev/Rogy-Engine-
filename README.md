@@ -1,6 +1,6 @@
 # Rogy-Engine Development
 My 3D game engine source code.
-(NOT THE FINAL VERSION)
+(NOT THE FINAL VERSION- Windows only)
 
 # Features:
 - PBR shading and reflection probes with parallax correction.
@@ -16,6 +16,10 @@ My 3D game engine source code.
 - Lightmapping (no auto uv mapping for now)
 - Game-UI in progress
 
-# Note :
-This is source code only, not a project.
-libraries used: OpenAL, Opengl (GLEW), GLFW, imgui, Bullet, Soloud, Lua, LuaBridge, FreeType, ImGuiFileDialog, stb_image, cereal, assimp, debug_draw, imguizmo, lightmapper.
+# Note : 
+- Requires Visual studio 2015 (If you have higher version you will need to recompile dependencies for you version)
+- Build in Release/84x 
+- Do not conatin example game projects. - some will be uploaded soon :) -
+
+# Screenshot : 
+![alt text](https://github.com/FOLOME/Rogy-Engine-/blob/main/Rogy/Screenshot/rscren.png?raw=true)
