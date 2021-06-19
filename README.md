@@ -1,5 +1,5 @@
 # Rogy-Engine Development
-My 3D game engine source code. (Outdated)
+My 3D game engine source code.
 (NOT THE FINAL VERSION)
 
 # Features:
@@ -13,8 +13,8 @@ My 3D game engine source code. (Outdated)
 - Component-Based
 - Grass rendering
 - Particle system
-- Lightmapping (no uv mapping for now)
-- Text rendering and UI in progress
+- Lightmapping (no auto uv mapping for now)
+- Game-UI in progress
 
 # Note :
 This is source code only, not a project.
