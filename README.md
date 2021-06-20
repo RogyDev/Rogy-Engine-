@@ -15,6 +15,7 @@ My 3D game engine source code.
 - Particle system
 - Lightmapping (no auto uv mapping for now)
 - Game-UI in progress
+- Skeletal Animation
 
 # Note : 
 - Requires Visual studio 2015 (If you have higher version you will need to recompile dependencies for you version)
