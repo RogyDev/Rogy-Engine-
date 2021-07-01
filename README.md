@@ -15,7 +15,7 @@ My 3D game engine source code.
 - Grass rendering
 - Particle system
 - Lightmapping (no auto uv mapping for now)
-- Game-UI in progress
+- Game-UI (in progress)
 - Skeletal Animation
 
 # Notes : 
