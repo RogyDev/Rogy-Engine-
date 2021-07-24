@@ -28,6 +28,6 @@ My 3D game engine source code.
 - Do not conatin example game projects. - some will be uploaded soon :) -
 
 # Screenshot : 
-![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/bg2.png?raw=true)
+![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/screen2.png?raw=true)
 ![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/sky.png?raw=true)
 
