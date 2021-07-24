@@ -21,6 +21,7 @@ My 3D game engine source code.
 - Game-UI
 - Forward+ rendering 
 - Bloom
+- Atmosphere Sky
 # Notes : 
 - Requires Visual studio 2015 (If you have higher version you will need to recompile dependencies for you version)
 - Build in Release/84x 
@@ -28,4 +29,5 @@ My 3D game engine source code.
 
 # Screenshot : 
 ![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/rscren.png?raw=true)
+![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/sky.png?raw=true)
 
