@@ -22,6 +22,9 @@ My 3D game engine.
 - Forward+ rendering 
 - Bloom
 - Atmosphere Sky
+- Terrain
+- FXAA
+
 # Notes : 
 - Requires Visual studio 2015 (If you have higher version you will need to recompile dependencies for you version)
 - Build in Release/84x 
