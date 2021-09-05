@@ -32,6 +32,7 @@ My 3D game engine.
 
 # Screenshot : 
 ![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/screen2.png?raw=true)
-![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/sky.png?raw=true)
-![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/rscreen3.png?raw=true)
+![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/BG3.png?raw=true)
+![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/BG5.png?raw=true)
+![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/Screenshot/BG4.png?raw=true)
 
