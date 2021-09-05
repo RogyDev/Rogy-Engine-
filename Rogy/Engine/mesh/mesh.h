@@ -17,6 +17,7 @@
 using namespace std;
 
 struct Vertex {
+	
 	// position
 	glm::vec3 Position;
 	// normal
@@ -29,6 +30,13 @@ struct Vertex {
 	glm::vec3 Tangent;
 	// bitangent
 	glm::vec3 Bitangent;
+
+	float Blend = 0.0f;
+};
+
+struct aFace
+{
+	std::vector<unsigned int> indices;
 };
 
 struct Texture0 {
@@ -41,21 +49,34 @@ struct Texture0 {
 class Mesh {
 public:
 	/*  Mesh Data  */
-	vector<Vertex> vertices;
-	vector<unsigned int> indices;
-	vector<Texture0> textures;
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+	std::vector<Texture0> textures;
+	std::vector<aFace> faces; 	// used for collision
+
 	unsigned int VAO;
+
 	BBox bbox;
+	std::string name;
 	std::string path;
 	int index;
+	glm::mat4 transformation;
+	bool isDisplacement = false;
+	bool init = false;
+
+	Mesh(){}
 
 	/*  Functions  */
 	// constructor
-	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture0> textures)
+	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture0> textures
+		,std::vector<aFace> afaces, std::string aname, glm::mat4 transf)
 	{
+		name = aname;
+		transformation = transf;
 		this->vertices = vertices;
 		this->indices = indices;
 		this->textures = textures;
+		this->faces = afaces;
 
 		// now that we have all the required data, set the vertex buffers and its attribute pointers.
 		setupMesh();
@@ -77,7 +98,6 @@ public:
 		glDeleteBuffers(1, &EBO);
 	}
 
-private:
 	/*  Render data  */
 	unsigned int VBO, EBO;
 
@@ -85,6 +105,9 @@ private:
 	// initializes all the buffer objects/arrays
 	void setupMesh()
 	{
+		if (init)
+			clear();
+		
 		// create buffers/arrays
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);
@@ -111,6 +134,7 @@ private:
 		// vertex Texture0 coords
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
 		// vertex tangent
 		glEnableVertexAttribArray(3);
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
@@ -122,7 +146,18 @@ private:
 		glEnableVertexAttribArray(5);
 		glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords2));
 
+		if (isDisplacement)
+		{
+			glEnableVertexAttribArray(6);
+			glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Blend));
+
+			glBindVertexArray(0);
+			init = true;
+			return;
+		}
+
 		glBindVertexArray(0);
+		init = true;
 	}
 
 };

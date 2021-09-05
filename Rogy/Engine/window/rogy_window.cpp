@@ -26,14 +26,13 @@ bool RWindow::StartWindow(int SCR_weight,int SCR_height, int Major, int Minor)
 		getchar();
 		return false;
 	}
-	
 	glfwWindowHint(GLFW_SAMPLES, 0);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Major);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Minor);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // fix compilation on OS X
 #endif
 
 	active = true;
@@ -65,6 +64,17 @@ bool RWindow::StartWindow(int SCR_weight,int SCR_height, int Major, int Minor)
 	std::printf("GL Renderer   : %s\n", glGetString(GL_RENDERER));
 	std::printf("GL Version    : %s\n", glGetString(GL_VERSION));
 	std::printf("GLSL Version  : %s\n\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	
+	// Make sure OpenGL version 4.5 API is available
+	if (!GLEW_VERSION_4_5) {
+		 std::cout << "OpenGL 4.5 API is not available.\n";
+	}
+
+	// Enable any OpenGL features we want to use
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_MULTISAMPLE);
 
 	return true;
 }
@@ -83,7 +93,9 @@ void RWindow::SetWindowIcon(const char* path)
 	{
 		GLFWimage WindowIcon;
 		WindowIcon.pixels = data;
-		//glfwSetWindowIcon(window, 1, &WindowIcon);
+		WindowIcon.width = width;
+		WindowIcon.width = height;
+	//	glfwSetWindowIcon(window, 1, &WindowIcon);
 	}
 	else
 	{

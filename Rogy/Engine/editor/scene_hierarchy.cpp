@@ -10,6 +10,12 @@ Scene_hierarchy::~Scene_hierarchy()
 {
 }
 
+void Scene_hierarchy::SetSelection(EnttID eid)
+{
+	sel_entt.clear();
+	sel_entt.push_back(eid);
+}
+
 bool Scene_hierarchy::Empty()
 {
 	return sel_entt.empty();

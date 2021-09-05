@@ -94,7 +94,9 @@ void Renderer::Initialize(int weight, int height, GLFWwindow* wind, ResourcesMan
 	// Initialize PBR Class
 	ibl.Init();
 	ibl.window = window;
-	SetEnv_SkyCapture("res/DaylightAmbientCubemap.HDR");
+	//SetEnv_SkyCapture("core\\textures\\bg.hdr");
+	SetEnv_SkyCapture("core\\textures\\background.jpg");
+	//SetEnv_SkyCapture("res/DaylightAmbientCubemap.HDR");
 	//SetEnv_SkyCapture("res/newport_loft.hdr");
 	//SetEnv_SkyCapture("res/hdr_bg.jpg");
 
@@ -108,6 +110,8 @@ void Renderer::Initialize(int weight, int height, GLFWwindow* wind, ResourcesMan
 	m_ShadowMapper.SetCascadesCount(m_ShadowMapper.SHADOW_MAP_CASCADE_COUNT);
 
 	m_cache.pbrShader = &materials.PbrShader;
+
+	//fplus_renderer.Initialize(weight, height);
 }
 // ------------------------------------------------------------------------
 void Renderer::SetEnv_SkyCapture(std::string path)
@@ -119,6 +123,7 @@ void Renderer::SetEnv_SkyCapture(std::string path)
 	ibl.DeleteCapture(m_SkyCapture);
 	glDeleteTextures(1, &envCubemap);
 	ibl.LoadHDR(SkyPath.c_str(), envCubemap);
+	ibl.LoadHDR("core\\textures\\clouds.jpg", skyClouds);
 	ibl.CreateCapture(envCubemap, m_SkyCapture);
 }
 // ------------------------------------------------------------------------
@@ -132,7 +137,9 @@ void Renderer::OnViewportResize(int pos, int top, int weight, int height)
 
 		postProc.Setup_PP = false;
 		MainCam.aspectRatio = (float)SCR_weight / (float)SCR_height;
+		entitySelectionBuffer.Generate(weight, height, true, false);
 		glViewport(left_scr_pos, top, SCR_weight, SCR_height);
+		//fplus_renderer.SetResolution(height, weight);
 	}
 }
 // ------------------------------------------------------------------------
@@ -147,9 +154,13 @@ void Renderer::RenderMesh(Mesh* mesh, Material* material, glm::mat4 transform)
 	mesh->Draw();
 }
 // ------------------------------------------------------------------------
-void Renderer::PushRender(Mesh* mesh, Material* material, glm::mat4 transform, BBox box, bool cast_shadows, glm::vec3 pos, bool is_static, std::string lmPath)
+void Renderer::PushRender(Mesh* mesh, Material* material, glm::mat4 transform, BBox box, bool cast_shadows, glm::vec3 pos, bool is_static, std::string lmPath, unsigned int entID)
 {
-	m_RenderBuffer.Push(mesh, material, transform, box, cast_shadows, pos, is_static, lmPath);
+	m_RenderBuffer.Push(mesh, material, transform, box, cast_shadows, pos, is_static, lmPath, entID);
+}
+void Renderer::PushCutoutRender(Mesh* mesh, Material* material, glm::mat4 transform, BBox box, bool cast_shadows, glm::vec3 pos, bool is_static, std::string lmPath, unsigned int entID)
+{
+	m_RenderBuffer.PushCutout(mesh, material, transform, box, cast_shadows, pos, is_static, lmPath, entID);
 }
 // ------------------------------------------------------------------------
 BillboardComponent* Renderer::CreateBillboard(EnttID ent)
@@ -195,7 +206,7 @@ void Renderer::AddBillbroadInfo(glm::vec3 pos, glm::vec2 size, const char* textu
 	if (!groupe_found)
 	{
 		BillboardInfo* bb = new BillboardInfo();
-		bb->texture = resManager->CreateTexture("bbtt", texture_path);
+		bb->texture = resManager->CreateTexture("bbtt", texture_path, true);
 		bb->positions.push_back(ABillboardState(pos, size, depth_test, color, tex_mask));
 		m_Billboards.push_back(bb);
 	}
@@ -264,11 +275,6 @@ SpotLight* Renderer::CreateSpotLight(EnttID ent_id)
 	//last_used_id++;
 	m_SpotLights.push_back(pl);
 
-	materials.PbrShader.use();
-	materials.PbrShader.setBool(("sp_lights[" + std::to_string(m_SpotLights.size() - 1) + "].use").c_str(), true);
-
-	materials.SkelShader.use();
-	materials.SkelShader.setBool(("sp_lights[" + std::to_string(m_SpotLights.size() - 1) + "].use").c_str(), true);
 	return pl;
 }
 // ------------------------------------------------------------------------
@@ -288,11 +294,7 @@ bool Renderer::RemoveSpotLight(EnttID ent_id)
 			SpotLight* sl = m_SpotLights[i];
 			m_SpotLights.erase(m_SpotLights.begin() + i);
 			delete sl;
-			materials.PbrShader.use();
-			materials.PbrShader.setBool(("sp_lights[" + std::to_string(m_SpotLights.size()) + "].use").c_str(), false);
 
-			materials.SkelShader.use();
-			materials.SkelShader.setBool(("sp_lights[" + std::to_string(m_SpotLights.size()) + "].use").c_str(), false);
 			return true;
 		}
 	}
@@ -318,12 +320,6 @@ PointLight* Renderer::CreatePointLight(EnttID ent_id)
 	//last_used_id++;
 	m_PointLights.push_back(pl);
 
-	materials.PbrShader.use();
-	materials.PbrShader.setBool(("p_lights[" + std::to_string(m_PointLights.size() - 1) + "].use").c_str(), true);
-
-	materials.SkelShader.use();
-	materials.SkelShader.setBool(("p_lights[" + std::to_string(m_PointLights.size() - 1) + "].use").c_str(), true);
-
 	return pl;
 }
 // ------------------------------------------------------------------------
@@ -341,11 +337,7 @@ bool Renderer::RemovePointLight(EnttID ent_id)
 			PointLight* pl = m_PointLights[i];
 			m_PointLights.erase(m_PointLights.begin() + i);
 			delete pl;
-			materials.PbrShader.use();
-			materials.PbrShader.setBool(("p_lights[" + std::to_string(m_PointLights.size()) + "].use").c_str(), false);
-
-			materials.SkelShader.use();
-			materials.SkelShader.setBool(("p_lights[" + std::to_string(m_PointLights.size()) + "].use").c_str(), false);
+		
 			return true;
 		}
 	}
@@ -483,6 +475,13 @@ void Renderer::UpdateGameCamera()
 	}
 }
 // ------------------------------------------------------------------------
+void Renderer::UpdateCamera()
+{
+	// Update Camera
+	// -------------------------------------------
+	MainCam.ComputeMatrices();
+}
+// ------------------------------------------------------------------------
 void Renderer::RenderGrass(Camera & cam, float dt)
 {
 	mGrass.ClearRemovedComponents();
@@ -541,10 +540,6 @@ void Renderer::RenderFrame(float dt)
 		SetEnv_SkyCapture(new_skyPath);
 	}
 
-	// Update Camera
-	// -------------------------------------------
-	MainCam.ComputeMatrices();
-
 	// Bake Lighting if requested last frame.
 	// -------------------------------------------
 	if (BakeLighting)
@@ -552,7 +547,7 @@ void Renderer::RenderFrame(float dt)
 		BakeLighting = false;
 		bakingSucceed = BakeSceneLightmaps();
 	}
-
+	MainCam.ComputeMatrices();
 	// Update reflection probes
 	// -------------------------------------------
 	UpdateReflectionProbes();
@@ -629,15 +624,253 @@ void Renderer::ReIndexSpotLightsShadowMaps()
 	}
 }
 // ------------------------------------------------------------------------
+void Renderer::RenderDisplacements()
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if (mDisplacements.Empty()) return;
+
+	glm::mat4 proj = MainCam.GetProjectionMatrix();
+	glm::mat4 view = MainCam.GetViewMatrix();
+	glm::vec3 viewPos = MainCam.transform.Position;
+
+	Shader* pbrShader = &materials.PbrShader2;
+	pbrShader->use();
+	pbrShader->SetMat4("projection", proj);
+	pbrShader->SetMat4("view", view);
+	pbrShader->SetVec3("CamPos", viewPos);
+	pbrShader->SetFloat("ao", 1.0f);
+
+	// Send Directional Light informations to shader
+	// -----------------------------------------------------------------
+	if (m_DirectionalLight != nullptr)
+	{
+		if (m_DirectionalLight->Active)
+		{
+			pbrShader->setBool("dirLight.cast_shadows", m_DirectionalLight->CastShadows);
+			if (m_DirectionalLight->CastShadows)
+			{
+				for (size_t i = 0; i < m_ShadowMapper.cascades.size(); i++)
+				{
+					pbrShader->SetMat4(("gLightWVP[" + std::to_string(i) + "]").c_str(), m_ShadowMapper.cascades[i].LightViewProjection);
+					pbrShader->SetFloat(("CascadeEndClipSpace[" + std::to_string(i) + "]").c_str(), m_ShadowMapper.cascades[i].cascadeSplitFar);
+				}
+			}
+			pbrShader->SetVec3("dirLight.direction", m_DirectionalLight->Direction);
+			pbrShader->SetFloat("dirLight.intensity", m_DirectionalLight->Intensity);
+			pbrShader->SetVec3("dirLight.color", m_DirectionalLight->Color);
+			pbrShader->setBool("dirLight.soft_shadows", m_DirectionalLight->Soft);
+			pbrShader->SetFloat("dirLight.Bias", m_DirectionalLight->Bias);
+		}
+		pbrShader->SetFloat("dirLight.use", m_DirectionalLight->Active);
+	}
+	int visibe_lights_index = 0;
+
+	// Send Point Lights informations to shader
+	// -----------------------------------------------------------------
+	/*for (unsigned int i = 0; i < MAX_LIGHT_COUNT; i++)
+	{
+		if (m_PointLights.empty())
+			break;
+		if ((m_PointLights.size() - 1) >= i)
+		{
+			if (m_PointLights[i]->removed)
+			{
+				RemovePointLight(m_PointLights[i]->light_id);
+				continue;
+			}
+			if (m_PointLights[i]->isActive())
+			{
+				m_PointLights[i]->inFrustum = frustum.sphereInFrustum(m_PointLights[i]->Position, m_PointLights[i]->Raduis);
+
+				if (m_PointLights[i]->inFrustum) {
+
+					pbrShader->setInt(("visible_pLights[" + std::to_string(visibe_lights_index) + "]").c_str(), i);
+					visibe_lights_index++;
+
+					pbrShader->SetVec4(("p_lights[" + std::to_string(i) + "].position").c_str(), glm::vec4(m_PointLights[i]->Position, m_PointLights[i]->Raduis));
+					pbrShader->SetVec4(("p_lights[" + std::to_string(i) + "].color").c_str(), glm::vec4(m_PointLights[i]->Color, m_PointLights[i]->Intensity));
+					pbrShader->SetFloat(("p_lights[" + std::to_string(i) + "].cast_shadows").c_str(), m_PointLights[i]->CastShadows);
+
+					if (m_PointLights[i]->CastShadows) {
+						pbrShader->SetFloat(("p_lights[" + std::to_string(i) + "].Bias").c_str(), m_PointLights[i]->Bias);
+						pbrShader->setInt(("p_lights[" + std::to_string(i) + "].shadow_index").c_str(), m_PointLights[i]->shadow_index);
+					}
+				}
+			}
+		}
+		else
+			break;
+	}
+
+	if (visibe_lights_index < MAX_LIGHT_COUNT)
+		pbrShader->setInt(("visible_pLights[" + std::to_string(visibe_lights_index) + "]").c_str(), -1);
+
+	visibe_lights_index = 0;
+
+	// Send Spot Lights informations to shader
+	// -----------------------------------------------------------------
+	for (unsigned int i = 0; i < MAX_LIGHT_COUNT; i++)
+	{
+		if (m_SpotLights.empty())
+			break;
+		if ((m_SpotLights.size() - 1) >= i)
+		{
+			if (m_SpotLights[i]->removed)
+			{
+				RemoveSpotLight(m_SpotLights[i]->light_id);
+				continue;
+			}
+			if (m_SpotLights[i]->isActive())
+			{
+				m_SpotLights[i]->inFrustum = frustum.sphereInFrustum(m_SpotLights[i]->Position, m_SpotLights[i]->Raduis);
+				if (m_SpotLights[i]->inFrustum) {
+
+					pbrShader->setInt(("visible_sLights[" + std::to_string(visibe_lights_index) + "]").c_str(), i);
+					visibe_lights_index++;
+
+					pbrShader->SetVec4(("sp_lights[" + std::to_string(i) + "].direction").c_str(), glm::vec4(m_SpotLights[i]->Direction, m_SpotLights[i]->CutOff));
+					pbrShader->SetVec4(("sp_lights[" + std::to_string(i) + "].position").c_str(), glm::vec4(m_SpotLights[i]->Position, m_SpotLights[i]->Raduis));
+					pbrShader->SetVec4(("sp_lights[" + std::to_string(i) + "].color").c_str(), glm::vec4(m_SpotLights[i]->Color, m_SpotLights[i]->Intensity));
+					pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].outerCutOff").c_str(), glm::cos(glm::radians(m_SpotLights[i]->CutOff + m_SpotLights[i]->OuterCutOff)));
+
+					pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].cast_shadows").c_str(), m_SpotLights[i]->CastShadows);
+					pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].Bias").c_str(), m_SpotLights[i]->Bias);
+					pbrShader->setInt(("sp_lights[" + std::to_string(i) + "].shadow_index").c_str(), m_SpotLights[i]->shadow_index);
+				}
+			}
+		}
+		else
+			break;
+	}
+	if (visibe_lights_index < MAX_LIGHT_COUNT)
+		pbrShader->setInt(("visible_sLights[" + std::to_string(visibe_lights_index) + "]").c_str(), -1);*/
+
+	// Set Fog config
+	// -----------------------------------------------------------------
+	pbrShader->setBool("Fog.use", usefog);
+	if (usefog)
+	{
+		pbrShader->SetVec3("Fog.color", fogColor);
+		pbrShader->SetFloat("Fog.far", fogFar);
+		pbrShader->SetFloat("Fog.near", fogNear);
+	}
+	// Send PBR environments maps
+	// -----------------------------------------------------------------
+	m_cache.BindTexture(TEX_IRRADIANCE_MAP, m_SkyCapture.Irradiance);
+	m_cache.BindTexture(TEX_PREFILTER_MAP, m_SkyCapture.Prefiltered);
+
+	// Send Shadow Maps
+	// -----------------------------------------------------------------
+	if (m_DirectionalLight != nullptr && m_DirectionalLight->Active && m_DirectionalLight->CastShadows)
+	{
+		for (size_t i = 0; i < m_ShadowMapper.cascades.size(); i++)
+		{
+			BindTexture(TEX_SHADOWMAP_1 + i, m_ShadowMapper.cascades[i].depthMap);
+		}
+	}
+	/*if (!m_PointLights.empty())
+	{
+		for (size_t i = 0; i < m_PointShadowMapper.shadowMaps.size(); i++)
+		{
+			BindTexture(TEX_CUBE_SHADOWMAP + i, m_PointShadowMapper.GetShadowMap(i), true);
+		}
+	}
+	if (!m_SpotLights.empty() && !m_SpotShadowMapper.shadowMaps.empty())
+	{
+		for (size_t i = 0; i < m_SpotShadowMapper.shadowMaps.size(); i++)
+		{
+			pbrShader->SetMat4(("spot_MVP[" + std::to_string(i) + "]").c_str(), m_SpotShadowMapper.shadowMaps[i]->MVP);
+			BindTexture(TEX_CUBE_SHADOWMAP + 8 + i, m_SpotShadowMapper.GetShadowMap(i));
+		}
+	}
+	*/
+	// Draw
+	// -------------------------------------------------------
+	std::vector<Displacement*> Disps = mDisplacements.GetComponents();
+	for (size_t i = 0; i < Disps.size(); i++)
+	{
+		BindMaterial(pbrShader, Disps[i]->mat0, true);
+		//if(Disps[i]->mat1->tex_albedo != nullptr)
+		//	m_cache.BindTexEmmi(Disps[i]->mat1->tex_albedo->getTexID());
+		pbrShader->SetMat4("model", Disps[i]->model);
+		Disps[i]->Render();
+	}
+}
+// ------------------------------------------------------------------------
 void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuffer, int resolu)
 {
 	glm::mat4 proj = cam.GetProjectionMatrix();
 	glm::mat4 view = cam.GetViewMatrix();
 	glm::vec3 viewPos = cam.transform.Position;
-
+	
 	UpdateSkeletons(delTime);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//glViewport(0, 0, SCR_weight, SCR_height);
+
+	/*fplus_renderer.UpdateLights(m_PointLights);
+	fplus_renderer.DepthPass(cam);
+	//fplus_renderer.depthdebugShader.SetFloat("far", MainCam.FarView);
+	//fplus_renderer.depthdebugShader.SetFloat("near", MainCam.NearView);
+	for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(fplus_renderer.depthShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(m_RenderBuffer.OpaqueRenderCommands[i].Transform));
+		m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
+	}
+	fplus_renderer.LightCullingPass(cam);
+
+	if (!cam.temp_cam) postProc.Bind();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	*/
+	/*glViewport(0, 0, SCR_weight, SCR_height);
+	fplus_renderer.UpdateLights(m_PointLights);
+	fplus_renderer.DepthPass(cam);
+	for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
+	{
+		if (m_RenderBuffer.OpaqueRenderCommands[i].Material == nullptr)  continue;
+		fplus_renderer.SetModel(m_RenderBuffer.OpaqueRenderCommands[i].Transform);
+		m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
+	}
+	fplus_renderer.LightCullingPass(cam);
+	glViewport(left_scr_pos, 0, SCR_weight, SCR_height);
+	fplus_renderer.debugShader.use();
+	fplus_renderer.debugShader.setInt("numberOfTilesX", fplus_renderer.workGroupsX);
+	fplus_renderer.debugShader.setInt("totalLightCount", fplus_renderer.NUM_LIGHTS);
+	glUniformMatrix4fv(glGetUniformLocation(fplus_renderer.debugShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(cam.GetProjectionMatrix()));
+	glUniformMatrix4fv(glGetUniformLocation(fplus_renderer.debugShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(cam.GetViewMatrix()));
+	glUniform3fv(glGetUniformLocation(fplus_renderer.debugShader.Program, "viewPosition"), 1, &cam.transform.Position[0]);
+	//std::cout << cam.transform.Position.x << " " << cam.transform.Position.y << " " << cam.transform.Position.z << "\n";
+	for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(fplus_renderer.debugShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(m_RenderBuffer.OpaqueRenderCommands[i].Transform));
+		m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
+	}
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
+
+	m_RenderBuffer.Clear();
+
+	MainCam.FarView = 50;
+	postProc.mm = fplus_renderer.depthMap;
+	return;
+	*/
+
+	/*glViewport(0, 0, SCR_weight, SCR_height);
+	fplus_renderer.UpdateLights(m_PointLights);
+	glBindFramebuffer(GL_FRAMEBUFFER, fplus_renderer.depthMapFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	materials.DepthShader.use();
+	materials.DepthShader.SetMat4("lightSpaceMatrix", cam.GetProjectionMatrix() *cam.GetViewMatrix());
+
+	for (size_t j = 0; j < m_RenderBuffer.OpaqueRenderCommands.size(); j++)
+	{
+		materials.DepthShader.SetMat4("model", m_RenderBuffer.OpaqueRenderCommands[j].Transform);
+		m_RenderBuffer.OpaqueRenderCommands[j].Mesh->Draw();
+	}*/
 
 	// SSAO Post Process
 	// -----------------------------------------------------------------
@@ -648,23 +881,25 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 		postProc.gBuffer.Bind();
 		materials.ShaderGeometryPass.use();
 		materials.ShaderGeometryPass.SetMat4("projection", proj);
-		materials.ShaderGeometryPass.SetMat4("view", view);
-		materials.ShaderGeometryPass.setInt("invertedNormals", 0);
+		materials.ShaderGeometryPass.SetMat4("view", view);		
 
-		for (size_t i = 0; i < m_RenderBuffer.ForwardRenderCommands.size(); i++)
+		for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
 		{
-			if (m_RenderBuffer.ForwardRenderCommands[i].Material == nullptr)  continue;
-			materials.ShaderGeometryPass.SetMat4("model", m_RenderBuffer.ForwardRenderCommands[i].Transform);
-			m_RenderBuffer.ForwardRenderCommands[i].Mesh->Draw();
+			if (m_RenderBuffer.OpaqueRenderCommands[i].Material == nullptr)  continue;
+			materials.ShaderGeometryPass.SetMat4("model", m_RenderBuffer.OpaqueRenderCommands[i].Transform);
+			m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
 		}
 		//postProc.gBuffer.UnBind();
 
 		// generate SSAO texture
 		// ------------------------
 		postProc.ssaoEffect.Bind(proj);
-		BindTexture(0, postProc.gBuffer.gPosition);
-		BindTexture(1, postProc.gBuffer.gNormal);
-		BindTexture(2, postProc.ssaoEffect.noiseTexture);
+		/*postProc.ssaoEffect.shaderSSAO->setInt("gDepthMap", 4);
+		postProc.ssaoEffect.shaderSSAO->SetMat4("invProj", glm::inverse(cam.GetProjectionMatrix()));
+		BindTexture(4, fplus_renderer.depthMap);*/
+		BindTexture(5, postProc.gBuffer.gPosition);
+		BindTexture(6, postProc.gBuffer.gNormal);
+		BindTexture(7, postProc.ssaoEffect.noiseTexture);
 		renderQuad();
 		//postProc.ssaoEffect.UnBind();
 
@@ -688,33 +923,49 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 
 		//postProc.ssaoEffect.Blur();
 		//renderQuad();
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 	// Check if We have enough render commands to draw
 	// -----------------------------------------------------------------
-	//if (m_RenderBuffer.ForwardRenderCommands.size() > 0)
+	//if (m_RenderBuffer.OpaqueRenderCommands.size() > 0)
 	//{
-		// Directional Light Shadows Mapping (Cascaded Shadow Mapping)
-		// -----------------------------------------------------------------
+	glActiveTexture(GL_TEXTURE0);
+	// Directional Light Shadows Mapping (Cascaded Shadow Mapping)
+	// -----------------------------------------------------------------
 	if (m_DirectionalLight != nullptr && m_DirectionalLight->Active && m_DirectionalLight->CastShadows)
 	{
 		m_ShadowMapper.CalcOrthoProjs(&cam, m_DirectionalLight);
-
+		
 		for (size_t i = 0; i < m_ShadowMapper.cascades.size(); i++)
 		{
 			frustum.Update(m_ShadowMapper.cascades[i].LightViewProjection);
 			m_ShadowMapper.Bind(i);
 			materials.DepthShader.use();
 			materials.DepthShader.SetMat4("lightSpaceMatrix", m_ShadowMapper.cascades[i].LightViewProjection);
-			for (size_t i = 0; i < m_RenderBuffer.ForwardRenderCommands.size(); i++)
+			for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
 			{
-				if (static_only && !m_RenderBuffer.ForwardRenderCommands[i].is_static) continue;
-				if (!m_RenderBuffer.ForwardRenderCommands[i].cast_shadows) continue;
-				if (!frustum.IsBoxVisible(m_RenderBuffer.ForwardRenderCommands[i].bbox.BoxMin, m_RenderBuffer.ForwardRenderCommands[i].bbox.BoxMax)) continue;
+				if (static_only && !m_RenderBuffer.OpaqueRenderCommands[i].is_static) continue;
+				if (!m_RenderBuffer.OpaqueRenderCommands[i].cast_shadows) continue;
+				if (!frustum.IsBoxVisible(m_RenderBuffer.OpaqueRenderCommands[i].bbox.BoxMin, m_RenderBuffer.OpaqueRenderCommands[i].bbox.BoxMax)) continue;
 
-				materials.DepthShader.SetMat4("model", m_RenderBuffer.ForwardRenderCommands[i].Transform);
-				m_RenderBuffer.ForwardRenderCommands[i].Mesh->Draw();
+				materials.DepthShader.SetMat4("model", m_RenderBuffer.OpaqueRenderCommands[i].Transform);
+				m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
 			}
+			materials.DepthShader.setBool("use_alpha", true);
+			for (size_t i = 0; i < m_RenderBuffer.CutoutRenderCommands.size(); i++)
+			{
+				if (static_only && !m_RenderBuffer.CutoutRenderCommands[i].is_static) continue;
+				if (!m_RenderBuffer.CutoutRenderCommands[i].cast_shadows) continue;
+				if (!frustum.IsBoxVisible(m_RenderBuffer.CutoutRenderCommands[i].bbox.BoxMin, m_RenderBuffer.OpaqueRenderCommands[i].bbox.BoxMax)) continue;
+
+				if(m_RenderBuffer.CutoutRenderCommands[i].Material->tex_emission != nullptr)
+					m_RenderBuffer.CutoutRenderCommands[i].Material->tex_emission->useTexture();
+
+				materials.DepthShader.SetMat4("model", m_RenderBuffer.CutoutRenderCommands[i].Transform);
+				m_RenderBuffer.CutoutRenderCommands[i].Mesh->Draw();
+			}
+			materials.DepthShader.setBool("use_alpha", false);
+
 			materials.DepthShader_sk.use();
 			materials.DepthShader_sk.SetMat4("lightSpaceMatrix", m_ShadowMapper.cascades[i].LightViewProjection);
 			auto anims = m_skMeshs.GetComponents();
@@ -750,7 +1001,7 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 			if (m_PointLights[i]->CastShadows == true && m_PointLights[i]->shadow_index != -1)
 			{
 				m_PointLights[i]->visible = m_PointLights[i]->inFrustum;//frustum.sphereInFrustum(m_PointLights[i]->Position, m_PointLights[i]->Raduis);
-				if (!m_PointLights[i]->visible)
+				if (!m_PointLights[i]->visible || !m_PointLights[i]->isActive())
 				{
 					not_visible.push_back(i);
 					continue;
@@ -766,15 +1017,15 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 				// --------------------------------
 				m_PointShadowMapper.Bind(materials.PointDepthShader, m_PointLights[i]->shadow_index, m_PointLights[i]->Position, m_PointLights[i]->Raduis);
 
-				for (size_t j = 0; j < m_RenderBuffer.ForwardRenderCommands.size(); j++)
+				for (size_t j = 0; j < m_RenderBuffer.OpaqueRenderCommands.size(); j++)
 				{
-					if (!m_RenderBuffer.ForwardRenderCommands[j].cast_shadows) continue;
-					if (static_only && !m_RenderBuffer.ForwardRenderCommands[j].is_static) continue;
-					//if (Check2BallsIntersect(m_PointLights[i]->Position, m_PointLights[i]->Raduis, m_RenderBuffer.ForwardRenderCommands[j].position, m_RenderBuffer.ForwardRenderCommands[j].bbox.radius))
+					if (!m_RenderBuffer.OpaqueRenderCommands[j].cast_shadows) continue;
+					if (static_only && !m_RenderBuffer.OpaqueRenderCommands[j].is_static) continue;
+					//if (Check2BallsIntersect(m_PointLights[i]->Position, m_PointLights[i]->Raduis, m_RenderBuffer.OpaqueRenderCommands[j].position, m_RenderBuffer.OpaqueRenderCommands[j].bbox.radius))
 					//	continue;
 
-					materials.PointDepthShader.SetMat4("model", m_RenderBuffer.ForwardRenderCommands[j].Transform);
-					m_RenderBuffer.ForwardRenderCommands[j].Mesh->Draw();
+					materials.PointDepthShader.SetMat4("model", m_RenderBuffer.OpaqueRenderCommands[j].Transform);
+					m_RenderBuffer.OpaqueRenderCommands[j].Mesh->Draw();
 				}
 				m_PointShadowMapper.Unbind();
 				if (cam.temp_cam)
@@ -824,7 +1075,7 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 			if (!m_SpotLights[i]->removed && m_SpotLights[i]->CastShadows == true && m_SpotLights[i]->shadow_index != -1)
 			{
 				m_SpotLights[i]->visible = m_SpotLights[i]->inFrustum;//frustum.sphereInFrustum(m_SpotLights[i]->Position, m_SpotLights[i]->Raduis);
-				if (!m_SpotLights[i]->visible)
+				if (!m_SpotLights[i]->visible || !m_SpotLights[i]->isActive())
 				{
 					not_visible.push_back(i);
 					continue;
@@ -844,13 +1095,13 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 				materials.DepthShader.use();
 				materials.DepthShader.SetMat4("lightSpaceMatrix", mats);
 
-				for (size_t j = 0; j < m_RenderBuffer.ForwardRenderCommands.size(); j++)
+				for (size_t j = 0; j < m_RenderBuffer.OpaqueRenderCommands.size(); j++)
 				{
-					if (!m_RenderBuffer.ForwardRenderCommands[j].cast_shadows) continue;
-					if (!fr.IsBoxVisible(m_RenderBuffer.ForwardRenderCommands[j].bbox.BoxMin, m_RenderBuffer.ForwardRenderCommands[j].bbox.BoxMax)) continue;
+					if (!m_RenderBuffer.OpaqueRenderCommands[j].cast_shadows) continue;
+					if (!fr.IsBoxVisible(m_RenderBuffer.OpaqueRenderCommands[j].bbox.BoxMin, m_RenderBuffer.OpaqueRenderCommands[j].bbox.BoxMax)) continue;
 
-					materials.DepthShader.SetMat4("model", m_RenderBuffer.ForwardRenderCommands[j].Transform);
-					m_RenderBuffer.ForwardRenderCommands[j].Mesh->Draw();
+					materials.DepthShader.SetMat4("model", m_RenderBuffer.OpaqueRenderCommands[j].Transform);
+					m_RenderBuffer.OpaqueRenderCommands[j].Mesh->Draw();
 				}
 
 				materials.DepthShader_sk.use();
@@ -922,6 +1173,9 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 
 	// Final Render Pass
 	// -----------------------------------------------------------------
+	
+	//fplus_renderer.LightCullingPass(cam);
+
 	// Bind Post Proccessing if used
 	if (!cam.temp_cam) postProc.Bind();
 
@@ -957,6 +1211,7 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 			pbrShader->SetFloat("dirLight.Bias", m_DirectionalLight->Bias);
 		}
 	}
+	int visibe_lights_index = 0;
 
 	// Send Point Lights informations to shader
 	// -----------------------------------------------------------------
@@ -971,19 +1226,34 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 				RemovePointLight(m_PointLights[i]->light_id);
 				continue;
 			}
-			m_PointLights[i]->inFrustum = frustum.sphereInFrustum(m_PointLights[i]->Position, m_PointLights[i]->Raduis);
-			pbrShader->SetVec3(("p_lights[" + std::to_string(i) + "].position").c_str(), m_PointLights[i]->Position);
-			pbrShader->SetVec3(("p_lights[" + std::to_string(i) + "].color").c_str(), m_PointLights[i]->Color);
-			pbrShader->SetFloat(("p_lights[" + std::to_string(i) + "].intensity").c_str(), m_PointLights[i]->Intensity);
-			pbrShader->SetFloat(("p_lights[" + std::to_string(i) + "].raduis").c_str(), m_PointLights[i]->Raduis);
-			pbrShader->SetFloat(("p_lights[" + std::to_string(i) + "].cast_shadows").c_str(), m_PointLights[i]->CastShadows);
-			pbrShader->SetFloat(("p_lights[" + std::to_string(i) + "].Bias").c_str(), m_PointLights[i]->Bias);
-			pbrShader->setInt(("p_lights[" + std::to_string(i) + "].shadow_index").c_str(), m_PointLights[i]->shadow_index);
-			pbrShader->setBool(("p_lights[" + std::to_string(i) + "].offscreen").c_str(), !m_PointLights[i]->inFrustum);
+			if (m_PointLights[i]->isActive())
+			{
+				m_PointLights[i]->inFrustum = frustum.sphereInFrustum(m_PointLights[i]->Position, m_PointLights[i]->Raduis);
+				
+				if (m_PointLights[i]->inFrustum) {
+
+					pbrShader->setInt(("visible_pLights[" + std::to_string(visibe_lights_index) + "]").c_str(), i);
+					visibe_lights_index++;
+
+					pbrShader->SetVec4(("p_lights[" + std::to_string(i) + "].position").c_str(), glm::vec4(m_PointLights[i]->Position, m_PointLights[i]->Raduis));
+					pbrShader->SetVec4(("p_lights[" + std::to_string(i) + "].color").c_str(), glm::vec4(m_PointLights[i]->Color, m_PointLights[i]->Intensity));
+					pbrShader->SetFloat(("p_lights[" + std::to_string(i) + "].cast_shadows").c_str(), m_PointLights[i]->CastShadows);
+
+					if (m_PointLights[i]->CastShadows) {
+						pbrShader->SetFloat(("p_lights[" + std::to_string(i) + "].Bias").c_str(), m_PointLights[i]->Bias);
+						pbrShader->setInt(("p_lights[" + std::to_string(i) + "].shadow_index").c_str(), m_PointLights[i]->shadow_index);
+					}
+				}
+			}
 		}
 		else
 			break;
 	}
+
+	if(visibe_lights_index < MAX_LIGHT_COUNT)
+		pbrShader->setInt(("visible_pLights[" + std::to_string(visibe_lights_index) + "]").c_str(), -1);
+
+	visibe_lights_index = 0;
 
 	// Send Spot Lights informations to shader
 	// -----------------------------------------------------------------
@@ -998,22 +1268,31 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 				RemoveSpotLight(m_SpotLights[i]->light_id);
 				continue;
 			}
-			m_SpotLights[i]->inFrustum = frustum.sphereInFrustum(m_SpotLights[i]->Position, m_SpotLights[i]->Raduis);
-			pbrShader->SetVec3(("sp_lights[" + std::to_string(i) + "].direction").c_str(), m_SpotLights[i]->Direction);
-			pbrShader->SetVec3(("sp_lights[" + std::to_string(i) + "].position").c_str(), m_SpotLights[i]->Position);
-			pbrShader->SetVec3(("sp_lights[" + std::to_string(i) + "].color").c_str(), m_SpotLights[i]->Color);
-			pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].intensity").c_str(), m_SpotLights[i]->Intensity);
-			pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].raduis").c_str(), m_SpotLights[i]->Raduis);
-			pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].cutOff").c_str(), glm::cos(glm::radians(m_SpotLights[i]->CutOff)));
-			pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].outerCutOff").c_str(), glm::cos(glm::radians(m_SpotLights[i]->CutOff + m_SpotLights[i]->OuterCutOff)));
-			pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].cast_shadows").c_str(), m_SpotLights[i]->CastShadows);
-			pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].Bias").c_str(), m_SpotLights[i]->Bias);
-			pbrShader->setInt(("sp_lights[" + std::to_string(i) + "].shadow_index").c_str(), m_SpotLights[i]->shadow_index);
-			pbrShader->setBool(("sp_lights[" + std::to_string(i) + "].offscreen").c_str(), !m_SpotLights[i]->inFrustum);
+			if (m_SpotLights[i]->isActive())
+			{
+				m_SpotLights[i]->inFrustum = frustum.sphereInFrustum(m_SpotLights[i]->Position, m_SpotLights[i]->Raduis);
+				if (m_SpotLights[i]->inFrustum) {
+
+					pbrShader->setInt(("visible_sLights[" + std::to_string(visibe_lights_index) + "]").c_str(), i);
+					visibe_lights_index++;
+
+					pbrShader->SetVec4(("sp_lights[" + std::to_string(i) + "].direction").c_str(), glm::vec4(m_SpotLights[i]->Direction, m_SpotLights[i]->CutOff));
+					pbrShader->SetVec4(("sp_lights[" + std::to_string(i) + "].position").c_str(), glm::vec4(m_SpotLights[i]->Position, m_SpotLights[i]->Raduis));
+					pbrShader->SetVec4(("sp_lights[" + std::to_string(i) + "].color").c_str(), glm::vec4(m_SpotLights[i]->Color, m_SpotLights[i]->Intensity));
+					pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].outerCutOff").c_str(), glm::cos(glm::radians(m_SpotLights[i]->CutOff + m_SpotLights[i]->OuterCutOff)));
+
+					pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].cast_shadows").c_str(), m_SpotLights[i]->CastShadows);
+					pbrShader->SetFloat(("sp_lights[" + std::to_string(i) + "].Bias").c_str(), m_SpotLights[i]->Bias);
+					pbrShader->setInt(("sp_lights[" + std::to_string(i) + "].shadow_index").c_str(), m_SpotLights[i]->shadow_index);
+				}
+			}
 		}
 		else
 			break;
 	}
+	if (visibe_lights_index < MAX_LIGHT_COUNT)
+		pbrShader->setInt(("visible_sLights[" + std::to_string(visibe_lights_index) + "]").c_str(), -1);
+
 	for (size_t i = 0; i < m_ReflectionProbes.size(); i++)
 	{
 		if (m_ReflectionProbes[i]->removed)
@@ -1062,94 +1341,35 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 
 	// Render all pushed commands
 	// ----------------------------------------------------
-	for (size_t i = 0; i < m_RenderBuffer.ForwardRenderCommands.size(); i++)
+	for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
 	{
-		if (static_only && !m_RenderBuffer.ForwardRenderCommands[i].is_static)
-			continue;
-		if (m_RenderBuffer.ForwardRenderCommands[i].Material == nullptr)
-			continue;
-		// Frustum culling
-		if (!frustum.IsBoxVisible(m_RenderBuffer.ForwardRenderCommands[i].bbox.BoxMin, m_RenderBuffer.ForwardRenderCommands[i].bbox.BoxMax))
-			continue;
-		/*if (m_RenderBuffer.ForwardRenderCommands[i].bbox.useRaduis)
-		{
-			if (!frustum.sphereInFrustum(m_RenderBuffer.ForwardRenderCommands[i].position, m_RenderBuffer.ForwardRenderCommands[i].bbox.radius))
-				continue;
-		}
-		else if (!frustum.IsBoxVisible(m_RenderBuffer.ForwardRenderCommands[i].bbox.BoxMin, m_RenderBuffer.ForwardRenderCommands[i].bbox.BoxMax))
-			continue;*/
+		if (static_only && !m_RenderBuffer.OpaqueRenderCommands[i].is_static) continue;
+		if (m_RenderBuffer.OpaqueRenderCommands[i].Material == nullptr) continue;
 
-		if (m_RenderBuffer.ForwardRenderCommands[i].Material->isDefault)
+		// Frustum culling
+		// -------------------------------------------------------
+		if (!frustum.IsBoxVisible(m_RenderBuffer.OpaqueRenderCommands[i].bbox.BoxMin, m_RenderBuffer.OpaqueRenderCommands[i].bbox.BoxMax))
+			continue;
+
+		// Bind Material
+		// -------------------------------------------------------
+		if (m_RenderBuffer.OpaqueRenderCommands[i].Material->isDefault)
 			lastMaterial = "default-mat";
 
-		if (lastMaterial != m_RenderBuffer.ForwardRenderCommands[i].Material->name)
+		if (lastMaterial != m_RenderBuffer.OpaqueRenderCommands[i].Material->name)
 		{
-			pbrShader->SetVec2("tex_uv", m_RenderBuffer.ForwardRenderCommands[i].Material->uv);
-			// albedo map 
-			// -------------------------------------------------------
-			if (m_RenderBuffer.ForwardRenderCommands[i].Material->tex_albedo != nullptr)
-			{
-				pbrShader->setBool("use_tex_albedo", true);
-				m_cache.BindTexAlbedo(m_RenderBuffer.ForwardRenderCommands[i].Material->tex_albedo->getTexID());
-			}
-			else pbrShader->setBool("use_tex_albedo", false);
-
-			// metalic map 
-			// -------------------------------------------------------
-			if (m_RenderBuffer.ForwardRenderCommands[i].Material->tex_metal != nullptr)
-			{
-				pbrShader->setBool("use_tex_metal", true);
-				m_cache.BindTexMetal(m_RenderBuffer.ForwardRenderCommands[i].Material->tex_metal->getTexID());
-			}
-			else pbrShader->setBool("use_tex_metal", false);
-			// roughness map 
-			// -------------------------------------------------------
-			if (m_RenderBuffer.ForwardRenderCommands[i].Material->tex_rough != nullptr)
-			{
-				pbrShader->setBool("use_tex_rough", true);
-				m_cache.BindTexRough(m_RenderBuffer.ForwardRenderCommands[i].Material->tex_rough->getTexID());
-			}
-			else pbrShader->setBool("use_tex_rough", false);
-
-			// normal map 
-			// -------------------------------------------------------
-			if (m_RenderBuffer.ForwardRenderCommands[i].Material->tex_normal != nullptr)
-			{
-				pbrShader->setBool("use_tex_normal", true);
-				m_cache.BindTexNormal(m_RenderBuffer.ForwardRenderCommands[i].Material->tex_normal->getTexID());
-			}
-			else pbrShader->setBool("use_tex_normal", false);
-
-			// Emission 
-			// -------------------------------------------------------
-			if (m_RenderBuffer.ForwardRenderCommands[i].Material->use_emission)
-			{
-				pbrShader->setBool("use_emission", true);
-				pbrShader->SetVec3("emission", m_RenderBuffer.ForwardRenderCommands[i].Material->emission);
-				pbrShader->SetFloat("emission_power", m_RenderBuffer.ForwardRenderCommands[i].Material->emission_power);
-
-				if (m_RenderBuffer.ForwardRenderCommands[i].Material->tex_emission != nullptr)
-				{
-					pbrShader->setBool("use_tex_emission", true);
-					m_cache.BindTexEmmi(m_RenderBuffer.ForwardRenderCommands[i].Material->tex_emission->getTexID());
-				}
-				else pbrShader->setBool("use_tex_emission", false);
-			}
-			else pbrShader->setBool("use_emission", false);
-
-			m_RenderBuffer.ForwardRenderCommands[i].Material->setShader(pbrShader);
-			pbrShader->SetFloat("ao", m_RenderBuffer.ForwardRenderCommands[i].Material->ao * AmbientLevel);
-
-			lastMaterial = m_RenderBuffer.ForwardRenderCommands[i].Material->name;
+			BindMaterial(pbrShader, m_RenderBuffer.OpaqueRenderCommands[i].Material);
+			lastMaterial = m_RenderBuffer.OpaqueRenderCommands[i].Material->name;
 		}
 
 		// Check ReflectionProbe intersection
+		// -------------------------------------------------------
 		bool intersectionFound = false;
 		if (!cam.temp_cam)
 		{
 			for (size_t j = 0; j < m_ReflectionProbes.size(); j++)
 			{
-				if (m_ReflectionProbes[j]->GetBBox().Intersect(m_RenderBuffer.ForwardRenderCommands[i].bbox))
+				if (m_ReflectionProbes[j]->GetBBox().Intersect(m_RenderBuffer.OpaqueRenderCommands[i].bbox))
 				{
 					intersectionFound = true;
 					pbrShader->setBool("env_probe.use_parallax_correction", m_ReflectionProbes[j]->BoxProjection);
@@ -1170,23 +1390,106 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 		}
 		else pbrShader->setBool("env_probe.use_parallax_correction", false);
 
-		// Lightmap if availiable 
+		// Bind Lightmap if availiable 
 		// -------------------------------------------------------
-		if (m_RenderBuffer.ForwardRenderCommands[i].is_static && m_RenderBuffer.ForwardRenderCommands[i].lightmapPath != "")
+		if (m_RenderBuffer.OpaqueRenderCommands[i].is_static && m_RenderBuffer.OpaqueRenderCommands[i].lightmapPath != "")
 		{
 			pbrShader->setBool("use_lightmap", true);
 			glActiveTexture(GL_TEXTURE6);
-			Get_Lightmap(m_RenderBuffer.ForwardRenderCommands[i].lightmapPath)->useTexture();
+			Get_Lightmap(m_RenderBuffer.OpaqueRenderCommands[i].lightmapPath)->useTexture();
 		}
 		else pbrShader->setBool("use_lightmap", false);
 
-		pbrShader->SetMat4("model", m_RenderBuffer.ForwardRenderCommands[i].Transform);
-		m_RenderBuffer.ForwardRenderCommands[i].Mesh->Draw();
+		// Draw
+		// -------------------------------------------------------
+		pbrShader->SetMat4("model", m_RenderBuffer.OpaqueRenderCommands[i].Transform);
+		m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
 	}
+
+	if (!m_RenderBuffer.CutoutRenderCommands.empty())
+	{
+		pbrShader->setBool("use_alpha", true);
+		glDisable(GL_CULL_FACE);
+	}
+	for (size_t i = 0; i < m_RenderBuffer.CutoutRenderCommands.size(); i++)
+	{
+		if (static_only && !m_RenderBuffer.CutoutRenderCommands[i].is_static) continue;
+		if (m_RenderBuffer.CutoutRenderCommands[i].Material == nullptr) continue;
+
+		// Frustum culling
+		// -------------------------------------------------------
+		if (!frustum.IsBoxVisible(m_RenderBuffer.CutoutRenderCommands[i].bbox.BoxMin, m_RenderBuffer.CutoutRenderCommands[i].bbox.BoxMax))
+			continue;
+
+		// Bind Material
+		// -------------------------------------------------------
+		if (m_RenderBuffer.CutoutRenderCommands[i].Material->isDefault)
+			lastMaterial = "default-mat";
+
+		if (lastMaterial != m_RenderBuffer.CutoutRenderCommands[i].Material->name)
+		{
+			BindMaterial(pbrShader, m_RenderBuffer.CutoutRenderCommands[i].Material);
+			lastMaterial = m_RenderBuffer.CutoutRenderCommands[i].Material->name;
+		}
+
+		// Check ReflectionProbe intersection
+		// -------------------------------------------------------
+		bool intersectionFound = false;
+		if (!cam.temp_cam)
+		{
+			for (size_t j = 0; j < m_ReflectionProbes.size(); j++)
+			{
+				if (m_ReflectionProbes[j]->GetBBox().Intersect(m_RenderBuffer.CutoutRenderCommands[i].bbox))
+				{
+					intersectionFound = true;
+					pbrShader->setBool("env_probe.use_parallax_correction", m_ReflectionProbes[j]->BoxProjection);
+					pbrShader->SetVec3("env_probe.mRefPos", m_ReflectionProbes[j]->Position);
+					pbrShader->SetVec3("env_probe.mBoxMin", m_ReflectionProbes[j]->GetBBox().BoxMin);
+					pbrShader->SetVec3("env_probe.mBoxMax", m_ReflectionProbes[j]->GetBBox().BoxMax);
+					m_cache.BindTexture(TEX_IRRADIANCE_MAP, m_ReflectionProbes[j]->capture.Irradiance);
+					m_cache.BindTexture(TEX_PREFILTER_MAP, m_ReflectionProbes[j]->capture.Prefiltered);
+					break;
+				}
+			}
+			if (!intersectionFound)
+			{
+				pbrShader->setBool("env_probe.use_parallax_correction", false);
+				m_cache.BindTexture(TEX_IRRADIANCE_MAP, m_SkyCapture.Irradiance);
+				m_cache.BindTexture(TEX_PREFILTER_MAP, m_SkyCapture.Prefiltered);
+			}
+		}
+		else pbrShader->setBool("env_probe.use_parallax_correction", false);
+
+		// Bind Lightmap if availiable 
+		// -------------------------------------------------------
+		if (m_RenderBuffer.CutoutRenderCommands[i].is_static && m_RenderBuffer.CutoutRenderCommands[i].lightmapPath != "")
+		{
+			pbrShader->setBool("use_lightmap", true);
+			glActiveTexture(GL_TEXTURE6);
+			Get_Lightmap(m_RenderBuffer.CutoutRenderCommands[i].lightmapPath)->useTexture();
+		}
+		else pbrShader->setBool("use_lightmap", false);
+
+		// Draw
+		// -------------------------------------------------------
+		pbrShader->SetMat4("model", m_RenderBuffer.CutoutRenderCommands[i].Transform);
+		m_RenderBuffer.CutoutRenderCommands[i].Mesh->Draw();
+	}
+
+	if (!m_RenderBuffer.CutoutRenderCommands.empty())
+	{
+		pbrShader->setBool("use_alpha", false);
+		glEnable(GL_CULL_FACE);
+	}
+
 	if (!cam.temp_cam)
 		m_RenderBuffer.Clear();
-	//}
 
+	RenderDisplacements();
+
+	//}
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	// Skeletal meshes
 	//-----------------------------------------------------
 	RenderSkeletons(delTime);
@@ -1198,12 +1501,88 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 	bg->use();
 	bg->SetMat4("view", view);
 	bg->SetMat4("projection", proj);
+	if (m_DirectionalLight != nullptr)
+	{
+		bg->SetVec3("sun_direction", m_DirectionalLight->Direction);
+	}
 	m_cache.BindTexture(TEX_IRRADIANCE_MAP, envCubemap);
+
+	bg->SetFloat("UseClouds", UseClouds);
+	if(UseClouds)
+		m_cache.BindTexture(TEX_PREFILTER_MAP, skyClouds);
+
 	glDisable(GL_CULL_FACE);
 	renderCube();
 	glEnable(GL_CULL_FACE);
 	//renderSphere();
 	glDepthFunc(GL_LESS); // set depth function back to default
+}
+// ------------------------------------------------------------------------
+void Renderer::BindMaterial(Shader* pbrShader, Material* mat, bool isDisp)
+{
+	pbrShader->SetVec2("tex_uv", mat->uv);
+	// albedo map 
+	// -------------------------------------------------------
+	if (mat->tex_albedo != nullptr)
+	{
+		pbrShader->setBool("material.use_tex_albedo", true);
+		m_cache.BindTexAlbedo(mat->tex_albedo->getTexID());
+	}
+	else pbrShader->setBool("material.use_tex_albedo", false);
+
+	// metalic map 
+	// -------------------------------------------------------
+	if (mat->tex_metal != nullptr)
+	{
+		pbrShader->setBool("material.use_tex_metal", true);
+		m_cache.BindTexMetal(mat->tex_metal->getTexID());
+	}
+	else pbrShader->setBool("material.use_tex_metal", false);
+	// roughness map 
+	// -------------------------------------------------------
+	if (mat->tex_rough != nullptr)
+	{
+		pbrShader->setBool("material.use_tex_rough", true);
+		m_cache.BindTexRough(mat->tex_rough->getTexID());
+	}
+	else pbrShader->setBool("material.use_tex_rough", false);
+
+	// normal map 
+	// -------------------------------------------------------
+	if (mat->tex_normal != nullptr)
+	{
+		pbrShader->setBool("material.use_tex_normal", true);
+		m_cache.BindTexNormal(mat->tex_normal->getTexID());
+	}
+	else pbrShader->setBool("material.use_tex_normal", false);
+
+	// Emission 
+	// -------------------------------------------------------
+	if (mat->cutout || isDisp)
+	{
+		bool ht = (mat->tex_emission != nullptr);
+		pbrShader->setBool("material.use_emission", ht);
+		if (ht)
+			m_cache.BindTexEmmi(mat->tex_emission->getTexID());
+	}
+
+	if (!isDisp && mat->use_emission)
+	{
+		pbrShader->setBool("material.use_emission", true);
+		pbrShader->SetVec3("material.emission", mat->emission);
+		pbrShader->SetFloat("material.emission_power", mat->emission_power);
+
+		if (mat->tex_emission != nullptr)
+		{
+			pbrShader->setBool("material.use_tex_emission", true);
+			m_cache.BindTexEmmi(mat->tex_emission->getTexID());
+		}
+		else pbrShader->setBool("material.use_tex_emission", false);
+	}
+	else pbrShader->setBool("material.use_emission", false);
+
+	mat->setShader(pbrShader);
+	pbrShader->SetFloat("material.ao", mat->ao * AmbientLevel);
 }
 // ------------------------------------------------------------------------
 void Renderer::RenderSkeletons(float dt)
@@ -1349,80 +1728,98 @@ void Renderer::RenderSkeletons(float dt)
 	}
 
 	auto anims = m_skMeshs.GetComponents();
+
 	std::string lastMaterial = "";
 	for (size_t i = 0; i < anims.size(); i++)
 	{
-		SkeletalMeshComponent* c_anim = anims[i];
+		SkeletalMeshComponent* c_anim = anims[i]; //std::cout << "SkeletalMeshComponent \n";
 		if (!c_anim->enabled) continue;
 		if (c_anim->mesh == nullptr) continue;
-		if (c_anim->material == nullptr) continue;
-
-		if (lastMaterial != c_anim->material->name)
-		{
-			pbrShader->SetVec2("tex_uv", c_anim->material->uv);
-			// albedo map 
-			// -------------------------------------------------------
-			if (c_anim->material->tex_albedo != nullptr)
-			{
-				pbrShader->setBool("use_tex_albedo", true);
-				m_cache.BindTexAlbedo(c_anim->material->tex_albedo->getTexID());
-			}
-			else pbrShader->setBool("use_tex_albedo", false);
-
-			// metalic map 
-			// -------------------------------------------------------
-			if (c_anim->material->tex_metal != nullptr)
-			{
-				pbrShader->setBool("use_tex_metal", true);
-				m_cache.BindTexMetal(c_anim->material->tex_metal->getTexID());
-			}
-			else pbrShader->setBool("use_tex_metal", false);
-			// roughness map 
-			// -------------------------------------------------------
-			if (c_anim->material->tex_rough != nullptr)
-			{
-				pbrShader->setBool("use_tex_rough", true);
-				m_cache.BindTexRough(c_anim->material->tex_rough->getTexID());
-			}
-			else pbrShader->setBool("use_tex_rough", false);
-
-			// normal map 
-			// -------------------------------------------------------
-			if (c_anim->material->tex_normal != nullptr)
-			{
-				pbrShader->setBool("use_tex_normal", true);
-				m_cache.BindTexNormal(c_anim->material->tex_normal->getTexID());
-			}
-			else pbrShader->setBool("use_tex_normal", false);
-
-			// Emission 
-			// -------------------------------------------------------
-			if (c_anim->material->use_emission)
-			{
-				pbrShader->setBool("use_emission", true);
-				pbrShader->SetVec3("emission", c_anim->material->emission);
-				pbrShader->SetFloat("emission_power", c_anim->material->emission_power);
-
-				if (c_anim->material->tex_emission != nullptr)
-				{
-					pbrShader->setBool("use_tex_emission", true);
-					m_cache.BindTexEmmi(c_anim->material->tex_emission->getTexID());
-				}
-				else pbrShader->setBool("use_tex_emission", false);
-			}
-			else pbrShader->setBool("use_emission", false);
-
-			c_anim->material->setShader(pbrShader);
-			pbrShader->SetFloat("ao", c_anim->material->ao * AmbientLevel);
-
-			lastMaterial = c_anim->material->name;
-		}
+		if (c_anim->materials.empty()) continue;
+		
 		auto transforms = c_anim->animator.GetFinalBoneMatrices();
 		for (size_t i = 0; i < transforms.size(); ++i)
 			pbrShader->SetMat4(("finalBonesMatrices[" + std::to_string(i) + "]").c_str(), transforms[i]);
-
 		pbrShader->SetMat4("model", glm::scale(c_anim->transform, glm::vec3(c_anim->scale)));
-		c_anim->Draw();
+
+		for (size_t j = 0; j < c_anim->mesh->meshes.size(); j++)
+		{
+			if (c_anim->isMeshSkiped(j)) continue;
+			size_t indx = 0;
+			if (j < c_anim->materials.size()) indx = j;
+			Material* tmat = c_anim->materials[indx];
+			if (lastMaterial != tmat->name)
+			{
+				pbrShader->SetVec3("albedo", tmat->albedo);
+				pbrShader->SetFloat("roughness", tmat->roughness);
+				pbrShader->SetFloat("metallic", tmat->metallic);
+
+				pbrShader->SetVec2("tex_uv", tmat->uv);
+				// albedo map 
+				// -------------------------------------------------------
+				if (tmat->tex_albedo != nullptr)
+				{
+					pbrShader->setBool("use_tex_albedo", true);
+					m_cache.BindTexAlbedo(tmat->tex_albedo->getTexID());
+				}
+				else pbrShader->setBool("use_tex_albedo", false);
+
+				// metalic map 
+				// -------------------------------------------------------
+				if (tmat->tex_metal != nullptr)
+				{
+					pbrShader->setBool("use_tex_metal", true);
+					m_cache.BindTexMetal(tmat->tex_metal->getTexID());
+				}
+				else pbrShader->setBool("use_tex_metal", false);
+				// roughness map 
+				// -------------------------------------------------------
+				if (tmat->tex_rough != nullptr)
+				{
+					pbrShader->setBool("use_tex_rough", true);
+					m_cache.BindTexRough(tmat->tex_rough->getTexID());
+				}
+				else pbrShader->setBool("use_tex_rough", false);
+
+				// normal map 
+				// -------------------------------------------------------
+				if (tmat->tex_normal != nullptr)
+				{
+					pbrShader->setBool("use_tex_normal", true);
+					m_cache.BindTexNormal(tmat->tex_normal->getTexID());
+				}
+				else pbrShader->setBool("use_tex_normal", false);
+
+				// Emission 
+				// -------------------------------------------------------
+				if (tmat->use_emission)
+				{
+					pbrShader->setBool("use_emission", true);
+					pbrShader->SetVec3("emission", tmat->emission);
+					pbrShader->SetFloat("emission_power", tmat->emission_power);
+
+					if (tmat->tex_emission != nullptr)
+					{
+						pbrShader->setBool("use_tex_emission", true);
+						m_cache.BindTexEmmi(tmat->tex_emission->getTexID());
+					}
+					else pbrShader->setBool("use_tex_emission", false);
+				}
+				else pbrShader->setBool("use_emission", false);
+
+				tmat->setShader(pbrShader);
+				pbrShader->SetFloat("ao", tmat->ao * AmbientLevel);
+
+				lastMaterial = tmat->name;
+			}
+
+			c_anim->mesh->meshes[j].Draw();
+		}
+		//c_anim->Draw();
+		/*glm::quat q(glm::vec3( 0.f,0.f,0.f));
+		glm::mat4 m = mat4_cast(q);
+		pbrShader->SetMat4("model", glm::scale(c_anim->transform, glm::vec3(c_anim->scale)) * m);
+		c_anim->mesh->meshes[3].Draw();*/
 	}
 }
 // ------------------------------------------------------------------------
@@ -1450,9 +1847,54 @@ void Renderer::EndFrame()
 		postProc.HorizontalBlur();
 		renderQuad();
 	}
+	/* Bloom */
+	if (postProc.bloom_use && postProc.Usable()) {
+		glViewport(0, 0, (int)postProc.bloomTex.scr_w, (int)postProc.bloomTex.scr_h);
 
+		bool horizontal = true, first_iteration = true;
+
+		postProc.bloomTex.Bind();
+		postProc.bloomShader.use();
+		postProc.bloomShader.SetFloat("threshold", postProc.bloom_threshold);
+		glActiveTexture(GL_TEXTURE0);
+		postProc.colorBuffer.UseTexture();
+		renderQuad();
+
+		postProc.bloomBlurShader.use();
+		for (unsigned int i = 0; i < 3; i++)
+		{
+			postProc.bloomBlurTex.Bind();
+			postProc.bloomBlurShader.setBool("horizontal", false);
+			postProc.bloomTex.UseTexture();
+			renderQuad();
+
+			postProc.bloomTex.Bind();
+			postProc.bloomBlurShader.setBool("horizontal", true);
+			postProc.bloomBlurTex.UseTexture();
+			renderQuad();
+		}
+	}
 	/* Apply image effects */
-	if (postProc.Render()) {
+	/*postProc.ssaoEffect.shaderSSAO->setInt("gDepthMap", 4);
+		postProc.ssaoEffect.shaderSSAO->SetMat4("invProj", glm::inverse(cam.GetProjectionMatrix()));
+		BindTexture(4, fplus_renderer.depthMap);*/
+	/*glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	postProc.screenShader.use();
+	postProc.screenShader.setInt("gDepthMap", 4);
+	postProc.screenShader.SetFloat("Near", MainCam.NearView);
+	postProc.screenShader.SetFloat("Far", MainCam.FarView);
+	glActiveTexture(GL_TEXTURE4);
+	BindTexture(GL_TEXTURE_2D, fplus_renderer.depthMap); */
+	/*GLuint tex_id = csm;
+	float f, n;
+	if (csm == 0) { tex_id = m_ShadowMapper.cascades[0].depthMap; f = m_ShadowMapper.cascades[0].cascadeSplitFar; }
+	if (csm == 1) {
+		tex_id = m_ShadowMapper.cascades[1].depthMap; f = m_ShadowMapper.cascades[1].cascadeSplitFar;
+	}
+	if (csm == 2) {
+		tex_id = m_ShadowMapper.cascades[2].depthMap; f = m_ShadowMapper.cascades[2].cascadeSplitFar;
+	}*/
+	if (postProc.Render(0, 0, 0.01f)) {
 		glViewport(left_scr_pos, 0, SCR_weight, SCR_height);
 		renderQuad();
 	}
@@ -1486,17 +1928,17 @@ void Renderer::RenderForLighmap(float* view, float* proj)
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_SkyCapture.Prefiltered);
 
-	for (size_t i = 0; i < m_RenderBuffer.ForwardRenderCommands.size(); i++)
+	for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
 	{
-		if (m_RenderBuffer.ForwardRenderCommands[i].Material == nullptr)
+		if (m_RenderBuffer.OpaqueRenderCommands[i].Material == nullptr)
 			continue;
 
 		// albedo map -------------------------------------------------------
-		if (m_RenderBuffer.ForwardRenderCommands[i].Material->tex_albedo != nullptr)
+		if (m_RenderBuffer.OpaqueRenderCommands[i].Material->tex_albedo != nullptr)
 		{
 			materials.PbrShader.setBool("use_tex_albedo", true);
 			glActiveTexture(GL_TEXTURE2);
-			m_RenderBuffer.ForwardRenderCommands[i].Material->tex_albedo->useTexture();
+			m_RenderBuffer.OpaqueRenderCommands[i].Material->tex_albedo->useTexture();
 		}
 		else
 		{
@@ -1507,10 +1949,10 @@ void Renderer::RenderForLighmap(float* view, float* proj)
 		materials.PbrShader.setBool("use_tex_rough", false);
 		materials.PbrShader.setBool("use_tex_normal", false);
 
-		materials.PbrShader.SetMat4("model", m_RenderBuffer.ForwardRenderCommands[i].Transform);
-		m_RenderBuffer.ForwardRenderCommands[i].Material->setShader(&materials.PbrShader);
+		materials.PbrShader.SetMat4("model", m_RenderBuffer.OpaqueRenderCommands[i].Transform);
+		m_RenderBuffer.OpaqueRenderCommands[i].Material->setShader(&materials.PbrShader);
 
-		m_RenderBuffer.ForwardRenderCommands[i].Mesh->Draw();
+		m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
 	}
 }
 // ------------------------------------------------------------------------
@@ -1576,99 +2018,63 @@ Material* Renderer::LoadMaterial(const char* mPath)
 	mat->name = mPath;
 
 	return mat;
-
-	/*Material* mt = materials.GetMaterialN(mPath);
-	if (mt != nullptr)
-		return mt;*/
-	/*
-	std::filebuf fb;
-	if (fb.open(mPath, std::ios::in))
-	{
-		Material* mat = materials.CreateMaterial(mPath);
-		
-		mat->isDefault = false;
-
-		std::istream is(&fb);
-		cereal::BinaryInputArchive ar(is);
-
-		std::string mat_name;
-		ar(mat_name);
-
-		ar(mat->albedo.x, mat->albedo.y, mat->albedo.z);
-		ar(mat->metallic);
-		ar(mat->roughness);
-		ar(mat->ao);
-		ar(mat->uv.x, mat->uv.y);
-
-		ar(mat->use_emission);
-		if (mat->use_emission)
-		{
-			ar(mat->emission.x, mat->emission.y, mat->emission.z);
-			ar(mat->emission_power);
-		}
-
-		std::string tex_name, tex_path;
-
-		// Albedo Texture
-		// ------------------------------------
-		bool has_albedo;
-		ar(has_albedo);
-		if (has_albedo)
-		{
-			ar(tex_name);
-			ar(tex_path);
-			mat->tex_albedo = resManager->CreateTexture(tex_name, tex_path.c_str());
-		}
-
-		// Normal Texture
-		// ------------------------------------
-		bool has_normal;
-		ar(has_normal);
-		if (has_normal)
-		{
-			ar(tex_name);
-			ar(tex_path);
-			mat->tex_normal = resManager->CreateTexture(tex_name, tex_path.c_str());
-		}
-		// Metallic Texture
-		// ------------------------------------
-		bool has_metallic;
-		ar(has_metallic);
-		if (has_metallic)
-		{
-			ar(tex_name);
-			ar(tex_path);
-			mat->tex_metal = resManager->CreateTexture(tex_name, tex_path.c_str());
-		}
-		// Roughness Texture
-		// ------------------------------------
-		bool has_rough;
-		ar(has_rough);
-		if (has_rough)
-		{
-			ar(tex_name);
-			ar(tex_path);
-			mat->tex_rough = resManager->CreateTexture(tex_name, tex_path.c_str());
-		}
-		// Emission Texture
-		// ------------------------------------
-		bool has_emissoin;
-		ar(has_emissoin);
-		if (has_emissoin)
-		{
-			ar(tex_name);
-			ar(tex_path);
-			mat->tex_emission = resManager->CreateTexture(tex_name, tex_path.c_str());
-		}
-		fb.close();
-		return mat;
-	}*/
-	//else cout << "Failed to load material : " << mPath << endl;
 }
 // ------------------------------------------------------------------------
 void Renderer::checkForChanges()
 {
 
+}
+// ------------------------------------------------------------------------
+int Renderer::GetHighlightedEntity(int mx, int my)
+{
+	glViewport(0, 0, entitySelectionBuffer.scr_w, entitySelectionBuffer.scr_h);
+
+	entitySelectionBuffer.Bind();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	int val = -1;
+	glClearTexImage(entitySelectionBuffer.textureColorbuffer, 0, GL_RED_INTEGER, GL_INT, &val);
+
+	materials.mousePickID.use();
+	materials.mousePickID.SetMat4("projection", MainCam.GetProjectionMatrix());
+	materials.mousePickID.SetMat4("view", MainCam.GetViewMatrix());
+
+	for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
+	{
+		//std::cout << m_RenderBuffer.OpaqueRenderCommands[i].ID << std::endl;
+		materials.mousePickID.setInt("entityID", m_RenderBuffer.OpaqueRenderCommands[i].ID);
+		materials.mousePickID.SetMat4("model", m_RenderBuffer.OpaqueRenderCommands[i].Transform);
+		m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
+	}
+	return entitySelectionBuffer.ReadPixel(0, mx, entitySelectionBuffer.scr_h-my);
+}
+glm::vec4 Renderer::Get3dPosition(int mx, int my)
+{
+	glViewport(0, 0, entitySelectionBuffer.scr_w, entitySelectionBuffer.scr_h);
+
+	entitySelectionBuffer.Bind();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//int val = -1;
+	//glClearTexImage(entitySelectionBuffer.textureColorbuffer, 0, GL_RED_INTEGER, GL_INT, &val);
+
+	materials.mousePickID.use();
+	materials.mousePickID.SetMat4("projection", MainCam.GetProjectionMatrix());
+	materials.mousePickID.SetMat4("view", MainCam.GetViewMatrix());
+
+	for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
+	{
+		//std::cout << m_RenderBuffer.OpaqueRenderCommands[i].ID << std::endl;
+		materials.mousePickID.setInt("entityID", m_RenderBuffer.OpaqueRenderCommands[i].ID);
+		materials.mousePickID.SetMat4("model", m_RenderBuffer.OpaqueRenderCommands[i].Transform);
+		m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
+	}
+	std::vector<Displacement*> Disps = mDisplacements.GetComponents();
+	for (size_t i = 0; i < Disps.size(); i++)
+	{
+		materials.mousePickID.SetMat4("model", Disps[i]->model);
+		Disps[i]->Render();
+	}
+
+	return entitySelectionBuffer.ReadPixelVec4(0, mx, entitySelectionBuffer.scr_h - my);
 }
 // ------------------------------------------------------------------------
 ReflectionProbe* Renderer::CreateReflectionProbe(EnttID ent_id)
@@ -1857,6 +2263,7 @@ void Renderer::Clear_Lightmaps()
 
 bool Renderer::BakeSceneLightmaps()
 {
+	std::cout << "m_LightmapSettings : " << m_LightmapSettings.resolution << " " << m_LightmapSettings.quality << " " << m_LightmapSettings.MaxDistance << "\n";
 	m_LightmapSettings.savePath = SceneName + "\\";
 
 	if (m_LightmapSettings.quality != 64 && m_LightmapSettings.quality != 32 &&
@@ -1868,16 +2275,16 @@ bool Renderer::BakeSceneLightmaps()
 
 	Clear_Lightmaps();
 
-	for (size_t i = 0; i < m_RenderBuffer.ForwardRenderCommands.size(); i++)
+	for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
 	{
-		if (m_RenderBuffer.ForwardRenderCommands[i].is_static)
+		if (m_RenderBuffer.OpaqueRenderCommands[i].is_static)
 			lm_Count++;
 	}
 
 	std::cout << "Baking lightmaps for " << lm_Count << " meshs" << std::endl;
-	for (size_t i = 0; i < m_RenderBuffer.ForwardRenderCommands.size(); i++)
+	for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
 	{
-		if (m_RenderBuffer.ForwardRenderCommands[i].is_static)
+		if (m_RenderBuffer.OpaqueRenderCommands[i].is_static)
 			BakeLightMaps(i);
 	}
 	lm_Count = 0;
@@ -1920,16 +2327,16 @@ void Renderer::BakeLightMaps(int meshIndex)
 
 	dArray[16] = { 0.0 };
 
-	pSource = (const float*)glm::value_ptr(m_RenderBuffer.ForwardRenderCommands[ii].Transform);
+	pSource = (const float*)glm::value_ptr(m_RenderBuffer.OpaqueRenderCommands[ii].Transform);
 	for (int j = 0; j < 16; ++j)
 		dArray[j] = pSource[j];
 
 	lmSetGeometry(ctx, dArray,
-		LM_FLOAT, (unsigned char*)&m_RenderBuffer.ForwardRenderCommands[ii].Mesh->vertices[0] + offsetof(Vertex, Position), sizeof(Vertex),
+		LM_FLOAT, (unsigned char*)&m_RenderBuffer.OpaqueRenderCommands[ii].Mesh->vertices[0] + offsetof(Vertex, Position), sizeof(Vertex),
 		//LM_NONE, NULL, 0,
-		LM_FLOAT, (unsigned char*)&m_RenderBuffer.ForwardRenderCommands[ii].Mesh->vertices[0] + offsetof(Vertex, Normal), sizeof(Vertex),
-		LM_FLOAT, (unsigned char*)&m_RenderBuffer.ForwardRenderCommands[ii].Mesh->vertices[0] + offsetof(Vertex, TexCoords2), sizeof(Vertex),
-		m_RenderBuffer.ForwardRenderCommands[ii].Mesh->indices.size(), LM_UNSIGNED_INT, &m_RenderBuffer.ForwardRenderCommands[ii].Mesh->indices[0]);
+		LM_FLOAT, (unsigned char*)&m_RenderBuffer.OpaqueRenderCommands[ii].Mesh->vertices[0] + offsetof(Vertex, Normal), sizeof(Vertex),
+		LM_FLOAT, (unsigned char*)&m_RenderBuffer.OpaqueRenderCommands[ii].Mesh->vertices[0] + offsetof(Vertex, TexCoords2), sizeof(Vertex),
+		m_RenderBuffer.OpaqueRenderCommands[ii].Mesh->indices.size(), LM_UNSIGNED_INT, &m_RenderBuffer.OpaqueRenderCommands[ii].Mesh->indices[0]);
 
 	int vp[4];
 	float view[16], projection[16];
@@ -1949,12 +2356,12 @@ void Renderer::BakeLightMaps(int meshIndex)
 		materials.LM.SetMat4("u_view", glm::make_mat4(view));
 		materials.LM.SetMat4("u_projection", glm::make_mat4(projection));
 		glDisable(GL_CULL_FACE);
-		for (size_t i = 0; i < m_RenderBuffer.ForwardRenderCommands.size(); i++)
+		for (size_t i = 0; i < m_RenderBuffer.OpaqueRenderCommands.size(); i++)
 		{
-			if (!m_RenderBuffer.ForwardRenderCommands[i].is_static) continue;
+			if (!m_RenderBuffer.OpaqueRenderCommands[i].is_static) continue;
 
-			materials.LM.SetMat4("u_model", m_RenderBuffer.ForwardRenderCommands[i].Transform);
-			m_RenderBuffer.ForwardRenderCommands[i].Mesh->Draw();
+			materials.LM.SetMat4("u_model", m_RenderBuffer.OpaqueRenderCommands[i].Transform);
+			m_RenderBuffer.OpaqueRenderCommands[i].Mesh->Draw();
 		}
 		glEnable(GL_CULL_FACE);
 		// --------------------------------------------------------------
@@ -2012,6 +2419,7 @@ void Renderer::SerializeSave(YAML::Emitter& out)
 	out << YAML::BeginMap;
 
 	out << YAML::Key << "SkyPath" << YAML::Value << SkyPath;
+	out << YAML::Key << "UseClouds" << YAML::Value << UseClouds;
 	out << YAML::Key << "postProc_Use" << YAML::Value << postProc.Use;
 	out << YAML::Key << "usefog" << YAML::Value << usefog;
 	out << YAML::Key << "fogNear" << YAML::Value << fogNear;
@@ -2022,9 +2430,18 @@ void Renderer::SerializeSave(YAML::Emitter& out)
 
 	out << YAML::BeginMap;
 
+	out << YAML::Key << "ToneMap" << YAML::Value << postProc.ToneMap;
+
 	out << YAML::Key << "vignette_use" << YAML::Value << postProc.vignette_use;
 	out << YAML::Key << "vignette_softness" << YAML::Value << postProc.vignette_softness;
 	out << YAML::Key << "vignette_radius" << YAML::Value << postProc.vignette_radius;
+
+
+	out << YAML::Key << "bloom_use" << YAML::Value << postProc.bloom_use;
+	out << YAML::Key << "bloom_threshold" << YAML::Value << postProc.bloom_threshold;
+
+	out << YAML::Key << "sharpen" << YAML::Value << postProc.sharpen;
+	out << YAML::Key << "sharpen_amount" << YAML::Value << postProc.sharpen_amount;
 
 	out << YAML::Key << "cc_use" << YAML::Value << postProc.cc_use;
 	out << YAML::Key << "cc_brightness" << YAML::Value << postProc.cc_brightness;
@@ -2048,6 +2465,8 @@ void Renderer::SerializeLoad(YAML::Node& out)
 	auto& rnderSeq = out["Renderer"];
 	auto& rnder = rnderSeq[0];
 	if (rnder) {
+		if(rnder["UseClouds"].IsDefined())
+			UseClouds = rnder["UseClouds"].as<bool>();
 
 		SkyPath = rnder["SkyPath"].as<std::string>();
 		postProc.Use = rnder["postProc_Use"].as<bool>();
@@ -2060,6 +2479,14 @@ void Renderer::SerializeLoad(YAML::Node& out)
 	auto& postp = rnderSeq[1];
 	if (postp)
 	{
+		if(postp["ToneMap"].IsDefined())
+			postProc.ToneMap = postp["ToneMap"].as<int>();
+
+		if (postp["sharpen"].IsDefined())
+			postProc.sharpen = postp["sharpen"].as<bool>();
+		if (postp["sharpen_amount"].IsDefined())
+			postProc.sharpen_amount = postp["sharpen_amount"].as<float>();
+
 		postProc.vignette_use = postp["vignette_use"].as<bool>();
 		postProc.vignette_softness = postp["vignette_softness"].as<float>();
 		postProc.vignette_radius = postp["vignette_radius"].as<float>();
@@ -2068,6 +2495,9 @@ void Renderer::SerializeLoad(YAML::Node& out)
 		postProc.cc_brightness = postp["cc_brightness"].as<float>();
 		postProc.cc_saturation = postp["cc_saturation"].as<float>();
 		postProc.cc_contrast = postp["cc_contrast"].as<float>();
+
+		postProc.bloom_use = postp["bloom_use"].as<bool>();
+		postProc.bloom_threshold = postp["bloom_threshold"].as<float>();
 
 		postProc.use_ssao = postp["use_ssao"].as<bool>();
 		postProc.ssaoEffect.kernelSize = postp["kernelSize"].as<int>();

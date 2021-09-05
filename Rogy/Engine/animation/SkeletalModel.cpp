@@ -124,6 +124,7 @@ void SK_Model::processNode(aiNode *node, const aiScene *scene)
 	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
+		std::cout << node->mName.C_Str() << std::endl;
 		processNode(node->mChildren[i], scene);
 	}
 
@@ -216,6 +217,7 @@ void SK_Model::ExtractBoneWeightForVertices(std::vector<SK_Vertex>& vertices, ai
 			newBoneInfo.id = m_BoneCounter;
 			newBoneInfo.offset = AiToGLMMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
 			m_BoneInfoMap[boneName] = newBoneInfo;
+			std::cout << boneName << "\n";
 			boneID = m_BoneCounter;
 			m_BoneCounter++;
 		}

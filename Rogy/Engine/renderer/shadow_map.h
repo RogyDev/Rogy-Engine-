@@ -37,7 +37,7 @@ public:
 	unsigned int SHADOW_MAP_CASCADE_COUNT = 2;
 	// 1024, 2048 1524
 	unsigned int TEXEL_SIZE = 1024;
-	unsigned int Shadow_Distance = 150;
+	float Shadow_Distance = 150;
 
 	std::vector<ShadowCascade> cascades;
 

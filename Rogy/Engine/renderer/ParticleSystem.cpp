@@ -194,7 +194,7 @@ void ParticleSystem::Update(float delta, glm::vec3 CameraPosition)
 			// Decrease life
 			p.life -= delta;
 			if (p.life > 0.0f) {
-
+				//p.pos = TargetPos;
 				// Simulate simple physics : gravity only, no collisions
 				p.speed += GravityModifier * (float)delta * 0.5f;
 				p.pos += p.speed * (float)delta;

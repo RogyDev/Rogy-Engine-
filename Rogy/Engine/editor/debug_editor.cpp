@@ -10,6 +10,12 @@ Editor_Debug::~Editor_Debug()
 // --------------------------------------------------------
 void Editor_Debug::Render()
 {
+	if (debuger->hasMessages)
+	{
+		is_open = true;
+		debuger->hasMessages = false;
+	}
+
 	if (!is_open) return;
 
 	ImGui::Begin("Console", &is_open, ImGuiWindowFlags_MenuBar);

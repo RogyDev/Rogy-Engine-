@@ -1,4 +1,5 @@
 
+
 // --------------------------------------------[ Vertex Shader ]------------------------------------------------------//
 #ifdef COMPILING_VS
 
@@ -47,53 +48,68 @@ vec3 reconstructCSFaceNormal(vec3 C) {
 
 void main()
 {
-	//ivec2 ssC = ivec2(gl_FragCoord.xy);
-
-	//vec3 fragPos = (view * vec4(positionMetallic.xyz, 1.0)).xyz;
-    //vec3 normal  = mat3(view) * normalRoughness.xyz;
+	// get this pixel position, normal and random noise
+    vec3 position = texture(gPosition, TexCoords).xyz;
+    vec3 normal = texture(gNormal, TexCoords).rgb;
+	//vec3 normal = normalize(cross(dFdx(position), dFdy(position)));
+    vec3 randomVec = texture(texNoise, TexCoords * power).xyz;
 	
-    // get input for SSAO algorithm
-    vec3 fragPos = texture(gPosition, TexCoords).xyz;
-	/*if(fragPos == vec3(-1, -1, -1))
-	{
-		FragColor = vec3(0,0,0);
-		return;
-	}*/
-	
-    vec3 normal  =  normalize(texture(gNormal, TexCoords).rgb);
-    vec3 randomVec = normalize(texture(texNoise, TexCoords * vec2(u_resolution.x*2/1.0, u_resolution.y*2/1.0)).xyz);
-	
-    // create TBN change-of-basis matrix: from tangent-space to view-space
-    vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
+    // create tangent space -> view space transformation
+    vec3 tangent   = normalize(randomVec - normal * dot(randomVec, normal));
     vec3 bitangent = cross(normal, tangent);
-    mat3 TBN = mat3(tangent, bitangent, normal);
+    mat3 TBN       = mat3(tangent, bitangent, normal);
+
+    // SSAO parameters
+    float occlusion = 0.0;  // total summed occlusion
 	
-    // iterate over the sample kernel and calculate occlusion factor
-    float occlusion = 0.0;
+    // use the whole kernel
+	for(int i = 0; i < kernelSize; i++) {
+		// extract the kernel sample
+		vec2 kernelCoords = vec2(i/8, i%8);  // make a const
+		//vec3 tsSample = texture(kernel, kernelCoords).xyz;  // tangent space
+		//vec3 sampl = TBN * samples[i]; // from tangent to view-space
+		vec3 sampl = TBN * samples[i];  // transform sample to view space
+		sampl = position + sampl * radius; // find the pixel to sample
+		
+		
+	vec4 clipSpacePos = projection * vec4(sampl, 1.0); // from view to clip-space
+	vec3 ndcSpacePos = clipSpacePos.xyz /= clipSpacePos.w; // perspective divide
+	vec2 windowSpacePos = ((ndcSpacePos.xy + 1.0) / 2.0) * u_resolution;
+
+	if ((windowSpacePos.y > 0) && (windowSpacePos.y < u_resolution.y))
+    if ((windowSpacePos.x > 0) && (windowSpacePos.x < u_resolution.x))
+    // THEN APPLY AMBIENT OCCLUSION
+	{
 	
-    for(int i = 0; i < kernelSize; ++i)
-    {
-        // get sample position
-        vec3 sampl = TBN * samples[i]; // from tangent to view-space
-        sampl = fragPos + sampl * radius; 
-        
-        // project sample position (to sample texture) (to get position on screen/texture)
-        vec4 offset = vec4(sampl, 1.0);
-        offset = projection * offset; // from view to clip-space
-        offset.xyz /= offset.w; // perspective divide
-        offset.xyz = offset.xyz * 0.5 + 0.5; // transform to range 0.0 - 1.0
-		
-        // get sample depth
-        float sampleDepth = texture(gPosition, offset.xy).z; // get depth value of kernel sample
-		
-        // range check & accumulate
-        float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
-		//float rangeCheck= abs(fragPos.z - sampleDepth) < 1.0 ? 1.0 : 0.0;
-        occlusion += (sampleDepth >= sampl.z + bias ? 1.0 : 0.0) * rangeCheck;
-    }
-    occlusion = 1.0 - (occlusion / power);
-    
-    FragColor = occlusion;
+	
+		// project sample to clip space
+		vec4 offset = vec4(sampl, 1.0);
+		offset      = projection * offset;  // from view to clip-space
+		offset.xyz /= offset.w;  // perspective divide
+		offset.xyz  = offset.xyz * 0.5 + 0.5;  // transform to range 0.0 - 1.0
+
+		// finally, sample depth from position
+		float sampleDepth = texture(gPosition, offset.xy).z;
+
+		// if they are too far we should ignore this
+		float ratio = radius / abs(position.z - sampleDepth);
+		float rangeCheck = smoothstep(0.0, 1.0, ratio);
+
+		// we moved towards light in a hemisphere and we know
+		// our view space z (sample.z), if there is something
+		// 'in' from of us (sampleDepth), add occlusion
+		if (sampleDepth >= sampl.z + bias) {
+			occlusion += 1.0 * rangeCheck;
+		}
+			
+	}
+	}
+    // calculate the ratio
+    float occlusionFactor = 1.0 - (occlusion / kernelSize);
+    // add power => make occlusion stronger
+    // occlusionFactor = pow(occlusionFactor, ssaoPower);
+    // return final color
+    FragColor = occlusionFactor;
 	
 }
 

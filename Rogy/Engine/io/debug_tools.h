@@ -38,6 +38,13 @@ public:
 	void Error(const std::string message);
 	void Clear();
 
+	size_t Size()
+	{
+		return messages.size();
+	}
+
+	bool hasMessages = false;
+
 	// Static
 	static DebugTool* GetInstance(DebugTool* _ins = nullptr);
 	/*static void LOG(std::string message);

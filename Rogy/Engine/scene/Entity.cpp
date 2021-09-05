@@ -122,6 +122,17 @@ void Entity::RotateY(float angle)
 	if (rigidbody)
 		rigidbody->SetRotation(rot);
 }
+void Entity::Rotate(glm::vec3 dir, float Amount)
+{
+	Amount = glm::radians(Amount);
+	glm::quat rot = transform.Rotation;
+	rot = glm::rotate(rot, Amount, dir);
+	transform.SetRotation(rot);
+
+	RigidBody* rigidbody = GetComponent<RigidBody>();
+	if (rigidbody)
+		rigidbody->SetRotation(rot);
+}
 // --------------------------------------------------------------------------------------------
 void Entity::OnDestory(bool isPlaying)
 {
@@ -190,6 +201,11 @@ void Entity::StartScripts()
 		if(m_scripts[i]->hasStart)
 			m_scripts[i]->CallMethod("OnStart");
 }
+void Entity::DontDestroyOnLoad()
+{
+	if(parent != nullptr && parent->IsRoot())
+		dontDestroyOnLoad = !dontDestroyOnLoad;
+}
 // --------------------------------------------------------------------------------------------
 void Entity::InvokeScriptFunc(const char* funcName)
 {
@@ -254,6 +270,8 @@ void Entity::RemoveAllChilds(bool isPlaying)
 
 	for (size_t i = 0; i < Children.size();i++)
 	{
+		if (/*isPlaying &&*/ Children[i]->dontDestroyOnLoad == true) continue;
+
 		Children[i]->OnDestory(isPlaying);
 		delete Children[i];
 		Children[i] = nullptr;

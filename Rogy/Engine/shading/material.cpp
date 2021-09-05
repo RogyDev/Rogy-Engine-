@@ -32,10 +32,20 @@ void Material::setShader(Shader* shader)
 
 	if (type == SHADER_PBR)
 	{
-		shader->SetVec3("albedo", albedo);
-		shader->SetFloat("metallic", metallic);
-		shader->SetFloat("roughness", roughness);
+		shader->SetVec3("material.albedo", albedo);
+		shader->SetFloat("material.metallic", metallic);
+		shader->SetFloat("material.roughness", roughness);
 	}
+	else if (type == SHADER_Blend)
+	{
+		shader->SetVec3("material.albedo", albedo);
+		shader->SetVec3("material.emission", emission);
+		shader->SetFloat("material.metallic", metallic);
+		shader->SetFloat("material.roughness", roughness);
+		shader->SetFloat("val1", val1);
+		shader->SetFloat("val2", val2);
+	}
+
 }
 
 std::string Material::getMatName()

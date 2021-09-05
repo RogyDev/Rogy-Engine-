@@ -108,7 +108,7 @@ bool Rogy::InitGraphics()
 	// ----------------------------
 	window.StartWindow(SCR_weight, SCR_height, 4, 0);		// Initialize GLFW window with GL/GLSL version 4.0
 #ifdef EDITOR_MODE											// Set Window Title
-	window.SetWindowTitle("Rogy Editor");
+	window.SetWindowTitle(("Rogy Editor - " + mProjectSettings.GameName).c_str());
 #else
 	window.SetWindowTitle(mProjectSettings.GameName.c_str());
 #endif 
@@ -122,7 +122,7 @@ bool Rogy::InitGraphics()
 	//glfwSwapInterval(1); // Vsync
 
 	// limit frame rate
-	frameRateLimit = 60.0f;
+	//frameRateLimit = 60.0f;
 
 	// Initialize Render Engine
 	// ----------------------------
@@ -210,19 +210,30 @@ bool Rogy::Init()
 		{
 			editor.s_hierarchy.scene = &mScene;
 			editor.s_hierarchy.input = &m_Input;
+
 			editor.scn_settings.rndr = &renderer;
+			editor.scn_settings._scene = &mScene;
+
 			editor.prep_editor.res = &resManager;
 			editor.prep_editor.rndr = &renderer;
 			editor.prep_editor.phy_world = &m_PhysicsWorld;
 			editor.prep_editor.scrMnger = &m_ScriptManager;
+
 			editor.db_editor.debuger = &m_Debug;
+
 			editor.prg_settings.input = &m_Input;
 			editor.prg_settings.rndr = &renderer;
 			editor.prg_settings.prj = &mProjectSettings;
+
 			editor.prep_editor.audio_mnger = &m_Audio;
 			editor.prep_editor.ui_renderer = &m_UI;
+
 			editor.prj_browser.mScene = &mScene;
 			editor.prj_browser.rnder = &renderer;
+
+			editor.mat_editor.renderer = &renderer;
+			editor.mat_editor.res = &resManager; 
+			editor.prg_settings.rndr = &renderer;
 		}
 	}
 	else return false; 
@@ -315,24 +326,13 @@ Entity *anim, *wpn, *mag;
 // ---------------------------------------------------------------
 void Rogy::StartUp()
 {
-	/*YAML::Emitter out;
-	out << YAML::BeginMap;
-	out << YAML::Key << "Scene" << YAML::Value << "Untitled";
-	out << YAML::Key << "Test2" << YAML::Value << "aaa";
-	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-	out << YAML::Key << "Test" << YAML::Value << 55;
-	out << YAML::EndSeq;
-	out << YAML::EndMap;
-	std::ofstream fout("test.yaml");
-	fout << out.c_str();*/
-
-	/*std::ifstream stream("test.yaml");
-	std::stringstream strStream;
-	strStream << stream.rdbuf();
-
-	YAML::Node data = YAML::Load(strStream.str());
-	if (data["Scene"])
-		std::cout << "DATA : " << data["Scene"].as<std::string>() << std::endl;*/
+#ifdef EDITOR_MODE
+	m_icons.emplace_back(EditorIcon::EI_PLight, "core\\editor\\IconPointLight.png", resManager);
+	m_icons.emplace_back(EditorIcon::EI_SLight, "core\\editor\\IconSpotLight.png", resManager);
+	m_icons.emplace_back(EditorIcon::EI_DLight, "core\\editor\\IconLight.png", resManager);
+	m_icons.emplace_back(EditorIcon::EI_Camera, "core\\editor\\IconCamera.png", resManager);
+	m_icons.emplace_back(EditorIcon::EI_Audio, "core\\editor\\IconAudio.png", resManager);
+#endif
 
 	/* ----------------------------------------------
 	 Set a unique id for each component by registering it
@@ -353,6 +353,22 @@ void Rogy::StartUp()
 	REGISTER_COMPONENT(GrassComponent);
 	REGISTER_COMPONENT(UIWidget);
 	REGISTER_COMPONENT(SkeletalMeshComponent);
+	REGISTER_COMPONENT(Displacement);
+
+	/*anim = mScene.AddEntity("Anim");
+	SkeletalMeshComponent* mesh = renderer.m_skMeshs.AddComponent(anim->ID);
+	mesh->scale = 0.001f;
+	anim->AddComponent<SkeletalMeshComponent>(mesh);
+	mesh->mesh = resManager.mMeshs.LoadSkeletalModel("res\\mag.fbx");
+	mesh->material = renderer.materials.GetMaterialN("");*/
+
+	/*Entity* disp = mScene.AddEntity("Displacement");
+	Displacement* d = renderer.mDisplacements.AddComponent(disp->ID);
+	d->Init();
+	d->mat0 = renderer.LoadMaterial("Mat1.mat");
+	d->mat1 = renderer.LoadMaterial("Mat2.mat");
+	disp->AddComponent<Displacement>(d);
+	disp->DontDestroyOnLoad();*/
 
 	/*renderer.postProc.Use = true;
 	anim = mScene.AddEntity("Anim");
@@ -473,6 +489,63 @@ void Rogy::MainLoop()
 		if (renderer.BakeLighting)
 			lmBaked = true;
 
+		//renderer.UpdateCamera();
+
+#ifdef EDITOR_MODE
+
+		if (!mScene.game_view && !gizHovred)
+		{
+			if (m_Input.GetMouseButtonDown(0) && m_Input.GetKey(RKey::KEY_LCTRL))
+			{
+				int mouseX = int(m_Input.GetMouseXPos() - MainViewport.left_pos);
+				int mouseY = int(m_Input.GetMouseYPos() - MainViewport.top_pos - 57);
+				if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)MainViewport.weight && mouseY < MainViewport.weight) {
+					glm::vec4 data = renderer.Get3dPosition(mouseX, mouseY);
+					EnttID entID = (EnttID)data.w;
+					editor.s_hierarchy.SetSelection(entID);
+				}
+			}
+		}
+
+		if (!mScene.game_view && !gizHovred)
+		{
+			if (m_Input.GetMouseButton(0) && mScene.editDisp != 8888)
+			{
+				int mouseX = int(m_Input.GetMouseXPos() - MainViewport.left_pos);
+				int mouseY = int(m_Input.GetMouseYPos() - MainViewport.top_pos - 57);
+				if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)MainViewport.weight && mouseY < MainViewport.weight) {
+					glm::vec4 data = renderer.Get3dPosition(mouseX, mouseY);
+
+					std::vector<Displacement*> disps = renderer.mDisplacements.GetComponents();
+					for (size_t i = 0; i < disps.size(); i++)
+					{
+						if (disps[i]->entid == mScene.editDisp)
+						{
+							Displacement* disp = disps[i]; 
+							if (disp->useOneHeight == true)
+							{
+								disp->useOneHeight = false;
+								disp->SetHeightAll(disp->SameHeight);
+							}
+							else 
+							{
+								float amount = disps[i]->Intensity;
+								if (m_Input.GetKey(RKey::KEY_LSHIFT)) amount = -disps[i]->Intensity;
+
+								if (disps[i]->edit_alpha)
+									disp->SetAlpha(glm::vec3(data.x, data.y, data.z), disps[i]->Raduis, amount);
+								else
+									disp->SetHeight(glm::vec3(data.x, data.y, data.z), disps[i]->Raduis, amount);
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+
+#endif
+
 		renderer.RenderFrame(deltaTime);
 		
 #ifdef EDITOR_MODE
@@ -505,7 +578,9 @@ void Rogy::MainLoop()
 			}
 			dd::flush();
 		}
+		RenderGuizmos();
 #endif
+		
 		renderer.EndFrame();
 		
 		if(mScene.game_view)
@@ -590,46 +665,31 @@ void Rogy::UpdateEntity(Entity* ent)
 		// Push Renderer component to the renderer
 		if (Component::IsComponentType<RendererComponent>(ent->m_components[i]))
 		{
+			/*if (ent->parent->HasComponent<SkeletalMeshComponent>())
+			{
+				glm::vec3 translation, rotation, scale;
+				LMath::DecomposeTransform(ent->parent->GetComponent<SkeletalMeshComponent>()->animator.wp, translation, rotation, scale);
+				//ent->SetTranslation( glm::vec3(ent->parent->GetComponent<SkeletalMeshComponent>()->animator.wp[3]));
+				ent->SetTranslation(translation);
+				ent->SetRotation(rotation);
+				ent->transform.UpdateTransform();
+			}*/
+			if (!active) continue;
 			RendererComponent* rc = Component::QuickCast<RendererComponent>(ent->m_components[i]);
 			if (rc->mesh) {
 				rc->enabled = ent->Active;
 				rc->IsStatic = ent->Static;
-
+			
 				if (ChangedTransform) {
 					rc->position = transform.GetWorldPosition();
 					rc->transform = transform.GetTransform();
 					rc->bbox = rc->mesh->bbox;
 					rc->bbox.Transform(rc->transform, rc->position);
-					//rc->bbox.Transforme(rc->transform);
-					/*glm::vec3 ws = transform.GetWorldScale();
-					rc->bbox.BoxMax = (rc->mesh->bbox.BoxMax * ws) + transform.GetWorldPosition();
-					rc->bbox.BoxMin = (rc->mesh->bbox.BoxMin * ws) + transform.GetWorldPosition();
-					rc->bbox.radius = (ws.x + ws.y + ws.z) / 3;
-					/*rc->bbox.radius = rc->mesh->bbox.radius + ws.x - 1;
-					rc->bbox.radius = rc->bbox.radius + ws.y - 1;
-					rc->bbox.radius = rc->bbox.radius + ws.z - 1;
-					if (transform.Angels != glm::vec3(0.0f, 0.0f, 0.0f))
-						rc->bbox.useRaduis = true;
-					else rc->bbox.useRaduis = false;*/
 				}
 
-				/*if (ent->ID == wpn->ID)
-				{
-					SkeletalMeshComponent* skmc = anim->GetComponent<SkeletalMeshComponent>();
-					rc->transform = skmc->animator.wp;
-					rc->position = glm::vec3(rc->transform[3]);
-					/*bool wp_node_found = false;
-					std::cout << "--------------------------------------------------------\n";
-					glm::mat4 mt = skmc->animator.GetNodeTransform(skmc->animator.GetAnimationRootNode(),
-						std::string("wp"), wp_node_found);
-					std::cout << "--------------------------------------------------------\n";
-					if (wp_node_found)
-					{
-						//m_Debug.Log("wp node found");
-						rc->transform = mt;
-						rc->position = glm::vec3(mt[3]);
-					}
-				}*/
+				//m_nav.m_mesh = rc->mesh;
+				//m_nav.maxx = rc->bbox.BoxMin;
+				//m_nav.minx = rc->bbox.BoxMax;
 
 				if (!mScene.game_view && ent->is_Selected && !rc->bbox.useRaduis) {
 					// Axis-aligned bounding box:
@@ -639,11 +699,25 @@ void Rogy::UpdateEntity(Entity* ent)
 					dd::aabb(bbMins, bbMaxs, dd::colors::Gray);
 				}
 				
-				renderer.PushRender(rc->mesh, rc->material, rc->transform, rc->bbox, rc->CastShadows, rc->position, rc->IsStatic, rc->lightmapPath);
+				if (ent->parent->HasComponent<SkeletalMeshComponent>())
+				{
+					renderer.PushRender(rc->mesh, rc->material, glm::scale( ent->parent->GetComponent<SkeletalMeshComponent>()->animator.wp * rc->transform, glm::vec3(ent->parent->GetComponent<SkeletalMeshComponent>()->scale)), rc->bbox, rc->CastShadows, rc->position, rc->IsStatic, rc->lightmapPath, ent->ID);
+				}
+
+				if(rc->material->cutout)
+					renderer.PushCutoutRender(rc->mesh, rc->material, rc->transform, rc->bbox, rc->CastShadows, rc->position, rc->IsStatic, rc->lightmapPath, ent->ID);
+				else
+					renderer.PushRender(rc->mesh, rc->material, rc->transform, rc->bbox, rc->CastShadows, rc->position, rc->IsStatic, rc->lightmapPath, ent->ID);
 			}
 			continue;
 		}
 
+		if (Component::IsComponentType<Displacement>(ent->m_components[i]))
+		{
+			Displacement* disp = Component::QuickCast<Displacement>(ent->m_components[i]);
+			disp->model = transform.GetTransform();
+			continue;
+		}
 		if (Component::IsComponentType<RigidBody>(ent->m_components[i]))
 		{
 			RigidBody* rb = Component::QuickCast<RigidBody>(ent->m_components[i]);
@@ -809,12 +883,12 @@ void Rogy::QueueSpawnList()
 			RecompileScripts();
 			break;
 		}
-		if (mScene.m_requests[i] == SR_PAST_COPY)
+		else if (mScene.m_requests[i] == SR_PAST_COPY)
 		{
 			SpawnEntity(std::string("savedCopy"), true);
 			break;
 		}
-		if (mScene.m_requests[i] == SR_PLAY_SCENE)
+		else if (mScene.m_requests[i] == SR_PLAY_SCENE)
 		{
 			if (IsPlaying())
 				StopPlay();
@@ -822,12 +896,12 @@ void Rogy::QueueSpawnList()
 				BeginPlay();
 			break;
 		}
-		if (mScene.m_requests[i] == SR_QUIT_GAME)
+		else if (mScene.m_requests[i] == SR_QUIT_GAME)
 		{
 			window.CloseWindow();
 			break;
 		}
-		if (mScene.m_requests[i] == SR_NEW_SCENE)
+		else if (mScene.m_requests[i] == SR_NEW_SCENE)
 		{
 			ClearScene();
 			mScene.name = "";
@@ -835,18 +909,56 @@ void Rogy::QueueSpawnList()
 			mScene.Root.name = "New Scene";
 			break;
 		}
-		if (mScene.m_requests[i] == SR_LOAD_SCENE)
+		else if (mScene.m_requests[i] == SR_LOAD_SCENE)
 		{
 			if(!IsPlaying())
 				m_Debug.Log(("Loading Scene: " + mScene.path));
 			LoadScene(mScene.path.c_str());
 			break;
 		}
-		if (mScene.m_requests[i] == SR_SAVE_SCENE)
+		else if (mScene.m_requests[i] == SR_SAVE_SCENE)
 		{
 			SaveScene(mScene.path.c_str());
 			if (!IsPlaying())
 				m_Debug.Log(("Scene Saved : " + mScene.path));
+			break;
+		}
+		else if (mScene.m_requests[i] == SR_BAKE_NAV)
+		{
+			//m_nav.NavMeshBuild();
+			break;
+		}
+		else if (mScene.m_requests[i] == SR_SPAWN_AT_MOUSE)
+		{
+			for (size_t j= 0; j < editor.prj_browser.dir_files.size(); j++)
+			{
+				if (editor.prj_browser.dir_files[j].is_selected && editor.prj_browser.dir_files[j].is_prefab)
+				{
+					m_PhysicsWorld.updateAABBs();
+
+					glm::vec3 rayStart, rayDir, daMousePos;
+					int mouseX = int(m_Input.GetMouseXPos() - MainViewport.left_pos);
+					int mouseY = int(m_Input.GetMouseYPos() - MainViewport.top_pos - 57);
+					m_PhysicsWorld.ScreenPosToWorldRay(mouseX, mouseY
+						, (int)MainViewport.weight, (int)MainViewport.height,
+						renderer.MainCam.GetViewMatrix(), renderer.MainCam.GetProjectionMatrix()
+						, rayStart, rayDir);
+
+					if (m_PhysicsWorld.RaycastHitPoint(renderer.MainCam.transform.Position, rayDir, 10000.0f, daMousePos))
+					{
+						Entity* eid = SpawnEntity((editor.prj_browser.shortcurrent_dir + "\\" + editor.prj_browser.dir_files[j].name));
+						eid->SetTranslation(daMousePos);
+						editor.s_hierarchy.SetSelection(eid->ID);
+						//renderer.disp.SetHeight(daMousePos, 1.2f, 0.23f);
+					}
+					break;
+				}
+			}
+			break;
+		}
+		else if (mScene.m_requests[i] == SR_EDIT_DISP)
+		{
+			
 			break;
 		}
 	}
@@ -862,192 +974,6 @@ void Rogy::QueueSpawnList()
 	mScene.spawn_requests.clear();
 	mScene.m_requests.clear();
 }
-/*
-void Rogy::LoadEntityForSpawn(cereal::BinaryInputArchive &ar, Entity* ent, bool is_load_scene_root, bool LoadCustomTransformation)
-{
-	ar(ent->is_prefab);
-	// If this entity is prefab then load it from its file
-	// Prefab is minimized version of scene and can be spawned inside a scene.
-	if (ent->is_prefab)
-	{
-		ar(ent->name);
-		//ar(ent->transform);
-		ar(ent->path);
-		//std::cout << "LOADING A PREFAB IN SCENE : " << ent->path << std::endl;
-		std::filebuf fb;
-		if (fb.open(ent->path, std::ios::in))
-		{
-			std::istream is(&fb);
-			cereal::BinaryInputArchive ar(is);
-
-			LoadEntityForSpawn(ar, ent, false, true);
-			fb.close();
-		}
-	}
-	else
-	{
-		std::string ent_name;
-		ar(ent_name);
-		if (LoadCustomTransformation)
-		{
-			// Do not apply the loaded transformation from the prefab when loading
-			// Just use the last applied trasformation
-			ent->transform.noApply = true;
-		} else  ent->name = ent_name;
-
-		ar(ent->tag);
-		ar(ent->Active);
-		ar(ent->Static);
-		//ar(ent->transform);
-
-		// Load entity's components one by one
-		int num_comp = 0; ar(num_comp);
-		int comp_id = -1;
-		for (int i = 0; i < num_comp; i++)
-		{
-			ar(comp_id);
-
-			if (comp_id == RendererComponent::TYPE_ID)
-			{
-				RendererComponent* rc = renderer.m_renderers.AddComponent(ent->ID);
-				ent->AddComponent<RendererComponent>(rc);
-				ar(rc->enabled);
-				ar(rc->CastShadows);
-				ar(rc->lightmapPath);
-				bool hasMesh = false;
-				ar(hasMesh);
-				if (hasMesh)
-				{
-					std::string dir;
-					int indx = 0;
-					ar(dir);
-					ar(indx);
-					rc->mesh = &resManager.mMeshs.CreateModel(dir)->meshes[indx];
-				}
-
-				std::string mat_dir, mat_name;
-				ar(mat_dir);
-				ar(mat_name);
-				rc->material = renderer.LoadMaterial(mat_dir.c_str());
-				if (!rc->material->isDefault)
-					rc->material->path = mat_name;
-			}
-			else if (comp_id == PointLight::TYPE_ID)
-			{
-				ent->AddComponent<PointLight>(renderer.CreatePointLight(ent->ID));
-				ent->GetComponent<PointLight>()->SerializeLoad<cereal::BinaryInputArchive>(ar);
-			}
-			else if (comp_id == SpotLight::TYPE_ID)
-			{
-				ent->AddComponent<SpotLight>(renderer.CreateSpotLight(ent->ID));
-				ent->GetComponent<SpotLight>()->SerializeLoad<cereal::BinaryInputArchive>(ar);
-			}
-			else if (comp_id == DirectionalLight::TYPE_ID) {
-				ent->AddComponent<DirectionalLight>(renderer.CreateDirectionalLight());
-				ent->GetComponent<DirectionalLight>()->SerializeLoad<cereal::BinaryInputArchive>(ar);
-			}
-			else if (comp_id == ReflectionProbe::TYPE_ID)
-			{
-				ent->AddComponent<ReflectionProbe>(renderer.CreateReflectionProbe(ent->ID));
-				ent->GetComponent<ReflectionProbe>()->SerializeSave<cereal::BinaryInputArchive>(ar);
-			}
-			else if (comp_id == RigidBody::TYPE_ID)
-			{
-				m_PhysicsWorld.AddRigidBody(ent);
-				ent->GetComponent<RigidBody>()->SerializeLoad<cereal::BinaryInputArchive>(ar);
-				ent->SetScale(ent->transform.GetLocalScale());
-			}
-			else if (comp_id == BillboardComponent::TYPE_ID)
-			{
-				BillboardComponent* bb = renderer.CreateBillboard(ent->ID);
-				ent->AddComponent<BillboardComponent>(bb);
-				bb->SerializeLoad<cereal::BinaryInputArchive>(ar);
-			}
-			else if (comp_id == CameraComponent::TYPE_ID)
-			{
-				ent->AddComponent<CameraComponent>(renderer.m_cameras.AddComponent(ent->ID));
-				ent->GetComponent<CameraComponent>()->SerializeLoad<cereal::BinaryInputArchive>(ar);
-			}
-			else if (comp_id == ParticleSystem::TYPE_ID)
-			{
-				ParticleSystem* ps = renderer.mParticals.AddComponent(ent->ID);
-				ent->AddComponent<ParticleSystem>(ps);
-				ps->serializeLoad<cereal::BinaryInputArchive>(ar);
-				ps->mTexture = resManager.CreateTexture(ps->tex_path, ps->tex_path.c_str());
-			}
-			else if (comp_id == RAudioSource::TYPE_ID)
-			{
-				RAudioSource* ras = m_Audio.AddComponent(ent->ID);
-				ent->AddComponent<RAudioSource>(ras);
-				ras->SerializeLoad<cereal::BinaryInputArchive>(ar);
-				ras->mClip = m_Audio.LoadClip(ras->clip_path);
-			}
-			else if (comp_id == GrassComponent::TYPE_ID)
-			{
-				GrassComponent* rc = renderer.mGrass.AddComponent(ent->ID);
-				rc->SerializeLoad<cereal::BinaryInputArchive>(ar);
-				rc->mTexture = resManager.CreateTexture(rc->texPath, rc->texPath.c_str());
-				ent->AddComponent<GrassComponent>(rc);
-			}
-			else if (comp_id == SkeletalMeshComponent::TYPE_ID)
-			{
-				SkeletalMeshComponent* rc = renderer.m_skMeshs.AddComponent(ent->ID);
-				ent->AddComponent<SkeletalMeshComponent>(rc);
-				ar(rc->enabled);
-				ar(rc->CastShadows);
-				ar(rc->scale);
-				bool hasMesh = false;
-				ar(hasMesh);
-				if (hasMesh)
-				{
-					std::string dir;
-					int indx = 0;
-					ar(dir);
-					//ar(indx);
-					rc->mesh = resManager.mMeshs.LoadSkeletalModel(dir);
-				}
-
-				std::string mat_dir, mat_name;
-				ar(mat_dir);
-				ar(mat_name);
-				rc->material = renderer.LoadMaterial(mat_dir.c_str());
-				if (!rc->material->isDefault)
-					rc->material->path = mat_name;
-				size_t anim_size;
-				ar(anim_size);
-				std::string anim_name, anim_path;
-				for (size_t i = 0; i < anim_size; i++)
-				{
-					ar(anim_name);
-					ar(anim_path);
-					rc->LoadAnimation(anim_name, anim_path);
-				}
-			}
-			else if (comp_id == UIWidget::TYPE_ID)
-			{
-				ent->AddComponent<UIWidget>(m_UI.uiWidgets.AddComponent(ent->ID));
-				ent->GetComponent<UIWidget>()->SerializeLoad<cereal::BinaryInputArchive, ResourcesManager>(ar, resManager);
-			}
-		}
-		size_t script_count; ar(script_count);
-		for (size_t i = 0; i < script_count; i++)
-		{
-			//std::string className; ar(className);
-			//ScriptInstance* scr = m_ScriptManager.InstanceComponentClass(ent->ID, className.c_str());
-			//ent->AddScript(scr);
-			//ScriptSerializer::LoadScriptObject(ar, scr);
-		}
-		
-		int child_count; ar(child_count);
-		for (int i = 0; i < child_count; i++)
-		{
-			Entity* child_ent = mScene.AddEntity("Entity (Load Failed)");
-			child_ent->SetParent(ent);
-			LoadEntityForSpawn(ar, child_ent, false);
-		}
-	}
-}
-*/
 
 size_t Rogy::LoadAndSpawnEntity(YAML::Node &scnNode, YAML::Node &entNode, Entity* ent, size_t& indx, bool is_scene_root, bool UseCustomTransformation)
 {
@@ -1137,7 +1063,16 @@ size_t Rogy::LoadAndSpawnEntity(YAML::Node &scnNode, YAML::Node &entNode, Entity
 			else if (comp_node["RigidBody"])
 			{
 				m_PhysicsWorld.AddRigidBody(ent);
-				ent->GetComponent<RigidBody>()->OnLoad(comp_node["RigidBody"]);
+				RigidBody* rb = ent->GetComponent<RigidBody>();
+				rb->OnLoad(comp_node["RigidBody"]);
+
+				if (rb->m_CollisionType == RCollisionShapeType::MESH_COLLIDER) 
+				{
+					Model* mdl = resManager.mMeshs.CreateModel(rb->mesh_path);
+					Mesh* amesh = &mdl->meshes[0];
+					btTriangleMesh* m = m_PhysicsWorld.GetMeshCollider(amesh);
+					rb->SetCollisionMesh(m, amesh->path);
+				}
 				ent->SetScale(ent->transform.GetLocalScale());
 			}
 			else if (comp_node["RAudioSource"])
@@ -1166,6 +1101,7 @@ size_t Rogy::LoadAndSpawnEntity(YAML::Node &scnNode, YAML::Node &entNode, Entity
 				ent->AddComponent<ParticleSystem>(ps);
 				ps->OnLoad(comp_node["ParticleSystem"]);
 				ps->mTexture = resManager.CreateTexture(ps->tex_path, ps->tex_path.c_str());
+				ps->TargetPos = ent->transform.GetWorldPosition();
 			}
 			else if (comp_node["RendererComponent"])
 			{
@@ -1378,11 +1314,23 @@ Entity* Rogy::SpawnModel(std::string& path)
 	Entity* ent = nullptr;
 	if (mdl != nullptr)
 	{
-		Entity* ent = mScene.AddEntity("Model");
-		RendererComponent* rc = renderer.m_renderers.AddComponent(ent->ID);
-		ent->AddComponent<RendererComponent>(rc);
-		rc->material = renderer.CreateMaterial("");
-		rc->mesh = mdl->GetFirstMesh();
+		//Entity* Bent = mScene.AddEntity("Model");
+		for (size_t i = 0; i < mdl->meshes.size(); i++)
+		{
+			Entity* ent = mScene.AddEntity(mdl->meshes[i].name);
+			//ent->SetParent(Bent);
+			RendererComponent* rc = renderer.m_renderers.AddComponent(ent->ID);
+			ent->AddComponent<RendererComponent>(rc);
+			rc->material = renderer.CreateMaterial("");
+			rc->mesh = &mdl->meshes[i];
+
+			glm::vec3 translation, rotation, scale;
+			LMath::DecomposeTransform(rc->mesh->transformation, translation, rotation, scale);
+
+			ent->SetTranslation(translation);
+			ent->transform.SetAngels(rotation);
+			ent->SetScale(scale);
+		}
 	}
 	return ent;
 }
@@ -1418,6 +1366,84 @@ SceneManager* Rogy::GetScene()
 	return &mScene;
 }
 
+#ifdef EDITOR_MODE
+void  Rogy::RenderGuizmos()
+{
+	// Render 3d icons
+	if (!mScene.game_view) {
+		glm::mat4 proj = renderer.MainCam.GetProjectionMatrix();
+		glm::mat4 view = renderer.MainCam.GetViewMatrix();
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		renderer.materials.BillboardShader.use();
+		renderer.materials.BillboardShader.SetMat4("VP", proj * view);
+		renderer.materials.BillboardShader.SetVec3("CameraUp_worldspace", renderer.MainCam.transform.up());
+		renderer.materials.BillboardShader.SetVec3("CameraRight_worldspace", renderer.MainCam.transform.right());
+		renderer.materials.BillboardShader.SetVec2("BillboardSize", glm::vec2(0.2f, 0.2f));
+		renderer.materials.BillboardShader.setBool("use_tex_as_mask", false);
+		glActiveTexture(GL_TEXTURE0);
+
+		for (size_t i = 0; i < m_icons.size(); i++)
+		{
+			if (m_icons[i].type == EditorIcon::EI_PLight && !renderer.m_PointLights.empty())
+			{
+				m_icons[i].image->useTexture();
+				for (size_t j = 0; j < renderer.m_PointLights.size(); j++)
+				{
+					PointLight* pl = renderer.m_PointLights[j];
+					renderer.materials.BillboardShader.SetVec3("BillboardPos", pl->Position);
+					renderer.materials.BillboardShader.SetVec3("Tex_color", pl->Color);
+					renderQuad();
+				}
+			}
+			else if (m_icons[i].type == EditorIcon::EI_SLight && !renderer.m_SpotLights.empty())
+			{
+				m_icons[i].image->useTexture();
+				for (size_t j = 0; j < renderer.m_SpotLights.size(); j++)
+				{
+					SpotLight* pl = renderer.m_SpotLights[j];
+					renderer.materials.BillboardShader.SetVec3("BillboardPos", pl->Position);
+					renderer.materials.BillboardShader.SetVec3("Tex_color", pl->Color);
+					renderQuad();
+				}
+			}
+			else if (m_icons[i].type == EditorIcon::EI_DLight && renderer.m_DirectionalLight != nullptr)
+			{
+				m_icons[i].image->useTexture();
+				renderer.materials.BillboardShader.SetVec3("BillboardPos", renderer.m_DirectionalLight->Position);
+				renderer.materials.BillboardShader.SetVec3("Tex_color", renderer.m_DirectionalLight->Color);
+				renderQuad();
+			}
+			/*else if (m_icons[i].type == EditorIcon::EI_Camera && !renderer.m_cameras.Empty())
+			{
+				m_icons[i].image->useTexture();
+				for (size_t j = 0; j < renderer.m_cameras.Size(); j++)
+				{
+					CameraComponent* pl = renderer.m_cameras.components[j];
+					renderer.materials.BillboardShader.SetVec3("BillboardPos", pl->position);
+					renderer.materials.BillboardShader.SetVec3("Tex_color", glm::vec3(1.0f));
+					renderQuad();
+				}
+			}*/
+			else if (m_icons[i].type == EditorIcon::EI_Audio && !m_Audio.mSources.Empty())
+			{
+				m_icons[i].image->useTexture();
+				for (size_t j = 0; j < m_Audio.mSources.Size(); j++)
+				{
+					RAudioSource* pl = m_Audio.mSources.components[j];
+					renderer.materials.BillboardShader.SetVec3("BillboardPos", pl->pos);
+					renderer.materials.BillboardShader.SetVec3("Tex_color", glm::vec3(1.0f));
+					renderQuad();
+				}
+			}
+		}
+		glDisable(GL_BLEND);
+	}
+}
+#endif
+
 // ---------------------------------------------------------------
 // ## Play mode
 // ---------------------------------------------------------------
@@ -1426,6 +1452,7 @@ void Rogy::RenderUI()
 	editor.SCR_height = SCR_height;
 	editor.SCR_weight = SCR_weight;
 #ifdef  EDITOR_MODE
+	// Editor
 	editor.start();
 	if (!mScene.game_view) {
 		ImGuizmo::BeginFrame();
@@ -1441,9 +1468,20 @@ void Rogy::RenderUI()
 				ImGuizmo::Manipulate(glm::value_ptr(renderer.MainCam.GetViewMatrix()), glm::value_ptr(renderer.MainCam.GetProjectionMatrix()),
 					editor.mCurrentGizmoOperation, editor.mCurrentGizmoMode, glm::value_ptr(transform), nullptr, nullptr);
 
+				gizHovred = ImGuizmo::IsOver();
+
 				// Translate only -- other things were buggy
-				if (ImGuizmo::IsUsing())
-					ent->SetTranslation(glm::vec3(transform[3]));
+				if (ImGuizmo::IsUsing()) 
+				{
+					//ent->SetTranslation(glm::vec3(transform[3]));
+					glm::vec3 translation, rotation, scale;
+					LMath::DecomposeTransform(transform, translation, rotation, scale);
+
+					//glm::vec3 deltaRotation = rotation - ent->transform.Angels;
+					ent->SetTranslation(translation);
+					//ent->transform.SetAngels(ent->transform.Angels + deltaRotation);
+					ent->SetScale(scale);
+				}
 			}
 		}
 		ImGuiIO& io = ImGui::GetIO();
@@ -1504,7 +1542,7 @@ void Rogy::LoadProjectSettings()
 
 	renderer.m_ShadowMapper.TEXEL_SIZE = mProjectSettings.CascadedShadowMapsResolution;
 	renderer.m_ShadowMapper.SHADOW_MAP_CASCADE_COUNT = mProjectSettings.CascadesCount;
-	renderer.m_ShadowMapper.Shadow_Distance = (size_t)mProjectSettings.ShadowDistance;
+	renderer.m_ShadowMapper.Shadow_Distance = mProjectSettings.ShadowDistance;
 	renderer.m_PointShadowMapper.TEXEL_SIZE = mProjectSettings.PointShadowResolution;
 	renderer.m_SpotShadowMapper.TEXEL_SIZE = mProjectSettings.SpotShadowsResolution;
 	renderer.m_ShadowMapper.CascadeSplits[0] = mProjectSettings.CascadeSplits[0];
@@ -1764,9 +1802,16 @@ void Rogy::BindEngineForScript()
 		.addProperty("name", &UIWidgetButton::name)
 		.endClass()
 
+		.beginClass<UIWidgetProgressBar>("UIWidgetProgressBar")
+		.addProperty("Enabled", &UIWidgetProgressBar::Enabled)
+		.addProperty("name", &UIWidgetProgressBar::name)
+		.addProperty("value", &UIWidgetProgressBar::Value)
+		.endClass()
+
 		.beginClass<UIWidget>("UIWidget")
 		.addFunction("GetText", &UIWidget::GetWidgetWithName<UIWidgetText>)
 		.addFunction("GetButton", &UIWidget::GetWidgetWithName<UIWidgetButton>)
+		.addFunction("GetBar", &UIWidget::GetWidgetWithName<UIWidgetProgressBar>)
 		.endClass()
 		
 		// --------------------------------------------------------------------------
@@ -1788,6 +1833,7 @@ void Rogy::BindEngineForScript()
 		.addFunction("SetRotation", &Entity::SetRotation)
 		.addFunction("SetTranslation", &Entity::SetTranslation)
 		.addFunction("RotateY", &Entity::RotateY)
+		.addFunction("Rotate", &Entity::Rotate)
 		.addFunction("GetScriptIndex", &Entity::GetScriptInstance)
 		.addFunction("GetChildWithTag", &Entity::GetChildWithTag)
 

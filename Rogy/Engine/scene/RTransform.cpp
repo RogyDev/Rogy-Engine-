@@ -51,6 +51,11 @@ void Transform::SetLocalScale(glm::vec3 sca)
 	SetScale(sca);
 }
 // ------------------------------------------------------------
+void Transform::SetMat4(glm::mat4 sMat4)
+{
+
+}
+// ------------------------------------------------------------
 void Transform::SetWorldPosition(glm::vec3 position)
 {
 	if (parent != nullptr)

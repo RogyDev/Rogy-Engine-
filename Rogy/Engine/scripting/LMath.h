@@ -5,6 +5,13 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <iostream>
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtc/epsilon.hpp>
+#include <glm/gtx/transform.hpp>
+
 namespace LMath
 {
 	float Clamp(float val, float min, float max);

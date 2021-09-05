@@ -11,4 +11,5 @@ enum RLightType
 	R_DIRECTIONAL_LIGHT,
 	R_SPOT_LIGHT
 };
+
 #endif

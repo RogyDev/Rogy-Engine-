@@ -11,10 +11,12 @@
 #include <dirent.h>
 
 #include "script_editor.h"
+#include "material_editor.h"
 #include "../scene/Scene.h"
 #include "../renderer/renderer.h"
 
 #include <RTools.h>
+#include <shellapi.h>
 
 struct EFileInfo
 {
@@ -25,6 +27,7 @@ struct EFileInfo
 	bool is_selected;
 	bool is_texture;
 	bool is_mesh;
+	bool is_prefab;
 
 	EFileInfo(std::string _name, std::string _name_only, std::string _file_type, bool _is_dir)
 	{
@@ -53,14 +56,21 @@ public:
 	bool last_operation_is_cut = false;
 
 	Script_Editor* scr_editor;
+	RMaterialEditor* mat_editor;
 	SceneManager* mScene;
 	Renderer* rnder;
 
-	bool isOn = true;
+	bool isOn = false;
 
 	std::vector<EFileInfo> dir_files;
 
 	void Render(ImFont* icon_font = nullptr);
+
+	void RefreshDir()
+	{
+		OpenDir(current_dir.c_str());
+	}
+	std::string& GetFileDir(unsigned int fileIndx);
 
 	void OpenDir(const char* path);
 	void GoBack();
@@ -71,7 +81,7 @@ public:
 
 	bool CheckForFile(std::string& fname);
 
-	void DisplayInfo(const char* desc);
+	void DisplayInfo(const char* desc, const char* desc2 = "");
 
 	int GetSelectionIndex();
 	//EFileInfo& GetSelection();

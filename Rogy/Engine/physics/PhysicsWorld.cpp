@@ -79,13 +79,27 @@ btTriangleMesh* PhysicsWorld::GetMeshCollider(Mesh * mesh)
 	}
 
 	btTriangleMesh* tm = new btTriangleMesh();
-	for (size_t i = 0; i < mesh->indices.size(); i += 3)
+	for (size_t i = 0; i < mesh->faces.size(); i++)
+	{
+		int index0 = mesh->faces[i].indices[0];
+		int index1 = mesh->faces[i].indices[1];
+		int index2 = mesh->faces[i].indices[2];
+
+		btVector3 vertex0(mesh->vertices[index0].Position.x, mesh->vertices[index0].Position.y, mesh->vertices[index0].Position.z);
+		btVector3 vertex1(mesh->vertices[index1].Position.x, mesh->vertices[index1].Position.y, mesh->vertices[index1].Position.z);
+		btVector3 vertex2(mesh->vertices[index2].Position.x, mesh->vertices[index2].Position.y, mesh->vertices[index2].Position.z);
+
+		tm->addTriangle(vertex0, vertex1, vertex2);
+	}
+
+	/*for (size_t i = 0; i < mesh->indices.size(); i += 3)
 	{
 		//tm->addIndex(mesh->indices[i]);
 		tm->addTriangle(btVector3(mesh->vertices[i].Position.x, mesh->vertices[i].Position.y, mesh->vertices[i].Position.z),
 			btVector3(mesh->vertices[i + 1].Position.x, mesh->vertices[i + 1].Position.y, mesh->vertices[i + 1].Position.z),
 			btVector3(mesh->vertices[i + 2].Position.x, mesh->vertices[i + 2].Position.y, mesh->vertices[i + 2].Position.z));
-	}
+
+	}*/
 	mesh_cols.emplace_back(tm, mesh->path);
 	return tm;
 }

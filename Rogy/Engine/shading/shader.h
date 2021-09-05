@@ -24,7 +24,7 @@ class Shader
         ~Shader();
 		void Shader::setShader_g(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath);
 		void Shader::setShader(const GLchar* vertexPath, const GLchar* fragmentPath);
-        void Shader::loadShader(const GLchar* ShaderPath);
+        void Shader::loadShader(const GLchar* ShaderPath, const GLchar* defines = "NON");
 		void Shader::loadShaderGeo(const GLchar* ShaderPath);
 		void Shader::loadComputeShader(const GLchar* ShaderPath);
         void use();

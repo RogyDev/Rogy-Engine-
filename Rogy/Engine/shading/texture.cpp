@@ -9,6 +9,36 @@
 #include "texture.h"
 
 
+int Texture::GetRed(int x, int y)
+{
+	unsigned char* pixel = tData + y * texWidth * 4 + x * 4;
+	return pixel[0] ;
+}
+
+int Texture::GetGreen(int x, int y)
+{
+	unsigned char* pixel = tData + y * texWidth * 4 + x * 4;
+	return pixel[1];
+}
+
+int Texture::GetBlue(int x, int y)
+{
+	/*unsigned char* pixelOffset = tData + (x + 255 * z) * 3;
+	unsigned char r = pixelOffset[0];
+	unsigned char g = pixelOffset[1];
+	unsigned char b = pixelOffset[2];
+	return ((int)r + (int)b + (int)g) / 3;*/
+	return tData[4 * (y * texWidth + x) + 0];
+	//unsigned char* pixel = tData + y * texWidth * 4 + x * 4;
+	//return ((int)pixel[2] + (int)pixel[1] + (int)pixel[0])/3 ;
+}
+
+int Texture::GetAlpha(int x, int y)
+{
+	unsigned char* pixel = tData + y * texWidth * 4 + x * 4;
+	return pixel[3];
+}
+
 Texture::Texture()
 {
 
@@ -25,7 +55,7 @@ std::string Texture::getTexPath()
 	return this->TPath;
 }
 
-bool Texture::setTexture(const char* texPath, std::string tex_Name, bool texFlip)
+bool Texture::setTexture(const char* texPath, std::string tex_Name, bool texFlip, bool keepData)
 {
     this->texType = GL_TEXTURE_2D;
 
@@ -78,7 +108,10 @@ bool Texture::setTexture(const char* texPath, std::string tex_Name, bool texFlip
 		return false;
     }
 
-    stbi_image_free(texData);
+	if (keepData)
+		tData = texData;
+	else
+		stbi_image_free(texData);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 	return true;
@@ -331,12 +364,4 @@ std::string Texture::getTexName()
 void Texture::useTexture()
 {
     glBindTexture(this->texType, this->texID);
-}
-
-TexHdr::TexHdr()
-{
-}
-
-TexHdr::~TexHdr()
-{
 }

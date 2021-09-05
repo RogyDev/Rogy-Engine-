@@ -42,11 +42,13 @@ void Scene_Settings::Render()
 		BeginPrepsA("##skypreps");
 		PrepNameA("HDR Path");
 		PrepNameA("Ambient");
+		PrepNameA("Clouds");
 		NextPrepsA();
 		if (ImGui::Button("Set ##hdr")) 
 			ImGuiFileDialog::Instance()->OpenModal("ChooseHDRModel", "Choose Texture", ".hdr\0.HDR\0.png\0.bmp\0", ".");
 		ImGui::SameLine(); ImGui::Text(rndr->SkyPath.c_str());
 		ImGui::DragFloat("##Ambientcc", &rndr->AmbientLevel);
+		ImGui::Checkbox(" ##cloudsss", &rndr->UseClouds);
 		EndPrepsA();
 		ImGui::Separator();
 	}
@@ -54,9 +56,14 @@ void Scene_Settings::Render()
 	if (ImGui::CollapsingHeader("Post Processing", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Checkbox("Enable Post Effects ##Effects", &rndr->postProc.Use);
+		ImGui::Text("Tone Mapping"); ImGui::SameLine();
+		ImGui::Combo("##tma_type", &rndr->postProc.ToneMap, "FilmicTM\0Reinhard\0HDRTM\0");
+
 		ImGui::Separator();
+		ImGui::Text("FXAA"); ImGui::SameLine();
+		ImGui::Checkbox("##FXAA", &rndr->postProc.Fxaa);
+
 		ImGui::DragFloat("Exposure ##Exposure", &rndr->postProc.exposure);
-		//ImGui::DragFloat("Exposure Speed ##Exposure", &rndr->exposure_speed);
 		ImGui::Separator();
 		ImGui::Checkbox("Vignette ##vignette", &rndr->postProc.vignette_use);
 		if (rndr->postProc.vignette_use)
@@ -82,7 +89,15 @@ void Scene_Settings::Render()
 			ImGui::DragFloat("Bias ##ss", &rndr->postProc.ssaoEffect.bias, 0.01f);
 			ImGui::Separator();
 		}
+		ImGui::Checkbox("Bloom ##ss", &rndr->postProc.bloom_use);
+		if (rndr->postProc.bloom_use)
+		{
+			ImGui::DragFloat("Threshold ##ss", &rndr->postProc.bloom_threshold, 0.01f);
+			ImGui::Separator();
+		}
 		ImGui::Checkbox("Blur", &rndr->postProc.blur_use);
+		ImGui::Checkbox("Sharpen", &rndr->postProc.sharpen);
+		ImGui::DragFloat("Sharpen ##Sharpen", &rndr->postProc.sharpen_amount);
 		//ImGui::Checkbox("Camera Motion Blur ##cmb", &rndr->postProc.mb_use);
 		ImGui::Separator();
 	}
@@ -111,8 +126,13 @@ void Scene_Settings::Render()
 			rndr->BakeReflectionProbes();
 		if (ImGui::Button("Bake Static Lights", ImVec2(ImGui::GetWindowWidth(), 0)))
 			rndr->BakeReflectionProbes();
+		if (ImGui::Button("Bake Nav", ImVec2(ImGui::GetWindowWidth(), 0)))
+			_scene->PushRequest(SR_BAKE_NAV);
+
 		ImGui::Separator();
 		ImGui::Text("Lightmapper");
+		if(rndr == nullptr)
+			ImGui::Text("rndr is null!");
 		ImGui::Text("This Lightmapper will bake Ambient Occlusion for All the static meshs \n in the scene.");
 		BeginPrepsA("##lmsettings");
 		PrepNameA("Resolution ");
@@ -129,6 +149,7 @@ void Scene_Settings::Render()
 		{
 			rndr->BakeLighting = true;
 		}
+		
 		ImGui::Separator();
 	}
 	ImGui::End();

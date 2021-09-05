@@ -25,6 +25,7 @@ public:
 	~Scene_Settings();
 
 	Renderer* rndr = nullptr;
+	SceneManager* _scene = nullptr;
 
 	void Render();
 

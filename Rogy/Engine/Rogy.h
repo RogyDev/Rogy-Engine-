@@ -42,6 +42,8 @@
 // UI
 #include "ui\UIRenderer.h"
 
+#include "navigation/Navigation.h"
+
 // include the window creator
 #include "window\rogy_window.h"
 #include <glm/gtc/type_ptr.hpp>
@@ -100,6 +102,8 @@ public:
 
 	// Debug
 	DebugTool m_Debug;
+
+	//Navigation m_nav;
 
 	// Game User-Interface
 	UIRenderer m_UI;
@@ -165,6 +169,24 @@ private:
 	void SetEntitiesLightmapPaths(Entity* ent);
 	int lmSetIndex = 0;
 	bool mainSceneLoaded = false;
+	bool gizHovred = false;
+
+#ifdef EDITOR_MODE
+	struct EDIT_ICON
+	{
+		Texture* image;
+		EditorIcon type;
+
+		EDIT_ICON(EditorIcon mtype, const char* npath, ResourcesManager& res)
+		{
+			type = mtype;
+			image = res.CreateTexture(npath, npath, true);
+		}
+	};
+	std::vector<EDIT_ICON> m_icons;
+	void RenderGuizmos();
+#endif
+
 };
 
 #endif // ! ROGY_ENGINE

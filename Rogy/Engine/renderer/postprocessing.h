@@ -36,11 +36,17 @@ public:
 
 	// Full screen blur
 	bool blur_use = false;
+
+	// Bloom
+	bool bloom_use = false;
+	float bloom_threshold = 1.0f;
 	
 	// Motion Blue
 	bool mb_use = false;
 	glm::vec2 cam_velocity;
 	int fps;
+
+	GLuint mm;
 
 	// framebuffer configuration
 	// -------------------------
@@ -55,8 +61,9 @@ public:
 	FrameBufferTex BluredScreen;
 
 	// Bloom stuff
-	GLuint bloomFBO;
-	GLuint bloomBuffer;
+	FrameBufferTex bloomTex;
+	FrameBufferTex bloomBlurTex;
+
 
 	// SSAO
 	// ------------------------------
@@ -76,13 +83,22 @@ public:
 	bool Initialized = false;
 	bool Use = false;
 
+	bool Fxaa = false;
+	bool sharpen = false;
+	float sharpen_amount = 1.f;
+
+	// Tone Mapping
+	int ToneMap = 0;
+
 	Shader screenShader;
 	Shader blurShader;
+	Shader bloomShader;
+	Shader bloomBlurShader;
 	
 	void Init();
 	void SetupBuffer(float w, float h);
 	void Bind();
-	bool Render();
+	bool Render(GLuint a, float f, float n);
 	bool VerticalBlur(FrameBufferTex& fbt);
 	bool HorizontalBlur();
 	bool Usable();

@@ -23,7 +23,6 @@ public:
 	float Bias      = 0.05f;
 
 	bool  CastShadows = false;
-	bool  Active      = true;
 	bool  Static = false;
 	bool baked = false;
 
@@ -31,11 +30,19 @@ public:
 	bool visible = true;
 	bool inFrustum = false;
 
+	bool  Active = true; // is entity active?
+
+	bool isActive()
+	{
+		return (Active && enabled);
+	}
+
 	// Serialization
 	virtual void OnSave(YAML::Emitter& out) override
 	{
 		out << YAML::Key << "PointLight" << YAML::BeginMap;
 
+		out << YAML::Key << "enabled" << YAML::Value << enabled;
 		out << YAML::Key << "Color"; RYAML::SerVec3(out, Color);
 		out << YAML::Key << "Bias" << YAML::Value << Bias;
 		out << YAML::Key << "CastShadows" << YAML::Value << CastShadows;
@@ -47,6 +54,7 @@ public:
 
 	virtual void OnLoad(YAML::Node& data) override
 	{
+		enabled = data["enabled"].as<bool>();
 		Color = RYAML::GetVec3(data["Color"]);
 		Bias = data["Bias"].as<float>();
 		CastShadows = data["CastShadows"].as<bool>();

@@ -226,12 +226,14 @@ void RigidBody::ChangeShape(RCollisionShapeType toType)
 void RigidBody::SetCollisionScale(glm::vec3 newScale)
 {
 	if (mScale == newScale) return;
-	if (newScale.x < 0.1f) newScale.x = 0.1f;
-	if (newScale.y < 0.1f) newScale.y = 0.1f;
-	if (newScale.z < 0.1f) newScale.z = 0.1f;
+	if (newScale.x < 0.001f) newScale.x = 0.001f;
+	if (newScale.y < 0.001f) newScale.y = 0.001f;
+	if (newScale.z < 0.001f) newScale.z = 0.001f;
 	mScale = newScale;
 	btVector3 rad = btVector3(mScale.x * mScaleMultiplier.x, mScale.y * mScaleMultiplier.y, mScale.z * mScaleMultiplier.z);
-	collisionShape->setLocalScaling(rad);
+	std::cout << rad.getX() << " " << rad.getY() << " " << rad.getZ();
+	if(collisionShape != nullptr)
+		collisionShape->setLocalScaling(rad);
 }
 // ------------------------------------------------------------------------
 glm::vec3& RigidBody::GetScale()
@@ -264,6 +266,7 @@ void RigidBody::OnSave(YAML::Emitter& out)
 	out << YAML::Key << "is_trigger" << YAML::Value << is_trigger;
 	out << YAML::Key << "mScaleMultiplier"; RYAML::SerVec3(out, mScaleMultiplier);
 	out << YAML::Key << "mOffset"; RYAML::SerVec3(out, mOffset);
+	out << YAML::Key << "mesh_path" << YAML::Value << mesh_path;
 
 	out << YAML::EndMap;
 }
@@ -283,6 +286,9 @@ void RigidBody::OnLoad(YAML::Node& data)
 	isTrigg = data["is_trigger"].as<bool>();
 	last_scale = RYAML::GetVec3(data["mScaleMultiplier"]);
 	mOffset = RYAML::GetVec3(data["mOffset"]);
+
+	if(data["mesh_path"].IsDefined())
+		mesh_path = data["mesh_path"].as<std::string>();
 
 	SetCollisionShape((RCollisionShapeType)coll_type);
 	SetBodyMode((RPhyBodyMode)bdMode);

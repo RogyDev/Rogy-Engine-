@@ -87,9 +87,6 @@
     <Filter Include="Engine\Renderer\components">
       <UniqueIdentifier>{a15ac1dd-3486-400c-b2e9-c3c701d7c4b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Components">
-      <UniqueIdentifier>{3207595d-65fa-456f-9b1a-a74972a7147f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\NativeScripting">
       <UniqueIdentifier>{749f3a02-1ea9-4e7c-805f-6a99bdb42787}</UniqueIdentifier>
     </Filter>
@@ -119,6 +116,12 @@
     </Filter>
     <Filter Include="SoLoud">
       <UniqueIdentifier>{384ad5be-1192-417e-a3e5-4b5761176af2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Navigation">
+      <UniqueIdentifier>{d63cf3da-9e8c-4ab4-9bb6-9b9b4bc75f28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\Detour">
+      <UniqueIdentifier>{97d10b3b-7612-4cca-95a8-8367db9f5865}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -247,9 +250,6 @@
     </ClCompile>
     <ClCompile Include="Engine\renderer\billboardComponent.cpp">
       <Filter>Engine\Renderer\components</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\components\DefaultComponents.cpp">
-      <Filter>Engine\Components</Filter>
     </ClCompile>
     <ClCompile Include="Engine\renderer\light_types\lights_impl.cpp">
       <Filter>Engine\Renderer\light_types</Filter>
@@ -848,6 +848,72 @@
     <ClCompile Include="ThirdParty\SoLoud\src\backend\openal\soloud_openal.cpp">
       <Filter>SoLoud</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\renderer\ForwardPlusRenderer.cpp">
+      <Filter>Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\editor\material_editor.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\navigation\Navigation.cpp">
+      <Filter>Engine\Navigation</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastLayers.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastMesh.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastMeshDetail.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastRasterization.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastRegion.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\DetourAlloc.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\DetourAssert.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\DetourCommon.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\DetourNavMesh.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\DetourNavMeshBuilder.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\DetourNavMeshQuery.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\DetourNode.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\Recast.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastAlloc.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastArea.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastAssert.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastContour.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Recast\Source\RecastFilter.cpp">
+      <Filter>ThirdParty\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\mesh\displacement.cpp">
+      <Filter>Engine\Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ImGuizmo.h">
@@ -1068,9 +1134,6 @@
     </ClInclude>
     <ClInclude Include="Engine\renderer\billboardComponent.h">
       <Filter>Engine\Renderer\components</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\components\DefaultComponents.h">
-      <Filter>Engine\Components</Filter>
     </ClInclude>
     <ClInclude Include="Engine\renderer\cameraComponent.h">
       <Filter>Engine\Renderer</Filter>
@@ -1827,6 +1890,21 @@
     </ClInclude>
     <ClInclude Include="ThirdParty\SoLoud\src\audiosource\wav\stb_vorbis.h">
       <Filter>SoLoud</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\renderer\ForwardPlusRenderer.h">
+      <Filter>Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\editor\material_editor.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\navigation\Navigation.h">
+      <Filter>Engine\Navigation</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\mesh\displacement.h">
+      <Filter>Engine\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\renderer\LightsBuffer.h">
+      <Filter>Engine\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

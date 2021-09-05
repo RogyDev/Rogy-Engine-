@@ -139,7 +139,7 @@ public:
 		}
 		assert(0);
 	}
-private:
+
 
 	/* Gets normalized value for Lerp & Slerp*/
 	float GetScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime)
@@ -155,8 +155,13 @@ private:
 	and returns the translation matrix */
 	glm::mat4 InterpolatePosition(float animationTime)
 	{
+		return glm::translate(glm::mat4(1.0f), InterpolatePositionVec3(animationTime));
+	}
+
+	glm::vec3 InterpolatePositionVec3(float animationTime)
+	{
 		if (1 == m_NumPositions)
-			return glm::translate(glm::mat4(1.0f), m_Positions[0].position);
+			return m_Positions[0].position;
 
 		int p0Index = GetPositionIndex(animationTime);
 		int p1Index = p0Index + 1;
@@ -165,17 +170,21 @@ private:
 		glm::vec3 finalPosition = glm::mix(m_Positions[p0Index].position,
 			m_Positions[p1Index].position
 			, scaleFactor);
-		return glm::translate(glm::mat4(1.0f), finalPosition);
+		return finalPosition;
 	}
 
 	/* figures out which rotations keys to interpolate b/w and performs the interpolation
 	and returns the rotation matrix */
 	glm::mat4 InterpolateRotation(float animationTime)
 	{
+		return glm::toMat4(InterpolateRotationQuat(animationTime));
+	}
+	glm::quat InterpolateRotationQuat(float animationTime)
+	{
 		if (1 == m_NumRotations)
 		{
 			auto rotation = glm::normalize(m_Rotations[0].orientation);
-			return glm::toMat4(rotation);
+			return rotation;
 		}
 
 		int p0Index = GetRotationIndex(animationTime);
@@ -185,15 +194,19 @@ private:
 		glm::quat finalRotation = glm::slerp(m_Rotations[p0Index].orientation,
 			m_Rotations[p1Index].orientation, scaleFactor);
 		finalRotation = glm::normalize(finalRotation);
-		return glm::toMat4(finalRotation);
+		return finalRotation;
 	}
 
 	/* figures out which scaling keys to interpolate b/w and performs the interpolation
 	and returns the scale matrix */
 	glm::mat4 Bone::InterpolateScaling(float animationTime)
 	{
+		return glm::scale(glm::mat4(1.0f), InterpolateScalingVec3(animationTime));
+	}
+	glm::vec3 Bone::InterpolateScalingVec3(float animationTime)
+	{
 		if (1 == m_NumScalings)
-			return glm::scale(glm::mat4(1.0f), m_Scales[0].scale);
+			return m_Scales[0].scale;
 
 		int p0Index = GetScaleIndex(animationTime);
 		int p1Index = p0Index + 1;
@@ -201,8 +214,9 @@ private:
 			m_Scales[p1Index].timeStamp, animationTime);
 		glm::vec3 finalScale = glm::mix(m_Scales[p0Index].scale,
 			m_Scales[p1Index].scale, scaleFactor);
-		return glm::scale(glm::mat4(1.0f), finalScale);
+		return finalScale;
 	}
+private:
 };
 
 #endif // ! SK_BONE_H

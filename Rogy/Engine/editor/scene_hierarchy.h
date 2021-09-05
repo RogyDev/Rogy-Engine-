@@ -26,6 +26,8 @@ public:
 
 	std::vector<EnttID> sel_entt;
 
+	void SetSelection(EnttID eid);
+
 	SceneManager* scene;
 	InputManager* input = nullptr;
 

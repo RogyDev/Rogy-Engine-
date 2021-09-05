@@ -25,7 +25,7 @@ public:
 	void Init();
 	void Clear();
 
-	Texture* CreateTexture(std::string tex_name, const char* tex_path, bool flip = false);
+	Texture* CreateTexture(std::string tex_name, const char* tex_path, bool flip = false, bool keepdata = false);
 	bool	 RemoveTexture(std::string tex_name);
 	Texture* GetTexture(std::string tex_name);
 	Texture* GetTextureName(std::string tex_name);

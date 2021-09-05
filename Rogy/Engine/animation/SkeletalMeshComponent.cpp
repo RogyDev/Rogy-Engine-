@@ -85,7 +85,7 @@ void SkeletalMeshComponent::Update(float dt)
 		return;
 	if (!animator.HasAnimation())
 		return;
-	animator.UpdateAnimation(dt);
+	animator.UpdateAnimation(dt, scale);
 }
 
 void SkeletalMeshComponent::Clear()

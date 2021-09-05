@@ -11,6 +11,7 @@ public:
 
 	int light_id;
 
+	glm::vec3 Position = glm::vec3(1.0f);
 	glm::vec3 Direction = glm::vec3(0.0f);
 	glm::vec3 Color = glm::vec3(1.0f);
 
@@ -20,10 +21,16 @@ public:
 	bool  Active	  = true;
 	bool  Soft        = false;
 
+	bool isActive()
+	{
+		return (Active && enabled);
+	}
+
 	virtual void OnSave(YAML::Emitter& out) override
 	{
 		out << YAML::Key << "DirectionalLight" << YAML::BeginMap;
 
+		out << YAML::Key << "enabled" << YAML::Value << enabled;
 		out << YAML::Key << "Color"; RYAML::SerVec3(out, Color);
 		out << YAML::Key << "Bias" << YAML::Value << Bias;
 		out << YAML::Key << "CastShadows" << YAML::Value << CastShadows;
@@ -35,6 +42,7 @@ public:
 
 	virtual void OnLoad(YAML::Node& data) override
 	{
+		enabled = data["enabled"].as<bool>();
 		Color = RYAML::GetVec3(data["Color"]);
 		Bias = data["Bias"].as<float>();
 		CastShadows = data["CastShadows"].as<bool>();

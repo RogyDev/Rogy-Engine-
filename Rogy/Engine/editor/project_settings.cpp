@@ -79,7 +79,7 @@ void Project_Settings::Render()
 		EditorProperty::SetWeightPrep(); ImGui::DragFloat("##changeCascade Split 1", &prj->CascadeSplits[0], 0.01f, 0.1f, 1.0f);
 		EditorProperty::SetWeightPrep(); ImGui::DragFloat("##changeCascade Split 2", &prj->CascadeSplits[1], 0.01f, 0.1f, 1.0f);
 		EditorProperty::SetWeightPrep(); ImGui::DragFloat("##changeCascade Split 3", &prj->CascadeSplits[2], 0.01f, 0.1f, 1.0f);
-
+		EditorProperty::SetWeightPrep(); ImGui::DragInt("##changeCascade Split 33", &rndr->csm);
 		EditorProperty::EndPreps();
 		ImGui::SetNextItemWidth(ImGui::GetWindowWidth());
 		if (ImGui::Button("Apply and Save"))
@@ -87,8 +87,8 @@ void Project_Settings::Render()
 			rndr->m_ShadowMapper.SHADOW_MAP_CASCADE_COUNT = prj->CascadesCount;
 			rndr->m_ShadowMapper.SetShadowDistance((size_t)prj->ShadowDistance);
 			rndr->m_ShadowMapper.SetCascadesResolution(prj->CascadedShadowMapsResolution);
-			rndr->m_PointShadowMapper.ResetShadowResolution(prj->PointShadowResolution);
-			rndr->m_SpotShadowMapper.ResetShadowResolution(prj->SpotShadowsResolution);
+			//rndr->m_PointShadowMapper.ResetShadowResolution(prj->PointShadowResolution);
+			//rndr->m_SpotShadowMapper.ResetShadowResolution(prj->SpotShadowsResolution);
 		}
 		ImGui::Separator();
 	}

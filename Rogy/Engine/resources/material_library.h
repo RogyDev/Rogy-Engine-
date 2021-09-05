@@ -33,6 +33,8 @@ public:
 	// Shaders
 	// ----------------------------------
 	Shader PbrShader;
+	Shader PbrShader2;
+	Shader PbrShaderDisp;
 	Shader SkelShader;
 	Shader DepthShader;
 	Shader DepthShader_sk;
@@ -54,6 +56,8 @@ public:
 	Shader LM;
 
 	Shader mgrass;
+
+	Shader mousePickID;
 
 	// Materials
 	// -----------------------------------

@@ -9,8 +9,10 @@
 #include "../renderer/renderer.h"
 
 #include "scene_hierarchy.h"
+#include "material_editor.h"
 
 #include "../scripting/ScriptManager.h"
+
 
 
 #define WIN32
@@ -28,6 +30,7 @@ public:
 	ScriptManager* scrMnger = nullptr;
 	AudioManager* audio_mnger = nullptr;
 	UIRenderer* ui_renderer = nullptr;
+	RMaterialEditor* mat_editor = nullptr;
 
 	bool showMat = false;
 
@@ -56,6 +59,7 @@ public:
 	void particles_editor(Entity &obj);
 	void audio_editor(Entity &obj);
 	void grass_editor(Entity &obj);
+	void displacement_editor(Entity &obj);
 	
 	void cam_editor(Entity &obj);
 
@@ -78,10 +82,13 @@ public:
 
 		if (ImGui::BeginDragDropTarget())
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RES_FILE_MAT"))
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RES_FILE_MAT", ImGuiDragDropFlags_SourceAllowNullID))
 			{
-				IM_ASSERT(payload->DataSize == sizeof(std::string));
-				std::string payload_n = *(std::string*)payload->Data;
+				//IM_ASSERT(payload->DataSize == sizeof(std::string));
+				//std::string payload_n = std::string((const char*)payload->Data);
+				//std::count << "MAT : " << (const char*)payload->Data << std::endl;
+				const wchar_t* ppp = (const wchar_t*)payload->Data;
+				std::string payload_n((const char*)ppp);
 				rc->material = rndr->LoadMaterial(payload_n.c_str());
 
 				int slashPos = 0;
@@ -113,7 +120,7 @@ public:
 					ImGui::OpenPopup("mat_edit_menu");
 				DisplayInfo(rc->material->getMatName().c_str());
 
-				if (showMat && ImGui::Button("Collapse", ImVec2(ImGui::GetWindowWidth(), 0)))
+				/*if (showMat && ImGui::Button("Collapse", ImVec2(ImGui::GetWindowWidth(), 0)))
 					showMat = false;
 				else if (!showMat && ImGui::Button("Edit", ImVec2(ImGui::GetWindowWidth(), 0)))
 					showMat = true;
@@ -167,7 +174,7 @@ public:
 						EditTextureProprty(rc->material);
 						EndPreps();
 					}
-				}
+				}*/
 			}
 			ImGui::Separator();
 
@@ -179,6 +186,8 @@ public:
 					ImGuiFileDialog::Instance()->OpenModal("CreateMatModel", "New Material", ".mat\0.mat\0.mat\0\0", ".mat");
 				if (ImGui::Selectable("Load"))
 					ImGuiFileDialog::Instance()->OpenModal("ChooseMatModel", "Select Material", ".mat\0.mat\0.mat\0\0", ".");
+				if (ImGui::Selectable("Edit"))
+					mat_editor->EditMaterial(rc->material);
 				ImGui::EndPopup();
 			}
 

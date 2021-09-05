@@ -22,6 +22,7 @@ void MaterialLibrary::Init()
 	DepthShader		  .loadShader("core/shaders/ShadowMapping/dir_shadow.rsh");
 	NonShader		  .loadShader("core/shaders/NonShader.rsh");
 	PbrShader		  .loadShader("core/shaders/iblShader.rsh");
+	PbrShaderDisp	  .loadShader("core/shaders/iblShader.rsh", "DISPLACEMENT");
 	background		  .loadShader("core/shaders/background.rsh");
 	PointLightPass	  .loadShader("core/shaders/ShadowMapping/point_shadows_pass.rsh");
 	PointDepthShader  .setShader_g("core/shaders/ShadowMapping/point_shadows_depth.vs", 
@@ -34,12 +35,16 @@ void MaterialLibrary::Init()
 	mgrass.loadShader("core\\shaders\\grass.rsh");
 	SkelShader.loadShader("core/shaders/Skeletal.rsh");
 	DepthShader_sk.loadShader("core/shaders/ShadowMapping/dir_shadow_sk.rsh");
-
+	mousePickID.loadShader("core\\shaders\\\MousePick\\MPick.rsh");
+	PbrShader2.loadShader("core/shaders/iblShader.rsh", "DISPLACEMENT");
 	// Prepare shaders
 	// ------------------------------------------------
 	mgrass.use();
 	mgrass.setInt("BBTexture", 0);
 	mgrass.setInt("shadowMaps", 1);
+
+	DepthShader.use();
+	DepthShader.setInt("alpha", 0);
 
 	PsShader.use();
 	PsShader.setInt("myTextureSampler", 0);
@@ -68,15 +73,17 @@ void MaterialLibrary::Init()
 	SSAOBlur.setInt("ssaoInput", 0);
 	ShaderGeometryPass.use();
 	ShaderGeometryPass.setInt("invertedNormals", 0);
+
 	shaderSSAO.use();
-	shaderSSAO.setInt("gPosition", 0);
-	shaderSSAO.setInt("gNormal"  , 1);
-	shaderSSAO.setInt("texNoise" , 2);
+	shaderSSAO.setInt("gPosition", 5);
+	shaderSSAO.setInt("gNormal"  , 6);
+	shaderSSAO.setInt("texNoise" , 7);
 
 	// PBR Background
 	background.use();
 	background.setInt("environmentMap", 0);
-	
+	background.setInt("CloudsTex", 1);
+
 	// Billboard shader
 	BillboardShader.use();
 	BillboardShader.setInt("BBTexture", 0);
@@ -86,11 +93,11 @@ void MaterialLibrary::Init()
 	PbrShader.setInt("env_probe.irradianceMap", TEX_IRRADIANCE_MAP);
 	PbrShader.setInt("env_probe.prefilterMap" , TEX_PREFILTER_MAP);
 
-	PbrShader.setInt("tex_albedo"   , TEX_ALBEDO);
-	PbrShader.setInt("tex_metal"    , TEX_METALLIC);
-	PbrShader.setInt("tex_rough"    , TEX_ROUGHNESS);
-	PbrShader.setInt("tex_normal"   , TEX_NORMAL);
-	PbrShader.setInt("tex_emission" , TEX_EMISSION);
+	PbrShader.setInt("material.tex_albedo"   , TEX_ALBEDO);
+	PbrShader.setInt("material.tex_metal"    , TEX_METALLIC);
+	PbrShader.setInt("material.tex_rough"    , TEX_ROUGHNESS);
+	PbrShader.setInt("material.tex_normal"   , TEX_NORMAL);
+	PbrShader.setInt("material.tex_emission" , TEX_EMISSION);
 
 	PbrShader.setInt("tex_lightmap" , TEX_AO);
 
@@ -108,47 +115,110 @@ void MaterialLibrary::Init()
 		PbrShader.setInt(("texSpot_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + 8 + i);
 	}
 
-	PbrShader.SetVec3("albedo", glm::vec3(1));
-	PbrShader.SetFloat("ao", 1.0f);
+	PbrShader.SetVec3("material.albedo", glm::vec3(1));
+	PbrShader.SetFloat("material.ao", 1.0f);
 
 	for (int i = 0; i < MAX_LIGHT_COUNT; i++)
 	{
 		PbrShader.setBool(("p_lights[" + std::to_string(i) + "].active").c_str(), false);
 	}
 
-	// SK Shader
-	SkelShader.use();
-	 SkelShader.setInt("irradianceMap", TEX_IRRADIANCE_MAP);
-	 SkelShader.setInt("prefilterMap", TEX_PREFILTER_MAP);
+	// PBR Shader
+	PbrShader2.use();
+	PbrShader2.setInt("env_probe.irradianceMap", TEX_IRRADIANCE_MAP);
+	PbrShader2.setInt("env_probe.prefilterMap", TEX_PREFILTER_MAP);
 
-	 SkelShader.setInt("tex_albedo", TEX_ALBEDO);
-	 SkelShader.setInt("tex_metal", TEX_METALLIC);
-	 SkelShader.setInt("tex_rough", TEX_ROUGHNESS);
-	 SkelShader.setInt("tex_normal", TEX_NORMAL);
-	 SkelShader.setInt("tex_emission", TEX_EMISSION);
+	PbrShader2.setInt("material.tex_albedo", TEX_ALBEDO);
+	PbrShader2.setInt("material.tex_metal", TEX_METALLIC);
+	PbrShader2.setInt("material.tex_rough", TEX_ROUGHNESS);
+	PbrShader2.setInt("material.tex_normal", TEX_NORMAL);
+	PbrShader2.setInt("material.tex_emission", TEX_EMISSION);
 
-	 SkelShader.setInt("tex_lightmap", TEX_AO);
+	PbrShader2.setInt("tex_lightmap", TEX_AO);
 
-	 SkelShader.setInt("shadowMaps[0]", TEX_SHADOWMAP_1);
-	 SkelShader.setInt("shadowMaps[1]", TEX_SHADOWMAP_2);
-	 SkelShader.setInt("shadowMaps[2]", TEX_SHADOWMAP_3);
+	PbrShader2.setInt("shadowMaps[0]", TEX_SHADOWMAP_1);
+	PbrShader2.setInt("shadowMaps[1]", TEX_SHADOWMAP_2);
+	PbrShader2.setInt("shadowMaps[2]", TEX_SHADOWMAP_3);
 
 	for (int i = 0; i < 8; i++)
 	{
-		 SkelShader.setInt(("tex_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + i);
+		PbrShader2.setInt(("tex_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + i);
 	}
 
 	for (int i = 0; i < 8; i++)
 	{
-		 SkelShader.setInt(("texSpot_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + 8 + i);
+		PbrShader2.setInt(("texSpot_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + 8 + i);
 	}
 
-	 SkelShader.SetVec3("albedo", glm::vec3(1));
-	 SkelShader.SetFloat("ao", 1.0f);
+	PbrShader2.SetVec3("material.albedo", glm::vec3(1));
+	PbrShader2.SetFloat("material.ao", 1.0f);
 
 	for (int i = 0; i < MAX_LIGHT_COUNT; i++)
 	{
-		 SkelShader.setBool(("p_lights[" + std::to_string(i) + "].active").c_str(), false);
+		PbrShader2.setBool(("p_lights[" + std::to_string(i) + "].active").c_str(), false);
+	}
+	// Displacement Shader
+	PbrShaderDisp.use();
+	PbrShaderDisp.setInt("env_probe.irradianceMap", TEX_IRRADIANCE_MAP);
+	PbrShaderDisp.setInt("env_probe.prefilterMap", TEX_PREFILTER_MAP);
+
+	PbrShaderDisp.setInt("material.tex_albedo", TEX_ALBEDO);
+	PbrShaderDisp.setInt("material.tex_metal", TEX_METALLIC);
+	PbrShaderDisp.setInt("material.tex_rough", TEX_ROUGHNESS);
+	PbrShaderDisp.setInt("material.tex_normal", TEX_NORMAL);
+
+	PbrShaderDisp.setInt("tex_lightmap", TEX_AO);
+
+	PbrShaderDisp.setInt("shadowMaps[0]", TEX_SHADOWMAP_1);
+	PbrShaderDisp.setInt("shadowMaps[1]", TEX_SHADOWMAP_2);
+	PbrShaderDisp.setInt("shadowMaps[2]", TEX_SHADOWMAP_3);
+
+	for (int i = 0; i < 8; i++)
+	{
+		PbrShaderDisp.setInt(("tex_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + i);
+	}
+
+	for (int i = 0; i < 8; i++)
+	{
+		PbrShaderDisp.setInt(("texSpot_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + 8 + i);
+	}
+
+	PbrShaderDisp.SetVec3("material.albedo", glm::vec3(1));
+	PbrShaderDisp.SetFloat("material.ao", 1.0f);
+
+	// SK Shader
+	SkelShader.use();
+	SkelShader.setInt("irradianceMap", TEX_IRRADIANCE_MAP);
+	SkelShader.setInt("prefilterMap", TEX_PREFILTER_MAP);
+
+	SkelShader.setInt("tex_albedo", TEX_ALBEDO);
+	SkelShader.setInt("tex_metal", TEX_METALLIC);
+	SkelShader.setInt("tex_rough", TEX_ROUGHNESS);
+	SkelShader.setInt("tex_normal", TEX_NORMAL);
+	SkelShader.setInt("tex_emission", TEX_EMISSION);
+
+	SkelShader.setInt("tex_lightmap", TEX_AO);
+
+	SkelShader.setInt("shadowMaps[0]", TEX_SHADOWMAP_1);
+	SkelShader.setInt("shadowMaps[1]", TEX_SHADOWMAP_2);
+	SkelShader.setInt("shadowMaps[2]", TEX_SHADOWMAP_3);
+
+	for (int i = 0; i < 8; i++)
+	{
+		SkelShader.setInt(("tex_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + i);
+	}
+
+	for (int i = 0; i < 8; i++)
+	{
+		SkelShader.setInt(("texSpot_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + 8 + i);
+	}
+
+	SkelShader.SetVec3("albedo", glm::vec3(1));
+	SkelShader.SetFloat("ao", 1.0f);
+
+	for (int i = 0; i < MAX_LIGHT_COUNT; i++)
+	{
+		SkelShader.setBool(("p_lights[" + std::to_string(i) + "].active").c_str(), false);
 	}
 	
 	// Create default material

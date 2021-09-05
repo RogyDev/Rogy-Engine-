@@ -76,6 +76,7 @@ public:
 	int GetScriptInstance(std::string& scrName);
 	void InvokeScriptFunc(const char* funcName);
 	void StartScripts();
+	void DontDestroyOnLoad();
 
 	unsigned int ChildCount()
 	{
@@ -150,6 +151,7 @@ public:
 	void SetRotation(glm::vec3 angels);
 	void SetScale(glm::vec3 newScale);
 	void RotateY(float angle);
+	void Rotate(glm::vec3 dir, float Amount);
 
 	/* Set entity parent. */
 	bool SetParent(Entity* target);
@@ -199,6 +201,7 @@ public:
 	bool started = false;
 	bool bboxSeted = false;
 	bool doRBActive = false;
+	bool dontDestroyOnLoad = false;
 	RPhyBodyCollMode m_CollMode = RB_COLLISION_NONE;
 private:
 	bool willDestroy = false;

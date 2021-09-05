@@ -26,11 +26,11 @@
     <ClCompile Include="Engine\audio\AudioSource.cpp" />
     <ClCompile Include="Engine\camera\Camera.cpp" />
     <ClCompile Include="Engine\camera\camera_frustum.cpp" />
-    <ClCompile Include="Engine\components\DefaultComponents.cpp" />
     <ClCompile Include="Engine\core\Random.cpp" />
     <ClCompile Include="Engine\editor\debug_editor.cpp" />
     <ClCompile Include="Engine\editor\editor_property.cpp" />
     <ClCompile Include="Engine\editor\game_editor.cpp" />
+    <ClCompile Include="Engine\editor\material_editor.cpp" />
     <ClCompile Include="Engine\editor\project_browser.cpp" />
     <ClCompile Include="Engine\editor\project_settings.cpp" />
     <ClCompile Include="Engine\editor\scene_hierarchy.cpp" />
@@ -41,11 +41,14 @@
     <ClCompile Include="Engine\io\debug_tools.cpp" />
     <ClCompile Include="Engine\io\FSerializer.cpp" />
     <ClCompile Include="Engine\io\PlayerPrefs.cpp" />
+    <ClCompile Include="Engine\mesh\displacement.cpp" />
     <ClCompile Include="Engine\mesh\model.cpp" />
     <ClCompile Include="Engine\nativeScripting\ScriptableEntity.cpp" />
+    <ClCompile Include="Engine\navigation\Navigation.cpp" />
     <ClCompile Include="Engine\physics\GLDebugDrawer.cpp" />
     <ClCompile Include="Engine\physics\PhysicsWorld.cpp" />
     <ClCompile Include="Engine\physics\RigidBody.cpp" />
+    <ClCompile Include="Engine\renderer\ForwardPlusRenderer.cpp" />
     <ClCompile Include="Engine\renderer\ParticleSystem.cpp" />
     <ClCompile Include="Engine\renderer\rendererComponent.cpp" />
     <ClCompile Include="Engine\renderer\billboardComponent.cpp" />
@@ -210,6 +213,24 @@
     <ClCompile Include="ThirdParty\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\DetourAlloc.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\DetourAssert.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\DetourCommon.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\DetourNavMesh.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\DetourNavMeshBuilder.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\DetourNavMeshQuery.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\DetourNode.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\Recast.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastAlloc.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastArea.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastAssert.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastContour.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastFilter.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastLayers.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastMesh.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastMeshDetail.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastRasterization.cpp" />
+    <ClCompile Include="ThirdParty\Recast\Source\RecastRegion.cpp" />
     <ClCompile Include="ThirdParty\SoLoud\src\audiosource\monotone\soloud_monotone.cpp" />
     <ClCompile Include="ThirdParty\SoLoud\src\audiosource\noise\soloud_noise.cpp" />
     <ClCompile Include="ThirdParty\SoLoud\src\audiosource\openmpt\soloud_openmpt.cpp" />
@@ -276,7 +297,6 @@
     <ClInclude Include="Engine\camera\Camera.h" />
     <ClInclude Include="Engine\camera\camera_frustum.h" />
     <ClInclude Include="Engine\camera\frustum.h" />
-    <ClInclude Include="Engine\components\DefaultComponents.h" />
     <ClInclude Include="Engine\core\Random.h" />
     <ClInclude Include="Engine\core\stl\containers\containers.hpp" />
     <ClInclude Include="Engine\core\stl\containers\containers_fixes.hpp" />
@@ -295,6 +315,7 @@
     <ClInclude Include="Engine\editor\debug_editor.h" />
     <ClInclude Include="Engine\editor\editor_property.h" />
     <ClInclude Include="Engine\editor\game_editor.h" />
+    <ClInclude Include="Engine\editor\material_editor.h" />
     <ClInclude Include="Engine\editor\project_browser.h" />
     <ClInclude Include="Engine\editor\project_settings.h" />
     <ClInclude Include="Engine\editor\scene_hierarchy.h" />
@@ -308,16 +329,20 @@
     <ClInclude Include="Engine\io\FSerializer.h" />
     <ClInclude Include="Engine\io\PlayerPrefs.h" />
     <ClInclude Include="Engine\mesh\bounding_box.h" />
+    <ClInclude Include="Engine\mesh\displacement.h" />
     <ClInclude Include="Engine\mesh\mesh.h" />
     <ClInclude Include="Engine\mesh\model.h" />
     <ClInclude Include="Engine\nativeScripting\ScriptableEntity.h" />
+    <ClInclude Include="Engine\navigation\Navigation.h" />
     <ClInclude Include="Engine\physics\GLDebugDrawer.h" />
     <ClInclude Include="Engine\physics\PhysicsWorld.h" />
     <ClInclude Include="Engine\physics\RigidBody.h" />
     <ClInclude Include="Engine\ProjectSettings.h" />
+    <ClInclude Include="Engine\renderer\ForwardPlusRenderer.h" />
     <ClInclude Include="Engine\renderer\framebuffer_texture.h" />
     <ClInclude Include="Engine\renderer\GrassComponent.h" />
     <ClInclude Include="Engine\renderer\lightmapper.h" />
+    <ClInclude Include="Engine\renderer\LightsBuffer.h" />
     <ClInclude Include="Engine\renderer\ParticleSystem.h" />
     <ClInclude Include="Engine\renderer\rendererComponent.h" />
     <ClInclude Include="Engine\renderer\billboardComponent.h" />
@@ -608,7 +633,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B56C9C7D-FC4F-489F-8568-99B42D636A58}</ProjectGuid>
     <RootNamespace>Rogy</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -655,10 +680,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -694,7 +716,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\FreeType\include;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\Bullet;$(ProjectDir)ThirdParty\SoLoud\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\FreeType\include;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\Bullet;$(ProjectDir)ThirdParty\SoLoud\include;$(ProjectDir)include;$(ProjectDir)ThirdParty\Recast\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -711,13 +733,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\FreeType\include;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\Bullet;$(ProjectDir)ThirdParty\SoLoud\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;assimp-vc140-mt.lib;STB_IMAGE.lib;lua.lib;lua53.lib;OpenAL32.lib;FreeType.lib;yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

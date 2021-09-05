@@ -224,6 +224,9 @@ void Model::processNodeAndScene(aiNode *node, const aiScene *scene, RModelNode* 
 
 Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 {
+	//std::cout << "processMesh vertices " << mesh->mNumVertices << "\n";
+	//std::cout << "processMesh faces " << mesh->mNumFaces << "\n";
+
 	// data to fill
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
@@ -282,15 +285,25 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 		vertex.Bitangent = vector;
 		vertices.push_back(vertex);
 	}
+	std::vector<aFace> faces;
+//	std::cout << "--------------\n";
 	// now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 	{
+		aFace mface;
 		aiFace face = mesh->mFaces[i];
 		// retrieve all indices of the face and store them in the indices vector
-		for (unsigned int j = 0; j < face.mNumIndices; j++)
+		for (unsigned int j = 0; j < face.mNumIndices; j++) {
 			indices.push_back(face.mIndices[j]);
+			mface.indices.push_back(face.mIndices[j]);
+		//	std::cout << "fface " << i << "-" << j << " "<< face.mIndices[j] <<" " << face.mNumIndices << "\n";
+		}
+		faces.push_back(mface);
+		
 	}
-	return Mesh(vertices, indices, textures);
+	
+//	std::cout << "--------------\nprocessMesh indices " << indices.size() << "\n";
+	return Mesh(vertices, indices, textures, faces, mesh->mName.C_Str(), AiToGLMMat4(scene->mRootNode->mTransformation));
 }
 
 vector<Texture0> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)

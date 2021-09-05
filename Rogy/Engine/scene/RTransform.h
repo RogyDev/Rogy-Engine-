@@ -44,6 +44,7 @@ public:
 
 	// Transformation
 	// ---------------------
+	void SetMat4(glm::mat4 sMat4);
 	void SetWorldPosition(glm::vec3 position);
 	void SetWorldScale(glm::vec3 sca);
 	void SetLocalScale(glm::vec3 sca);

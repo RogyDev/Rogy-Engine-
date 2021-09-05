@@ -17,7 +17,7 @@ public:
 
 	DebugTool* debuger;
 	
-	bool is_open = true;
+	bool is_open = false;
 	void Render();
 private:
 

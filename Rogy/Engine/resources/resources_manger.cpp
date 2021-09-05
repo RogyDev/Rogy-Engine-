@@ -17,14 +17,14 @@ void ResourcesManager::Clear()
 	mMeshs.Clear();
 }
 
-Texture* ResourcesManager::CreateTexture(std::string tex_name, const char* tex_path, bool flip)
+Texture* ResourcesManager::CreateTexture(std::string tex_name, const char* tex_path, bool flip, bool keepdata)
 {
 	Texture* tex = GetTexture(tex_path);
 	if (tex != nullptr)
 		return tex;
 
 	Texture* texp = new Texture();
-	if (!texp->setTexture(tex_path, tex_name, flip)) 
+	if (!texp->setTexture(tex_path, tex_name, flip, keepdata))
 	{
 		delete texp;
 		return nullptr;

@@ -176,6 +176,7 @@ void EditorProperty::general_editor(Entity &obj)
 					SkeletalMeshComponent* rc = rndr->m_skMeshs.AddComponent(obj.ID);
 					rc->mesh = nullptr;
 					rc->material = rndr->CreateMaterial("");
+					rc->materials.push_back(rc->material);
 					obj.AddComponent<SkeletalMeshComponent>(rc);
 				}
 			}
@@ -528,7 +529,7 @@ void EditorProperty::mesh_editor(Entity &obj)
 // -----------------------------------------------------------------------
 void OpenTextureSelect()
 {
-	ImGuiFileDialog::Instance()->OpenModal("ChooseTexModel", "Choose Texture", ".png\0.bmp\0.tga\0.PNG\0.BMP\0.TGA\0.jpg\0.JPG\0.psd", ".");
+	ImGuiFileDialog::Instance()->OpenModal("ChooseTexModel", "Choose Texture", ".png\0.bmp\0.tga\0.PNG\0.BMP\0.TGA\0.jpg\0.JPG\0.psd\0.tif", ".");
 	//cout << ImGuiFileDialog::Instance()->GetCurrentPath() << endl;
 }
 // -----------------------------------------------------------------------
@@ -758,12 +759,14 @@ void EditorProperty::dir_light_editor(Entity &obj)
 		[](Entity* ent, DirectionalLight* dir_light, bool removeComponent)
 	{
 		BeginPreps("edit_dl");
+		PrepName("enabled");
 		PrepName("Intensity");
 		PrepName("Color");
 		PrepName("Cast Shadows");
 		PrepName("Soft Shadows");
 		PrepName("Bais");
 		NextPreps();
+		ImGui::Checkbox("##DirLight__enable", &dir_light->enabled);
 		SetWeightPrep(); ImGui::DragFloat("##DirLight_Intensity", &dir_light->Intensity, 0.01f);
 		ImGui::ColorEdit3("##DirLight_Color", (float*)&dir_light->Color, ImGuiColorEditFlags_NoInputs);
 		ImGui::Checkbox("##DirLight_active", &dir_light->CastShadows);
@@ -783,12 +786,14 @@ void EditorProperty::point_light_editor(Entity& obj)
 		[](Entity* ent, PointLight* point_light, bool removeComponent)
 	{
 		BeginPreps("edit_pl");
+		PrepName("Active");
 		PrepName("Intensity");
 		PrepName("Color");
 		PrepName("Raduis");
 		PrepName("Cast Shadows");
 		PrepName("Bias");
 		NextPreps();
+		ImGui::Checkbox("##ppLight_enable", &point_light->enabled);
 		ImGui::DragFloat("##PLight_Intensity", &point_light->Intensity, 0.01f);
 		SetWeightPrep();
 		ImGui::ColorEdit3("##PLight_Color", (float*)&point_light->Color, ImGuiColorEditFlags_NoInputs);
@@ -810,6 +815,7 @@ void EditorProperty::spot_light_editor(Entity &obj)
 		[](Entity* ent, SpotLight* spot_light, bool removeComponent)
 	{
 		BeginPreps("edit_pl");
+		PrepName("Active");
 		PrepName("Intensity");
 		PrepName("Color");
 		PrepName("Raduis");
@@ -818,6 +824,7 @@ void EditorProperty::spot_light_editor(Entity &obj)
 		PrepName("Cast Shadows");
 		PrepName("Bias");
 		NextPreps();
+		ImGui::Checkbox("##spLight_enable", &spot_light->enabled);
 		ImGui::DragFloat("##PsLight_Intensity", &spot_light->Intensity, 0.01f);
 		SetWeightPrep();
 		ImGui::ColorEdit3("##PsLight_Color", (float*)&spot_light->Color, ImGuiColorEditFlags_NoInputs);
@@ -919,6 +926,13 @@ void EditorProperty::rb_editor(Entity &obj)
 			PrepName("Raduis | Height");
 		else if (rigidbody->m_CollisionType == BOX_COLLIDER)
 			PrepName("Scale");
+
+		else if (rigidbody->m_CollisionType == MESH_COLLIDER)
+		{
+			if (ImGui::Button("Set This Mesh"))
+				rigidbody->smfs = true;
+			PrepName("Scale");
+		}
 		NextPreps();
 		int item = 0;
 		if (rigidbody->m_CollisionType == SPHERE_COLLIDER)
@@ -960,17 +974,9 @@ void EditorProperty::rb_editor(Entity &obj)
 		}
 		else if (rigidbody->m_CollisionType == MESH_COLLIDER)
 		{
-			if (ImGui::Button("Set")) {}
-			ImGui::SameLine();
-			if (ImGui::Button("From mesh"))
-			{
-				rigidbody->smfs = true;
-			
-			}
-			if (rigidbody->collisionShape != nullptr) {
-				ImGui::SameLine();
+			if (rigidbody->collisionShape != nullptr)
 				ImGui::Text(rigidbody->mesh_path.c_str());
-			}
+
 			glm::vec3 rad = rigidbody->GetScale(); glm::vec3 rad_t = rad;
 			SetWeightPrep(); ImGui::DragFloat3("##rbc_rad", (float*)&rad, 0.1f);
 			if (rad != rad_t) rigidbody->SetScale(rad);
@@ -1030,7 +1036,7 @@ void EditorProperty::animation_editor(Entity & obj)
 		
 		NextPreps();
 		if (ImGui::Button("Set ##setRCmesh"))
-			ImGuiFileDialog::Instance()->OpenModal("ChooseFileModelsk", "Choose File", ".obj\0.fbx\0.3ds\0.dae\0\0", ".");
+			ImGuiFileDialog::Instance()->OpenModal("ChooseFileModelsk", "Choose File", ".fbx\0.obj\0.3ds\0.dae\0\0", ".");
 
 		if (anim->mesh) {
 			ImGui::SameLine();
@@ -1085,6 +1091,27 @@ void EditorProperty::animation_editor(Entity & obj)
 				ImGui::SameLine();
 				ImGui::Text(anim->animations[i]->anim_path.c_str());*/
 				ImGui::PopID();
+			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("##animMaterialss", "Materials"))
+		{
+			// Cheating
+			
+			if (!anim->material->isDefault)// || anim->materials.size() != 0 && anim->material->id != anim->materials[anim->materials.size() - 1]->id)
+			{
+				anim->materials.push_back(anim->material);
+				anim->material->isDefault = true;
+			}
+			//std::cout << anim->material->id << " | " << anim->materials[anim->materials.size() - 1]->id << std::endl;
+			for (size_t i = 0; i < anim->materials.size(); i++)
+			{
+				if (ImGui::Button(anim->materials[i]->getMatPath().c_str()))
+				{ }
+				/*if (ImGui::Button(std::string("X ##remove" + i).c_str()))
+				{
+
+				}*/
 			}
 			ImGui::TreePop();
 		}
@@ -1592,10 +1619,44 @@ void EditorProperty::grass_editor(Entity & obj)
 		{
 			std::string filePathName = ImGuiFileDialog::Instance()->GetFilepathName();
 			RGetRelativePath(filePathName);
-			obj.GetComponent<GrassComponent>()->mTexture = res->CreateTexture(filePathName, filePathName.c_str());
+			obj.GetComponent<GrassComponent>()->mTexture = res->CreateTexture(filePathName, filePathName.c_str(), true);
 		}
 		ImGuiFileDialog::Instance()->CloseDialog("SetGrassTex");
 	}
+}
+// -----------------------------------------------------------------------
+SceneManager* ascn;
+
+void editDisp(Entity* ent, Displacement* comp, bool removeComponent)
+{
+	if (ImGui::Button("Edit ##editDisp", ImVec2(ImGui::GetWindowWidth(), 0)))
+	{
+		ascn->editDisp = ent->ID;
+		ascn->PushRequest(SR_EDIT_DISP);
+	}
+	EditorProperty::BeginPreps("edit_Displacement");
+	EditorProperty::PrepName("Raduis");
+	EditorProperty::PrepName("Intensity");
+	EditorProperty::PrepName("DoOneHeight");
+	EditorProperty::PrepName("Height");
+	EditorProperty::PrepName("Set Alpha");
+	EditorProperty::NextPreps();
+	EditorProperty::SetWeightPrep(); ImGui::DragFloat("##disp_ee", &comp->Raduis, 0.1f, 0.0f);
+	EditorProperty::SetWeightPrep(); ImGui::DragFloat("##disp_eee", &comp->Intensity, 0.1f, 0.0f, 100.0f);
+	ImGui::Checkbox("##disp_eeee", &comp->useOneHeight);
+	EditorProperty::SetWeightPrep(); ImGui::DragFloat("##disp_eeeee", &comp->SameHeight, 0.1f, 0.0f, 100.0f);
+	ImGui::Checkbox("##disp_eeeeee", &comp->edit_alpha);
+	EditorProperty::EndPreps();
+
+}
+
+void EditorProperty::displacement_editor(Entity & obj)
+{
+	ascn = nodes->scene;
+	bool remove = DrawComponent<Displacement>("Displacemet", &obj, editDisp);
+
+	if (remove)
+		obj.RemoveComponent<Displacement>();
 }
 // -----------------------------------------------------------------------
 void EditorProperty::components_editor(Entity &obj)
@@ -1628,6 +1689,8 @@ void EditorProperty::components_editor(Entity &obj)
 			UIwidget_editor(obj);
 		else if (Component::IsComponentType<SkeletalMeshComponent>(obj.m_components[i]))
 			animation_editor(obj);
+		else if (Component::IsComponentType<Displacement>(obj.m_components[i]))
+			displacement_editor(obj);
 	}
 
 	for (size_t i = 0; i < obj.m_scripts.size(); i++)
@@ -1666,10 +1729,14 @@ void EditorProperty::Render()
 				}
 
 				ImGui::PopFont();
+				ImGui::SameLine();
+				ImGui::Text(std::to_string(ourEntity->ID).c_str());
+				ImGui::SameLine();
+				ImGui::Text("| ");
 				ImGui::SameLine(); ImGui::Text(ourEntity->name.c_str());
 				if (ourEntity->IsPrefab())
 					ImGui::Text(ourEntity->path.c_str());
-
+			
 				general_editor(*ourEntity);
 				transform_editor(*ourEntity);
 				components_editor(*ourEntity);
@@ -1680,7 +1747,7 @@ void EditorProperty::Render()
 	{
 		ImGui::Text("");
 		ImGui::Text("");
-		ImGui::SameLine(0, ImGui::GetWindowWidth() / 2 - 120);
+		ImGui::SameLine(0, ImGui::GetWindowWidth() / 2 - 200);
 		ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 0.6f), "Select an object to see its properties.");
 	}
 

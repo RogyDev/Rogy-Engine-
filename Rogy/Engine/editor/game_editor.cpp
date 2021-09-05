@@ -1,6 +1,7 @@
 #include "game_editor.h"
 
 ImFont* tex;
+ImFont* texBig;
 ImFont* Smalltex;
 ImFont* codeTex;
 
@@ -24,7 +25,7 @@ bool Game_Editor::Init(char* glsl_version, GLFWwindow* window, bool platform_sup
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	if (platform_support) 
+	if (platform_support)
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
 	// Setup Dear ImGui style
@@ -35,14 +36,16 @@ bool Game_Editor::Init(char* glsl_version, GLFWwindow* window, bool platform_sup
 	style.WindowRounding = 0.0f;
 	style.TabRounding = 0.0f;
 	style.WindowBorderSize = 0;
-	style.ScrollbarSize = 10;
+	style.ScrollbarSize = 5;
 	style.ScrollbarRounding = 13;
+	style.WindowMenuButtonPosition = 0;
+	style.WindowPadding.x = 3;
 	//style.FrameRounding = 3;
 
 	style.Colors[ImGuiCol_TitleBg] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
 	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
 	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.23f, 0.23f, 0.23f, 1.00f);
-	style.Colors[ImGuiCol_Header] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+	style.Colors[ImGuiCol_Header] = ImVec4(0.23f, 0.23f, 0.23f, 1.00f);
 	style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
 
 	style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.28f, 0.28f, 1.00f);
@@ -50,7 +53,7 @@ bool Game_Editor::Init(char* glsl_version, GLFWwindow* window, bool platform_sup
 	style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
 
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
-	style.Colors[ImGuiCol_FrameBg] = ImVec4(0.2f, 0.2f, 0.2f, 1.f);
+	style.Colors[ImGuiCol_FrameBg] = ImVec4(0.21f, 0.21f, 0.21f, 1.f);
 	style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
 	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
 	style.Colors[ImGuiCol_Tab] = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
@@ -61,7 +64,7 @@ bool Game_Editor::Init(char* glsl_version, GLFWwindow* window, bool platform_sup
 	style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.f, 0.f, 0.f, 0.f);
 	style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.f, 0.f, 0.f, 0.f);
 
-	style.Colors[ImGuiCol_ChildBg] = ImVec4(0.23f, 0.23f, 0.23f, 1.f);
+	style.Colors[ImGuiCol_ChildBg] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -70,13 +73,16 @@ bool Game_Editor::Init(char* glsl_version, GLFWwindow* window, bool platform_sup
 	// Load Fonts 
 	io.Fonts->AddFontFromFileTTF("core/font/DroidSans.ttf", 30);
 	tex = io.Fonts->AddFontFromFileTTF("core/font/Icons.ttf", 35);
+	texBig = io.Fonts->AddFontFromFileTTF("core/font/Icons.ttf", 100);
 	Smalltex = io.Fonts->AddFontFromFileTTF("core/font/Icons.ttf", 30);
 	codeTex = io.Fonts->AddFontFromFileTTF("core/font/consola.ttf", 33);
-	
+
 	s_hierarchy.icon_small = Smalltex;
 	prep_editor.nodes = &s_hierarchy;
+	prep_editor.mat_editor = &mat_editor;
 	prj_browser.scr_editor = &code_editor;
-
+	prj_browser.mat_editor = &mat_editor;
+	
 	viewport = ImGui::GetMainViewport();
 	io.FontGlobalScale = 0.5f;
 	return true;
@@ -100,7 +106,7 @@ bool Game_Editor::BeginWindow(char* name)
 	ImGui::Button(";");
 	ImGui::PopFont();
 
-	ImGui::BeginChild(string(name + 1).c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoTitleBar || ImGuiWindowFlags_MenuBar);
+	ImGui::BeginChild(string(name + 1).c_str(), ImVec2(0, 0), false, ImGuiWindowFlags_NoTitleBar || ImGuiWindowFlags_MenuBar);
 
 	return b;
 }
@@ -124,8 +130,9 @@ void Game_Editor::start()
 	prep_editor.Render();
 	db_editor.Render();
 	code_editor.Render(codeTex);
-	prj_browser.Render(tex);
+	//prj_browser.Render(texBig);
 	prg_settings.Render();
+	mat_editor.Render();
 
 	/*ImGui::SetNextWindowPos(ImVec2(200, 200));
 	ImGui::SetNextWindowBgAlpha(0.0f);
@@ -190,7 +197,7 @@ void Game_Editor::EndPreps()
 
 void Game_Editor::EditVec3_xyz(const char* name_id, glm::vec3 &values)
 {
-	float siz = (ImGui::GetWindowWidth()/2)/3;
+	float siz = (ImGui::GetWindowWidth() / 2) / 3;
 	string col_s("##1");
 	col_s += name_id;
 	ImGui::SetNextItemWidth(siz);
@@ -207,6 +214,7 @@ void Game_Editor::EditVec3_xyz(const char* name_id, glm::vec3 &values)
 void Game_Editor::CreateEntityWithMesh(std::string ent_name, std::string mesh_path, const char* col_type)
 {
 	Entity* e = s_hierarchy.scene->AddEntity(-1, ent_name);
+	s_hierarchy.SetSelection(e->ID);
 	RendererComponent* rc = prep_editor.rndr->m_renderers.AddComponent(e->ID);
 	rc->mesh = prep_editor.res->mMeshs.CreateModel(mesh_path)->GetFirstMesh();
 	rc->material = prep_editor.rndr->CreateMaterial("");
@@ -239,6 +247,16 @@ void Game_Editor::CreateEntityWithMesh(std::string ent_name, std::string mesh_pa
 
 void Game_Editor::ToolBar()
 {
+	if (s_hierarchy.input->GetKey(RKey::KEY_N) && s_hierarchy.input->GetMouseButtonDown(0))
+	//if (s_hierarchy.input->GetKey(RKey::KEY_N) && s_hierarchy.input->GetMouseButton(0))
+	{
+		s_hierarchy.scene->PushRequest(SceneRequest::SR_SPAWN_AT_MOUSE);
+	}
+	if (s_hierarchy.input->GetKeyDown(RKey::KEY_SPACE) && s_hierarchy.input->GetKey(RKey::KEY_LCTRL))
+	{
+		prj_browser.isOn = !prj_browser.isOn;
+	}
+
 	if (!s_hierarchy.sel_entt.empty() && s_hierarchy.input->GetKey(RKey::KEY_LCTRL))
 	{
 		if (s_hierarchy.input->GetKeyDown(RKey::KEY_A))
@@ -338,7 +356,7 @@ void Game_Editor::ToolBar()
 			if (!s_hierarchy.Empty() && ImGui::MenuItem("Create Entity prefab"))
 			{
 				Entity* ent = s_hierarchy.scene->FindEntity(s_hierarchy.GetSelected());
-				if (ent != nullptr) 
+				if (ent != nullptr)
 				{
 					std::string saveP = prj_browser.current_dir + "\\" + ent->name + ".rbp";
 					RGetRelativePath(saveP);
@@ -352,7 +370,7 @@ void Game_Editor::ToolBar()
 		{
 			if (ImGui::Selectable("New Entity"))
 			{
-				s_hierarchy.scene->AddEntity(-1, "New Entity");
+				s_hierarchy.SetSelection(s_hierarchy.scene->AddEntity(-1, "New Entity")->ID);
 			}
 			if (ImGui::Selectable("Load Entity")) // load entity
 				ImGuiFileDialog::Instance()->OpenModal("ChooseBPModel", "Select Prefab", ".rbp\0", ".");
@@ -376,31 +394,35 @@ void Game_Editor::ToolBar()
 			}
 			ImGui::Separator();
 
-			if (ImGui::Selectable("Point Light")) 
+			if (ImGui::Selectable("Point Light"))
 			{
 				Entity* e = s_hierarchy.scene->AddEntity(-1, "Point Light");
 				e->AddComponent<PointLight>(prep_editor.rndr->CreatePointLight(e->ID));
+				s_hierarchy.SetSelection(e->ID);
 			}
-			if (ImGui::Selectable("Directional Light")) 
+			if (ImGui::Selectable("Directional Light"))
 			{
 				Entity* e = s_hierarchy.scene->AddEntity(-1, "Directional Light");
 				e->AddComponent<DirectionalLight>(prep_editor.rndr->CreateDirectionalLight());
+				s_hierarchy.SetSelection(e->ID);
 			}
 			if (ImGui::Selectable("Spot Light"))
 			{
 				Entity* e = s_hierarchy.scene->AddEntity(-1, "Spot Light");
 				e->AddComponent<SpotLight>(prep_editor.rndr->CreateSpotLight(e->ID));
+				s_hierarchy.SetSelection(e->ID);
 			}
 			if (ImGui::Selectable("Reflection Probe"))
 			{
 				Entity* e = s_hierarchy.scene->AddEntity(-1, "Reflection Probe");
 				e->AddComponent<ReflectionProbe>(prep_editor.rndr->CreateReflectionProbe(e->ID));
+				s_hierarchy.SetSelection(e->ID);
 			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Script"))
 		{
-			if (ImGui::MenuItem("Recompile Scripts")){
+			if (ImGui::MenuItem("Recompile Scripts")) {
 				s_hierarchy.scene->PushRequest(SR_RECOMPILE_SCRIPTS);
 			}
 			if (ImGui::MenuItem("Edit Script")) {
@@ -417,10 +439,10 @@ void Game_Editor::ToolBar()
 				prg_settings.isOn = true;
 			}
 			if (ImGui::MenuItem("Scene")) {
-				
+
 			}
 			if (ImGui::MenuItem("Preperties")) {
-				
+
 			}
 			if (ImGui::MenuItem("Scene Settings")) {
 
@@ -449,7 +471,7 @@ void Game_Editor::ToolBar()
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("About ")) {
-			
+
 			}
 			ImGui::EndMenu();
 		}
@@ -590,7 +612,7 @@ void Game_Editor::ToolBar()
 	else
 		if (ImGui::Button("6"))
 			s_hierarchy.scene->game_view = true;
-	
+
 	ImGui::SameLine();
 
 	if (s_hierarchy.scene->is_playing)
@@ -600,10 +622,10 @@ void Game_Editor::ToolBar()
 			s_hierarchy.scene->PushRequest(SR_PLAY_SCENE);
 		}
 		ImGui::PopStyleColor();
-		
+
 	}
 	else if (ImGui::Button("C")) s_hierarchy.scene->PushRequest(SR_PLAY_SCENE);
-	
+
 	ImGui::SameLine();
 	ImGui::PopFont();
 	if (s_hierarchy.scene->is_playing) {
@@ -624,7 +646,21 @@ void Game_Editor::DownBar()
 
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.15f, 0.15f, 0.15f, 1.f));
 	ImGui::Begin("DebugInfo", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	if (ImGui::Button("    Project Browser    ", ImVec2(0, 20)))
+		prj_browser.isOn = !prj_browser.isOn;
+	ImGui::SameLine();
 	ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::SameLine();
+	size_t msize = db_editor.debuger->Size();
+	if (msize != 0) {
+		LogInfo& info = db_editor.debuger->messages[msize - 1];
+		if (info.type == LT_Message)
+			ImGui::Text(("Log : " + info.msg).c_str());
+		else if (info.type == LT_Warning)
+			ImGui::TextColored(ImVec4(1, 1, 0, 0.8f), ("Warning : " + info.msg).c_str());
+		else
+			ImGui::TextColored(ImVec4(1, 0, 0, 0.8f), ("Error : " + info.msg).c_str());
+	}
 	ImGui::End();
 	ImGui::PopStyleColor();
 }
@@ -674,7 +710,7 @@ void Game_Editor::DockSpaces()
 		ImGui::SetNextWindowPos(ImVec2(win01_pos.x + win01_size.x, win01_pos.y), ImGuiCond_Always, window_pos_pivot);
 		ImGui::SetNextWindowViewport(viewport->ID);
 		ImGui::SetNextWindowSize(ImVec2(SCR_weight - win01_size.x - win02_size.x, win01_size.y));
-	 
+
 		ImGui::Begin("Dock_033 ForScripts", &scripts_board, ImGuiWindowFlags_NoTitleBar || ImGuiWindowFlags_NoResize);
 		ImGui::Text("");
 		ImGui::SameLine(0, ImGui::GetWindowWidth() / 2 - 90);
@@ -683,6 +719,15 @@ void Game_Editor::DockSpaces()
 		ImGuiID dockspace_id22 = ImGui::GetID("MyDockSpace44");
 		ImGui::DockSpace(dockspace_id22, ImVec2(0, 0));
 		ImGui::End();
+	}
+	if (prj_browser.isOn)
+	{
+		float hig = 210;
+		ImGui::SetNextWindowPos(ImVec2(win01_pos.x + win01_size.x, win01_pos.y + (win01_size.y - hig)), ImGuiCond_Always, window_pos_pivot);
+		//ImGui::SetNextWindowViewport(viewport->ID);
+		ImGui::SetNextWindowSize(ImVec2(SCR_weight - win01_size.x - win02_size.x, hig));
+
+		prj_browser.Render(texBig);
 	}
 
 	MainViewport->left_pos = rw;

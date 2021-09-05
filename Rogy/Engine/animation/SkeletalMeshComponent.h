@@ -22,6 +22,7 @@ class SkeletalMeshComponent : public Component
 
 	SK_Model*      mesh     = nullptr;
 	Material*  material = nullptr;
+	std::vector<Material*> materials;
 	
 	bool CastShadows = true;
 

@@ -32,7 +32,7 @@ void RCache::BindTexture(ShaderTextureType type, GLuint tex_id)
 {
 	if (type == TEX_IRRADIANCE_MAP)
 	{
-		if (irra != tex_id)
+	//	if (irra != tex_id)
 		{
 			irra = tex_id;
 			glActiveTexture(GL_TEXTURE0 + TEX_IRRADIANCE_MAP);
@@ -41,7 +41,7 @@ void RCache::BindTexture(ShaderTextureType type, GLuint tex_id)
 	}
 	else if (type == TEX_PREFILTER_MAP)
 	{
-		if (pref != tex_id)
+		//if (pref != tex_id)
 		{
 			pref = tex_id;
 			glActiveTexture(GL_TEXTURE0 + TEX_PREFILTER_MAP);
@@ -82,7 +82,7 @@ void RCache::BindTexRough(GLuint tex_id)
 
 void RCache::BindTexEmmi(GLuint tex_id)
 {
-	if (m_emm != tex_id)
+	//if (m_emm != tex_id)
 	{
 		m_emm = tex_id;
 		glActiveTexture(GL_TEXTURE7);

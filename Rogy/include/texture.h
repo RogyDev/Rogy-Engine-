@@ -7,22 +7,27 @@
 #include <iostream>
 #include <vector>
 
-#include <GL/glew.h>
+#include <GL\glew.h>
 
 
 class Texture
 {
     public:
-		int id;
         GLuint texID, texWidth, texHeight, texComponents;
         GLfloat anisoFilterLevel;
         GLenum texType, texInternalFormat, texFormat;
         std::string texName;
 		std::string TPath;
 
+		unsigned char* tData;
+		float GetRed(int x, int y);
+		float GetGreen(int x, int y);
+		float GetBlue(int x, int y);
+		float GetAlpha(int x, int y);
+
         Texture();
         ~Texture();
-        void setTexture(const char* texPath, std::string texName, bool texFlip);
+		bool setTexture(const char* texPath, std::string tex_Name, bool texFlip = false, bool keepData = false);
         void setTextureHDR(const char* texPath, std::string texName, bool texFlip);
 		void setTextureHDR(GLuint width, GLuint height, GLenum format, GLenum internalFormat, GLenum type, GLenum minFilter);
         void setTextureCube(std::vector<const char*>& faces, bool texFlip);
@@ -35,5 +40,6 @@ class Texture
 		std::string getTexPath();
         void useTexture();
 };
+
 
 #endif

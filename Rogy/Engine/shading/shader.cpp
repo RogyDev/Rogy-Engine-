@@ -50,7 +50,7 @@ void checkCompileErrors(GLuint shader, std::string type)
 	}
 }
 
-GLuint LoadShaders_File(const char * shader_file_path) {
+GLuint LoadShaders_File(const char * shader_file_path, const GLchar* defines) {
 
 	// Create the shaders
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -58,7 +58,9 @@ GLuint LoadShaders_File(const char * shader_file_path) {
 
 	// Read the Vertex Shader code from the file
 	std::string Shader_Code;
-	Shader_Code += "#define NUM_CASCADES ";
+	Shader_Code += "#define ";
+	Shader_Code += defines;	
+	Shader_Code += "\n#define NUM_CASCADES ";
 	Shader_Code += std::to_string(Shader::gNUM_CASCADES) + "\n";
 	Shader_Code += "#define MAX_LIGHT_COUNT ";
 	Shader_Code += std::to_string(Shader::gNUM_LIGHTS) + "\n";
@@ -164,7 +166,7 @@ GLuint LoadShader_Compute_File(const char * shader_file_path) {
 		return 0;
 	}
 
-	char *csdefines = "#version 400 core \n";
+	char *csdefines = "#version 430 \n";
 	std::string ComputeShaderCode = csdefines;
 	ComputeShaderCode += Shader_Code;
 
@@ -304,9 +306,9 @@ void Shader::loadComputeShader(const GLchar* ShaderPath)
 	Program = LoadShader_Compute_File(ShaderPath);
 }
 
-void Shader::loadShader(const GLchar* ShaderPath)
+void Shader::loadShader(const GLchar* ShaderPath, const GLchar* defines)
 {
-	Program = LoadShaders_File(ShaderPath);
+	Program = LoadShaders_File(ShaderPath, defines);
 }
 
 void Shader::loadShaderGeo(const GLchar* ShaderPath)

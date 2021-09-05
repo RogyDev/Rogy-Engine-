@@ -136,10 +136,11 @@ public:
 		PlayOnStart = data["PlayOnStart"].as<bool>();
 		Looping = data["Looping"].as<bool>();
 		StartLifeTime = data["StartLifeTime"].as<float>();
+		StartSpeed = RYAML::GetVec2(data["StartSpeed"]);
 		StartColor = RYAML::GetVec4(data["StartColor"]);
 		StartSize = RYAML::GetVec2(data["StartSize"]);
-		SimulationSpeed = data["SimulationSpeed"].as<bool>();
-		GravityModifier = RYAML::GetVec3(data["AnimSheetSize"]);
+		SimulationSpeed = data["SimulationSpeed"].as<float>();
+		GravityModifier = RYAML::GetVec3(data["GravityModifier"]);
 		Spread = data["Spread"].as<float>();
 		EmitteCount = data["EmitteCount"].as<float>();
 		AddSizeOverTime = data["AddSizeOverTime"].as<float>();
@@ -152,6 +153,9 @@ public:
 		SetMaxParticleCount(maxP);
 		tex_path = data["tex_path"].as<std::string>();
 		ReceiveShadows = data["ReceiveShadows"].as<bool>();
+
+		if (PlayOnStart)
+			Emitte();
 	}
 
 private:

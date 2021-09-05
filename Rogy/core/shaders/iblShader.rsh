@@ -12,115 +12,112 @@ layout (location = 3) in vec3 aTangent;
 layout (location = 4) in vec3 aBitangent;
 layout (location = 5) in vec2 aTexCoords2;
 
-out vec2 TexCoords;
-out vec2 TexCoords2;
+#ifdef DISPLACEMENT
+layout (location = 6) in float aBlend;
+#endif
 
-out vec3 Normal;
-out vec3 FragPos;
-out vec3 WorldPos;
-out mat3 TBN;
-out vec4 LightSpacePos[NUM_CASCADES];
-out float ClipSpacePosZ;
-out vec4 spot_MVP_SPACE[8];
+out VS_OUT {
+    vec3 FragPos;
+    vec3 Normal;
+    vec2 TexCoords;
+	vec2 TexCoords2;
+	vec3 WorldPos;
+	mat3 TBN;
+	vec4 LightSpacePos[NUM_CASCADES];
+	float ClipSpacePosZ;
+	vec4 spot_MVP_SPACE[8];
+#ifdef DISPLACEMENT
+	float Blend;
+#endif
+} vs_out;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform vec2 tex_uv;
-
 uniform mat4 gLightWVP[NUM_CASCADES];
-
 uniform mat4 spot_MVP[8];
 
 void main()
 {
-	TexCoords = aTexCoords * tex_uv;
-	TexCoords2 = aTexCoords2;
+#ifdef DISPLACEMENT
+	vs_out.Blend = aBlend;
+#endif
+
+	vs_out.TexCoords = aTexCoords * tex_uv;
+	vs_out.TexCoords2 = aTexCoords2;
 	
-	WorldPos = aPos;
-    Normal = mat3(transpose(inverse(model))) * aNormal;
-    FragPos = vec3(model * vec4(aPos, 1.0));
+	vs_out.WorldPos = aPos;
+    vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
+    vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
 	
-	vec4 Pos = vec4(FragPos, 1.0);
+	
+	vec4 Pos = vec4(vs_out.FragPos, 1.0);
 	for (int i = 0 ; i < NUM_CASCADES ; i++) 
 	{
-       LightSpacePos[i] = gLightWVP[i] * Pos;
+       vs_out.LightSpacePos[i] = gLightWVP[i] * Pos;
     }
 	
 	for(int i = 0 ; i < 8 ; i++)
 	{
-		spot_MVP_SPACE[i] = spot_MVP[i] * Pos;
+		vs_out.spot_MVP_SPACE[i] = spot_MVP[i] * Pos;
 	}
 	
 	vec3 T = normalize(vec3(model * vec4(aTangent, 0.0)));
 	vec3 B = normalize(vec3(model * vec4(aBitangent, 0.0)));
 	vec3 N = normalize(vec3(model * vec4(aNormal, 0.0)));
-	TBN = mat3(T, B, N);
+	vs_out.TBN = mat3(T, B, N);
 
     gl_Position = projection * view * model * vec4(aPos, 1.0);
-	
-	ClipSpacePosZ = gl_Position.z;
+	vs_out.ClipSpacePosZ = gl_Position.z;
 }
 
-#endif
+#endif // COMPILING_VS
 
 // -------------------------------------------[ Fragment Shader ]------------------------------------------------------//
 #ifdef COMPILING_FS
+//#extension GL_ARB_shader_storage_buffer_object : enable
+out vec4 FragColor;
 
-struct SpotLight 
-{
-    vec3 position;
-	vec3 direction;
-	vec3 color;
-	
-	float intensity;
-	float cutOff;
-	float outerCutOff;
-	
-    float raduis;
-	
-	bool use;
-	bool cast_shadows;
-	int  shadow_index;
-	float Bias;
-	bool offscreen;
-};
-
-struct PointLight 
-{
-    vec3 position;
-    vec3 color;
-	
-	float intensity;
-    float raduis;
-	float Bias;
-	
-	bool use;
-	bool cast_shadows;
-	int  shadow_index;
-	bool offscreen;
-};
+// -------------- STRUCTS -------------- //
 
 struct DirLight 
 {
+	bool use;
     vec3 direction;
 	vec3 color;
-	
 	float intensity;
-	bool use;
-	
 	bool cast_shadows;
 	bool soft_shadows;
 	float Bias;
 };
 
+struct PointLight {
+	vec4 color; // color + intensity
+	vec4 position; // pos + raduis
+	bool cast_shadows;
+	int  shadow_index;
+	float Bias;
+};
+
+struct SpotLight {
+	vec4 color; // color + intensity
+	vec4 position; // pos + raduis
+	vec4 direction; // dir + cutOff
+	float outerCutOff;
+	bool cast_shadows;
+	int  shadow_index;
+	float Bias;
+};
+
 struct FogEffect 
 {
+	bool use;
 	vec3 color;
 	float near;
 	float far;
-	bool use;
 };
+
 
 struct RefProbe 
 {
@@ -132,77 +129,108 @@ struct RefProbe
 	samplerCube prefilterMap;
 };
 
-out vec4 FragColor;
+struct Material {
+    vec3  albedo;
+	float metallic;
+	float roughness;
+	float ao;
 
-in vec4 LightSpacePos[NUM_CASCADES];
-in float ClipSpacePosZ;
+#ifndef DISPLACEMENT
+	float emission_power;
+#endif
+	bool  use_emission;
+	vec3  emission;
+	bool use_tex_emission;
+	sampler2D tex_emission;
 
-in vec3 Normal;
-in vec3 FragPos;
-in vec3 WorldPos;
-in vec2 TexCoords;
-in vec2 TexCoords2;
-in mat3 TBN; 
-uniform sampler2DShadow shadowMaps[NUM_CASCADES];
-uniform float CascadeEndClipSpace[NUM_CASCADES];
+	bool use_tex_metal;
+	sampler2D tex_metal;
 
-// material parameters
-uniform vec3  albedo;
-uniform float metallic;
-uniform float roughness;
-uniform float ao;
+	bool use_tex_rough;
+	sampler2D tex_rough;
+	// textures
+	bool use_tex_albedo;
+	sampler2D tex_albedo;
 
-uniform bool  use_emission;
-uniform vec3  emission;
-uniform float emission_power;
+	bool use_tex_normal;
+	sampler2D tex_normal;
+}; 
 
-// textures
-uniform bool use_tex_albedo;
-uniform sampler2D tex_albedo;
+#ifdef DISPLACEMENT
+uniform	float val1;
+uniform	float val2;
+#endif
+/*
+struct VisibleIndex {
+	int index;
+};
 
-uniform bool use_tex_metal;
-uniform sampler2D tex_metal;
+// Shader storage buffer objects
+layout(std430, binding = 0) readonly buffer LightBuffer {
+	PointLight data[];
+} lightBuffer;
 
-uniform bool use_tex_rough;
-uniform sampler2D tex_rough;
 
-uniform bool use_tex_normal;
-uniform sampler2D tex_normal;
+layout(std430, binding = 1) readonly buffer VisibleLightIndicesBuffer {
+	VisibleIndex data[];
+} visibleLightIndicesBuffer;
 
-uniform bool use_tex_emission;
-uniform sampler2D tex_emission;
 
-// Lightmaps
+layout (std140) uniform Matrices
+{
+    mat4 projection;
+    mat4 view;
+};
+*/
+// -------------- Vertex Data -------------- //
+in VS_OUT {
+    vec3 FragPos;
+    vec3 Normal;
+    vec2 TexCoords;
+	vec2 TexCoords2;
+	vec3 WorldPos;
+	mat3 TBN;
+	vec4 LightSpacePos[NUM_CASCADES];
+	float ClipSpacePosZ;
+	vec4 spot_MVP_SPACE[8];
+
+#ifdef DISPLACEMENT
+	float Blend;
+#endif
+} fs_in;
+
+
+// -------------- Lightmap -------------- //
 uniform bool use_lightmap;
 uniform sampler2D tex_lightmap;
 
-// environmet
+// -------------- Environmet Data -------------- //
 uniform RefProbe env_probe;
 
-/*uniform samplerCube irradianceMap;
-uniform samplerCube prefilterMap;
-
-// Cubemap Correction
-uniform bool use_parallax_correction;
-uniform vec3 mRefPos;
-uniform vec3 mBoxMin;
-uniform vec3 mBoxMax;*/
-
-// ligthing
+// -------------- Engine Data -------------- //
 uniform vec3 CamPos;
+uniform bool use_alpha;
+
+uniform DirLight dirLight;
 uniform PointLight[MAX_LIGHT_COUNT] p_lights;
 uniform SpotLight[MAX_LIGHT_COUNT] sp_lights;
-uniform DirLight dirLight;
 
-// Point Shadows
+uniform sampler2DShadow shadowMaps[NUM_CASCADES];
+uniform float CascadeEndClipSpace[NUM_CASCADES];
+
 uniform samplerCube tex_shadows[8];
-
-// Spot Shadows
 uniform sampler2DShadow texSpot_shadows[8];
-in vec4 spot_MVP_SPACE[8];
 
-// Fog
 uniform FogEffect Fog;
+
+uniform int numberOfTilesX;
+
+uniform int visible_pLights[MAX_LIGHT_COUNT];
+uniform int visible_sLights[MAX_LIGHT_COUNT];
+
+// -------------- Material -------------- //
+uniform Material material;
+//uniform Material material0;
 
 // array of offset direction for sampling
 vec3 gridSamplingDisk[20] = vec3[]
@@ -216,13 +244,10 @@ vec3 gridSamplingDisk[20] = vec3[]
 
 float SpotShadowCalculation(int idx, float bias, vec3 lightPos)
 {	
-	vec4 frag_pos_light = spot_MVP_SPACE[idx];
-	
+	vec4 frag_pos_light = fs_in.spot_MVP_SPACE[idx];
 	vec3 projCoords = frag_pos_light.xyz / frag_pos_light.w;
 	projCoords = projCoords * 0.5 + 0.5;
-
 	float shadow =  1.0 - textureProj( texSpot_shadows[idx], vec4(projCoords.xy, projCoords.z - bias, 1.0)) ;
-    
 	return shadow;
 }
 
@@ -232,28 +257,7 @@ float PointShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, float
     float closestDepth = texture(tex_shadows[shadow_index], fragToLight).r;
     closestDepth *= far_plane;
     float currentDepth = length(fragToLight);
-	
-	//float bas = max(bias * (1.0 - dot(Normal, normalize(fragToLight))), 0.005); 
-	
     float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0; 
-	
-	/*vec3 fragToLight = fragPos - lightPos;
-    float currentDepth = length(fragToLight);
-	 float shadow = 0.0;
-    float bias = 0.0;
-    int samples = 20;
-    float viewDistance = length(CamPos - fragPos);
-    float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
-    for(int i = 0; i < samples; ++i)
-    {
-        float closestDepth = texture(PointdepthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
-        closestDepth *= far_plane;   // undo mapping [0;1]
-        if(currentDepth - bias > closestDepth)
-            shadow += 1.0;
-    }
-    shadow /= float(samples);*/
-
-	
     return shadow;
 }
 
@@ -286,36 +290,18 @@ float random(vec3 seed, int i){
 
 float ShadowCalculation(int sh_index, bool softS)
 {
-	//vec4 fragPosLightSpace = LightSpacePos[sh_index];
-	
 	float bias = dirLight.Bias;
-	//float bias = dirLight.Bias * (1.0 - dot(Normal, normalize(dirLight.direction))); 
 	
-    vec3 projCoords = LightSpacePos[sh_index].xyz;// / LightSpacePos[sh_index].w;
+    vec3 projCoords = fs_in.LightSpacePos[sh_index].xyz;// / fs_in.LightSpacePos[sh_index].w;
 
     projCoords = projCoords * 0.5 + 0.5;
 	
 	float shadow = 0.0;
 
-	//shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy, projCoords.z - bias) ));
 	if(softS)
 	{
 		// PCF
 		vec2 texelSize = 1.0 / textureSize(shadowMaps[sh_index], 0);
-		
-		/*shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy + vec2(-1, -1) * texelSize, projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy + vec2(-1, 0) * texelSize, projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy + vec2(-1, 1) * texelSize, projCoords.z - bias) ));
-		
-		shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy + vec2(0, -1) * texelSize, projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy + vec2(0, 0) * texelSize, projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy + vec2(0, 1) * texelSize, projCoords.z - bias) ));
-		
-		shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy + vec2(1, -1) * texelSize, projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy + vec2(1, 0) * texelSize, projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps[sh_index], vec3(projCoords.xy + vec2(1, 1) * texelSize, projCoords.z - bias) ));
-		shadow /= 9.0;
-		*/
 		
 		for(int x = -1; x <= 1; ++x)
 		{
@@ -337,12 +323,6 @@ float ShadowCalculation(int sh_index, bool softS)
 
 // -----------------------------------------------------------------------------------------------------------------------
 const float PI = 3.14159265359;
-
-vec3 getNormalFromMap()
-{
-    vec3 tangentNormal = texture(tex_normal, TexCoords).xyz * 2.0 - 1.0;
-	return normalize(TBN * tangentNormal);
-}
 // -----------------------------------------------------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float a)
 {
@@ -405,19 +385,19 @@ vec3 CalcIBL(vec3 N, vec3 V, vec3 F0, vec3 albedo_color, float metallic_color, f
 	if(env_probe.use_parallax_correction)
 	{
 		// Find the ray intersection with box plane
-		vec3 FirstPlaneIntersect = (env_probe.mBoxMax - FragPos) / ReflDirectionWS;
-		vec3 SecondPlaneIntersect = (env_probe.mBoxMin - FragPos) / ReflDirectionWS;
+		vec3 FirstPlaneIntersect = (env_probe.mBoxMax - fs_in.FragPos) / ReflDirectionWS;
+		vec3 SecondPlaneIntersect = (env_probe.mBoxMin - fs_in.FragPos) / ReflDirectionWS;
 		// Get the furthest of these intersections along the ray
 		vec3 FurthestPlane = max(FirstPlaneIntersect, SecondPlaneIntersect);
 		// Find the closest far intersection
 		float Distance = min(min(FurthestPlane.x, FurthestPlane.y), FurthestPlane.z);
 		// Get the intersection position
-		vec3 IntersectPositionWS = FragPos + ReflDirectionWS * Distance;
+		vec3 IntersectPositionWS = fs_in.FragPos + ReflDirectionWS * Distance;
 		// Get corrected reflection
 		ReflDirectionWS = IntersectPositionWS - env_probe.mRefPos;
 		// End parallax-correction code
 		
-		if(insideBox3d(FragPos, env_probe.mBoxMin, env_probe.mBoxMax) == 1) 
+		if(insideBox3d(fs_in.FragPos, env_probe.mBoxMin, env_probe.mBoxMax) == 1) 
 			R = ReflDirectionWS;
 	}
 	
@@ -431,9 +411,9 @@ vec3 CalcIBL(vec3 N, vec3 V, vec3 F0, vec3 albedo_color, float metallic_color, f
     vec3 prefilteredColor = textureLod(env_probe.prefilterMap, R,  roughness_color * 4).rgb;      
     vec3 specular = prefilteredColor * F;
     
-	float Auo = ao;
+	float Auo = material.ao;
 	if(use_lightmap)
-		Auo *= texture(tex_lightmap, TexCoords2).r;
+		Auo *= texture(tex_lightmap, fs_in.TexCoords2).r;
 		
 	return  (kD * diffuse + specular) * Auo;
 }
@@ -446,7 +426,7 @@ vec3 CalcDirLight(DirLight light, vec3 V, vec3 N, vec3 F0, vec3 albedo_color, fl
 	{
 		for (int i = 0 ; i < NUM_CASCADES ; i++) 
 		{
-			if (ClipSpacePosZ <= CascadeEndClipSpace[i])
+			if (fs_in.ClipSpacePosZ <= CascadeEndClipSpace[i])
 			{
 				shadow = ShadowCalculation(i, light.soft_shadows);
 				break;
@@ -475,24 +455,28 @@ vec3 CalcDirLight(DirLight light, vec3 V, vec3 N, vec3 F0, vec3 albedo_color, fl
 // -----------------------------------------------------------------------------------------------------------------------
 vec3 CalcPointLight(PointLight light, vec3 V, vec3 N, vec3 F0, vec3 albedo_color, float metallic_color, float roughness_color)
 {
-	float shadow = (light.cast_shadows && light.shadow_index >= 0) ? PointShadowCalculation(FragPos, light.position, light.raduis, light.Bias, light.shadow_index) : 0.0;                      
+	float shadow = (light.cast_shadows && light.shadow_index >= 0) ? PointShadowCalculation(fs_in.FragPos, light.position.xyz, light.position.w, light.Bias, light.shadow_index) : 0.0;                      
+	vec3 lpos = light.position.xyz;
+	vec3 lcol =  light.color.rgb;
+	float lrad = light.position.w;
+    float distance = length(lpos - fs_in.FragPos);
 
-    float distance = length(light.position - FragPos);
+	if(distance > lrad) return vec3(0);
 
-	if(distance > light.raduis) return vec3(0);
-
-	vec3 L = normalize(light.position - FragPos);
+	vec3 L = normalize(lpos - fs_in.FragPos);
     vec3 H = normalize(V + L);
 	
 	//float attenuation = 1 * ((distance + light.quadratic/light.linear) * (distance * distance)) / (light.linear * distance);
 
-    float attenuation;// = smoothstep(light.raduis, 0, distance);//1.0 - (distance / (light.raduis));
-	attenuation = clamp(1.0 - distance/light.raduis, 0.0, 1.0); attenuation *= attenuation;
-	//attenuation = clamp(1.0 - distance*distance/(light.raduis*light.raduis), 0.0, 1.0); attenuation *= attenuation;
-	//if(attenuation < 0) attenuation = 0;
-	//if(attenuation > 1) attenuation = 1;
+	//float attenuation = pow(clamp(1.0 - pow(distance / lrad, 1.0), 0.0, 1.0), 2.0) / (distance * distance + 1.0);
+    //float attenuation = max(0.95 - length(worldPos - lightPos) / lightRadius, 0.0);
+     
+
+    //float attenuation;// = smoothstep(light.raduis, 0, distance);//1.0 - (distance / (light.raduis));
+	float attenuation = clamp(1.0 - distance/lrad, 0.0, 1.0); attenuation *= attenuation;
+//	attenuation = clamp(1.0 - distance*distance/(light.raduis*light.raduis), 0.0, 1.0); attenuation *= attenuation;
 	
-    vec3 radiance = vec3(1.0) * attenuation * light.intensity;
+  	vec3 radiance = lcol * attenuation * light.color.w;    
 
     // Cook-Torrance BRDF direction
     float NDF = DistributionGGX(N, H, roughness_color);   
@@ -507,31 +491,35 @@ vec3 CalcPointLight(PointLight light, vec3 V, vec3 N, vec3 F0, vec3 albedo_color
     kD *= 1.0 - metallic_color;	  
     float NdotL = max(dot(N, L), 0.0);        
 	
-	return ((1.0 - shadow) * ( kD * albedo_color / PI + specular)) * radiance * NdotL * light.color;
+	return ((1.0 - shadow) * ( kD * albedo_color / PI + specular)) * radiance * NdotL;
 }
 // -----------------------------------------------------------------------------------------------------------------------
 vec3 CalcSpotLight(SpotLight light, vec3 V, vec3 N, vec3 F0, vec3 albedo_color, float metallic_color, float roughness_color)
 {
-	float shadow = (light.cast_shadows && light.shadow_index >= 0) ? SpotShadowCalculation(light.shadow_index, light.Bias, light.position) : 0.0;     
+	vec3 lpos = light.position.xyz;
+	float lrad = light.position.w;
 	
-    float distance = length(light.position - FragPos);
-	if(distance > light.raduis) return vec3(0);
+	float shadow = (light.cast_shadows && light.shadow_index >= 0) ? SpotShadowCalculation(light.shadow_index, light.Bias, lpos) : 0.0;     
+	//float shadow = SpotShadowCalculation(light.shadow_index, light.Bias, lpos);  
+    float distance = length(lpos - fs_in.FragPos);
+	if(distance > lrad) return vec3(0);
 	
-	vec3 L = normalize(light.position - FragPos);
-	float theta = dot(L, normalize(-light.direction));
+	vec3 L = normalize(lpos - fs_in.FragPos);
+	float theta = dot(L, normalize(-light.direction.xyz));
 	
-	if(theta < light.outerCutOff) return vec3(0); // we're working with angles as cosines instead of degrees so a '>' is used.
+	//if(theta < light.outerCutOff) return vec3(0); // we're working with angles as cosines instead of degrees so a '>' is used.
 	
 	// spotlight (soft edges)
-    float epsilon = (light.cutOff - light.outerCutOff);
+    float epsilon = (light.direction.w - light.outerCutOff);
     float intensitys = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 	vec3 H = normalize(V + L);
 
-    float attenuation = 1.0 - (distance / (light.raduis));
-	if(attenuation < 0) attenuation = 0;
-	if(attenuation > 1) attenuation = 1;
+    //float attenuation = 1.0 - (distance / lrad);
+	float attenuation = clamp(1.0 - distance/lrad, 0.0, 1.0); attenuation *= attenuation;
+	//if(attenuation < 0) attenuation = 0;
+	//if(attenuation > 1) attenuation = 1;
 	
-    vec3 radiance = vec3(1.0) * attenuation * light.intensity * intensitys;
+    vec3 radiance = light.color.rgb * attenuation * light.color.w * intensitys;
 	
     // Cook-Torrance BRDF direction
     float NDF = DistributionGGX(N, H, roughness_color);   
@@ -546,57 +534,98 @@ vec3 CalcSpotLight(SpotLight light, vec3 V, vec3 N, vec3 F0, vec3 albedo_color, 
     kD *= 1.0 - metallic_color;	  
     float NdotL = max(dot(N, L), 0.0);        
 	
-	return (1.0 - shadow) * ( kD * albedo_color / PI + specular) * radiance * NdotL * light.color;
+	return (1.0 - shadow) * ( kD * albedo_color / PI + specular) * radiance * NdotL;
 }
 // -----------------------------------------------------------------------------------------------------------------------
 vec3 CalcFog()
 {	
 	vec3 fg = vec3(0.0);
-	float distance = length(CamPos - FragPos);
+	float distance = length(CamPos - fs_in.FragPos);
 	if(distance < Fog.near) return vec3(0);
 	fg = Fog.color;
 	
 	float attenuation = ((distance - Fog.near) / (Fog.far - Fog.near));
-	
-	if(attenuation < 0) attenuation = 0;
-	if(attenuation > 1) attenuation = 1;
+	attenuation = clamp(attenuation, 0.0, 1.0); 
 	
 	fg *= attenuation;
 	return fg;
 }
 // -----------------------------------------------------------------------------------------------------------------------
+vec3 getNormalFromMap()
+{
+#ifndef DISPLACEMENT
+    vec3 tangentNormal = texture(material.tex_normal, fs_in.TexCoords).xyz * 2.0 - 1.0;
+	return normalize(fs_in.TBN * tangentNormal);
+#else
+	vec3 N1 ;
+	vec3 N2 ;
+
+	if(material.use_tex_normal) N1 = (fs_in.TBN * (texture(material.tex_normal, fs_in.TexCoords).xyz * 2.0 - 1.0));
+	else N1 = (fs_in.Normal);
+
+	if(material.use_emission) N2 = (fs_in.TBN * (texture(material.tex_emission, fs_in.TexCoords).xyz * 2.0 - 1.0));
+	else N2 = (fs_in.Normal);
+
+	return normalize(mix(N1, N2, fs_in.Blend));
+#endif
+}
+// -----------------------------------------------------------------------------------------------------------------------
 void main()
-{   
-	//FragColor = vec4(1.0, 1.0, 1.0 , 1.0);
-	//return;
-	
-    // Main Colors 
+{  
+ #ifndef DISPLACEMENT
+	if(use_alpha)
+	{
+		vec4 tr = texture(material.tex_emission, fs_in.TexCoords);
+	 	if((tr.r) < 0.5)
+       		discard;
+	}
+#endif
+	//FragColor = vec4(1.0, 1.0, 1.0 , 1.0); return;
+    // Get material data
 	//--------------------------------------------
-    vec3  albedo_color    = albedo;
-    float metallic_color  = metallic;
-    float roughness_color = roughness;
+    vec3  albedo_color    = material.albedo;
+    float metallic_color  = material.metallic;
+    float roughness_color = material.roughness;
+	vec3 N; 										// Normal
+	vec3 V = normalize(CamPos - fs_in.FragPos);	    // View Direction
 	
-	vec3 N; 									// Normal
-	vec3 V = normalize(CamPos - FragPos);	    // View Direction
+#ifndef DISPLACEMENT
+	if(material.use_tex_albedo)
+	albedo_color *= pow(texture(material.tex_albedo, fs_in.TexCoords).rgb, vec3(2.2));
 	
-	///float dd = length(CamPos - FragPos);
-	//albedo_color *= pow(texture(tex_albedo, TexCoords).rgb, vec3(2.2));
-	//N = normalize(Normal);
+	if(material.use_tex_metal)
+    metallic_color *= texture(material.tex_metal, fs_in.TexCoords).r;
 	
-	if(use_tex_albedo)
-	albedo_color *= pow(texture(tex_albedo, TexCoords).rgb, vec3(2.2));
+	if(material.use_tex_rough)
+    roughness_color *= texture(material.tex_rough, fs_in.TexCoords).r;
 	
-	if(use_tex_metal)
-    metallic_color *= texture(tex_metal, TexCoords).r;
-	
-	if(use_tex_rough)
-    roughness_color *= texture(tex_rough, TexCoords).r;
-	
-	if(use_tex_normal)
+	if(material.use_tex_normal) N = getNormalFromMap();
+	else N = normalize(fs_in.Normal);
+#else
+	metallic_color = mix(material.metallic, val2, fs_in.Blend);
+	albedo_color = mix(albedo_color, material.emission, fs_in.Blend);
+
+	vec3 albedo_color1 = material.albedo;
+	vec3 albedo_color2 = material.emission;
+
+	if(material.use_tex_albedo)	
+		albedo_color1 *=  pow(texture(material.tex_albedo, fs_in.TexCoords).rgb, vec3(2.2));
+	if(material.use_tex_metal)
+		albedo_color2 *=  pow(texture(material.tex_metal, fs_in.TexCoords).rgb, vec3(2.2));
+
+	albedo_color *= mix(albedo_color1, albedo_color2, fs_in.Blend);
+
+	if(material.use_tex_rough)
+    	roughness_color *= texture(material.tex_rough, fs_in.TexCoords).r;
+
+	roughness_color = mix(roughness_color, val1, fs_in.Blend);
+
 	N = getNormalFromMap();
-	else
-	N = normalize(Normal);
-	
+#endif
+
+	//if(texture(material.tex_emission, fs_in.TexCoords).r == 1)
+	//	discard;
+		
 	// Ambient Lighting (IBL)
 	//--------------------------------------------
 	vec3 F0 = mix(vec3(0.04), albedo_color, metallic_color); 
@@ -608,46 +637,78 @@ void main()
 	
 	if(dirLight.use) 
 	Lo += CalcDirLight(dirLight, V, N, F0, albedo_color, metallic_color, roughness_color);
-	int a = 1;
-	for(int i = 0; i < MAX_LIGHT_COUNT; i++)
+	
+	for(int i = 0; i < MAX_LIGHT_COUNT && visible_pLights[i] != -1; i++)
 	{
+		Lo += CalcPointLight(p_lights[visible_pLights[i]], V, N, F0, albedo_color, metallic_color, roughness_color);
+	}
+	
+	for(int i = 0; i < MAX_LIGHT_COUNT && visible_sLights[i] != -1; i++)
+	{
+		Lo += CalcSpotLight(sp_lights[i], V, N, F0, albedo_color, metallic_color, roughness_color);
+	}
+	
+	// Forward+ lighting (testing)
+	//--------------------------------------------
+	// Determine which tile this pixel belongs to
+	/*ivec2 location = ivec2(gl_FragCoord.xy);
+	ivec2 tileID = location / ivec2(16, 16);
+	uint index = tileID.y * numberOfTilesX + tileID.x;*/
+
+	//vec3 viewDirection = normalize(fragment_in.tangentViewPosition - fragment_in.tangentFragmentPosition);
+
+	// The offset is this tile's position in the global array of valid light indices.
+	// Loop through all these indices until we hit max number of lights or the end (indicated by an index of -1)
+	// Calculate the lighting contribution from each visible point light
+	/*uint offset = index * 1024;
+	for (int i = 0; i < 1024 && visibleLightIndicesBuffer.data[offset + i].index != -1; i++) 
+	{
+		int lightIndex = visibleLightIndicesBuffer.data[offset + i].index;
+		PointLight light = lightBuffer.data[lightIndex];
 		
-		if(p_lights[i].offscreen) continue;
-		if(p_lights[i].use)
-			Lo += CalcPointLight(p_lights[i], V, N, F0, albedo_color, metallic_color, roughness_color);
-		else break;
-	}
-	for(int i = 0; i < MAX_LIGHT_COUNT; i++)
-	{
-		if(sp_lights[i].offscreen) continue;
-		if(sp_lights[i].use)
-			Lo += CalcSpotLight(sp_lights[i], V, N, F0, albedo_color, metallic_color, roughness_color);
-		else break;
-	}
+		Lo += CalcPointLight(light, V, N, F0, albedo_color, metallic_color, roughness_color);
+	}*/
+	
 	// Final Shading
 	//--------------------------------------------
 	vec3 color = ambient + Lo;
 	
-	if (use_emission)
+#ifndef DISPLACEMENT
+	if (material.use_emission)
 	{
 		// emission
-		vec3 emi = emission * emission_power;
-		if(use_tex_emission){
-			emi *= texture(tex_emission, TexCoords).r;
+		vec3 emi = material.emission * material.emission_power;
+		if(material.use_tex_emission){
+			emi *= texture(material.tex_emission, fs_in.TexCoords).r;
 		}
 		color += emi;
 	}
-	
+#endif
 	// apply fog
-	if(Fog.use)
-	color += CalcFog();
+	if(Fog.use) color += CalcFog();
 	
 	// HDR tonemapping
-    //color = color / (color + vec3(1.0));
+   // color = color / (color + vec3(1.0));
     // gamma correct
-    //color = pow(color, vec3(1.0/2.2));
+   // color = pow(color, vec3(1.0/2.2));
 	
+	/*vec4 CascadeIndicator = vec4(0.0, 0.0, 0.0, 0.0);
+
+	for (int i = 0 ; i < NUM_CASCADES ; i++) 
+	{
+		if (fs_in.ClipSpacePosZ <= CascadeEndClipSpace[i])
+		{
+			 if (i == 0) 
+                CascadeIndicator = vec4(0.1, 0.0, 0.0, 1.0);
+            else if (i == 1)
+                CascadeIndicator = vec4(0.0, 0.1, 0.0, 1.0);
+            else if (i == 2)
+                CascadeIndicator = vec4(0.0, 0.0, 0.1, 1.0);
+			break;
+		}
+	}*/
+
     FragColor = vec4(color , 1.0);
 }
 
-#endif
+#endif // COMPILING_FS

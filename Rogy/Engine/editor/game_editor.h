@@ -24,6 +24,7 @@
 
 #include "editor_property.h"
 #include "project_settings.h"
+#include "material_editor.h"
 
 class Game_Editor 
 {
@@ -32,6 +33,7 @@ public:
 	~Game_Editor();
 	
 	bool scripts_board = false;
+	bool tryingtoSpawn = false;
 
 	ViewPort_Bounds* MainViewport;
 	Scene_hierarchy s_hierarchy;
@@ -41,6 +43,7 @@ public:
 	Editor_Debug db_editor;
 	EProjectBrowser prj_browser;
 	Project_Settings prg_settings;
+	RMaterialEditor mat_editor;
 
 	ImGuizmo::OPERATION mCurrentGizmoOperation;
 	ImGuizmo::MODE mCurrentGizmoMode;

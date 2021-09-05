@@ -16,7 +16,10 @@ enum SceneRequest
 	SR_PLAY_SCENE,
 	SR_RECOMPILE_SCRIPTS,
 	SR_SET_EDITOR_GRID,
-	SR_SET_VIEW
+	SR_SET_VIEW,
+	SR_SPAWN_AT_MOUSE,
+	SR_BAKE_NAV,
+	SR_EDIT_DISP
 };
 
 struct ScnSpawnReq
@@ -87,14 +90,15 @@ public:
 		if (ent != nullptr) {
 			ent->path = ""; // Spawn as clone
 			ent->name += " (Clone)";
-			ent->transform.SetPosition(position);
-			ent->transform.SetAngels(rot);
+			ent->SetTranslation(position);
+			ent->SetRotation(rot);
 		}
 		return ent;
 	}
 
 	void SaveBP(YAML::Emitter& out);
 
+	EnttID editDisp = 8888;
 	// Editor Events
 public:
 	bool is_playing = false;

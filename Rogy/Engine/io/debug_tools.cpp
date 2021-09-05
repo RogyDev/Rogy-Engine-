@@ -16,16 +16,19 @@ void DebugTool::Log(const std::string message)
 // ---------------------------------------------
 void DebugTool::Warning(const std::string message)
 {
+	hasMessages = true;
 	addMsg(message, LogType::LT_Warning);
 }
 // ---------------------------------------------
 void DebugTool::Error(const std::string message)
 {
+	hasMessages = true;
 	addMsg(message, LogType::LT_Error);
 }
 // ---------------------------------------------
 void DebugTool::Clear()
 {
+	hasMessages = false;
 	messages.clear();
 }
 // ---------------------------------------------

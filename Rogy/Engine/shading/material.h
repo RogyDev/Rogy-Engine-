@@ -16,7 +16,7 @@
 enum Shader_Type
 {
 	SHADER_PBR,
-	SHADER_CUSTOM,
+	SHADER_Blend,
 };
 
 class Material
@@ -36,9 +36,13 @@ public:
 		float ao;
 		float specular = 0.5f;
 		bool use_emission = false;
+		bool cutout = false;
 		glm::vec3 emission;
 		float emission_power;
 		glm::vec2 uv = glm::vec2(1.0f, 1.0f);
+
+		float val1;
+		float val2;
 
 		Texture* tex_albedo = nullptr;
 		Texture* tex_rough = nullptr;
@@ -62,6 +66,7 @@ public:
 			out << YAML::BeginMap;
 			out << YAML::Key << "Material" << YAML::Value << YAML::BeginSeq;
 			out << YAML::BeginMap;
+			out << YAML::Key << "type" << YAML::Value << (int)type;
 			out << YAML::Key << "name" << YAML::Value << name;
 			out << YAML::Key << "tag" << YAML::Value << tag;
 			out << YAML::Key << "albedo_x" << YAML::Value << albedo.x;
@@ -72,6 +77,11 @@ public:
 			out << YAML::Key << "ao" << YAML::Value << ao;
 			out << YAML::Key << "uv_x" << YAML::Value << uv.x;
 			out << YAML::Key << "uv_y" << YAML::Value << uv.y;
+
+			out << YAML::Key << "val1" << YAML::Value << val1;
+			out << YAML::Key << "val2" << YAML::Value << val2;
+
+			out << YAML::Key << "cutout" << YAML::Value << cutout;
 
 			out << YAML::Key << "use_emission" << YAML::Value << use_emission;
 			out << YAML::Key << "emission_x" << YAML::Value << emission.x;
@@ -128,6 +138,19 @@ public:
 
 				name = data["name"].as<std::string>();
 				tag = data["tag"].as<std::string>();
+
+				if(data["cutout"].IsDefined())
+					cutout = data["cutout"].as<bool>();
+
+				if (data["type"].IsDefined())
+					type = (Shader_Type)data["type"].as<int>();
+
+				if (data["val1"].IsDefined())
+					val1 = data["val1"].as<float>();
+
+				if (data["val2"].IsDefined())
+					val1 = data["val2"].as<float>();
+
 				albedo.x = data["albedo_x"].as<float>();
 				albedo.y = data["albedo_y"].as<float>();
 				albedo.z = data["albedo_z"].as<float>();

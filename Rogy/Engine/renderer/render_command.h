@@ -13,6 +13,7 @@ All render state required for submitting a render command.
 */
 struct RenderCommand
 {
+	unsigned int ID;
 	glm::mat4 Transform;
 	Mesh*      Mesh;
 	Material*  Material;

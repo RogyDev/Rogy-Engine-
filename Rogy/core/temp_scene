@@ -1,31 +1,37 @@
 Renderer:
-  - SkyPath: res/DaylightAmbientCubemap.HDR
+  - SkyPath: core\textures\background.jpg
+    UseClouds: false
     postProc_Use: true
     usefog: true
-    fogNear: 40
-    fogFar: 800
-    AmbientLevel: 1
-    fogColor: [0, 0.787613869, 1]
-  - vignette_use: true
+    fogNear: 100
+    fogFar: 500
+    AmbientLevel: 1.5
+    fogColor: [0, 0.165459216, 0.28761059]
+  - ToneMap: 0
+    vignette_use: true
     vignette_softness: 1
     vignette_radius: 1
+    bloom_use: true
+    bloom_threshold: 2
+    sharpen: true
+    sharpen_amount: 7
     cc_use: true
-    cc_brightness: 0.0900000036
-    cc_saturation: 0.959999979
-    cc_contrast: 1.48000002
-    use_ssao: false
-    kernelSize: 64
-    radius: 1
-    ssao_power: 30
+    cc_brightness: 0.00999999978
+    cc_saturation: 0.300000012
+    cc_contrast: 1.5
+    use_ssao: true
+    kernelSize: 10
+    radius: 10
+    ssao_power: 200
     bias: 0.100000001
     mb_use: false
-    exposure: 1
-Scene: Test4
+    exposure: 3
+Scene: Scene33
 Entities:
   - Entity: 4294967295
     Root: true
     IsPrefab: false
-    name: Test4
+    name: Scene33
     tag: default
     Active: true
     Static: false
@@ -41,33 +47,33 @@ Entities:
     script_count: 0
     Scripts:
       []
-    ChildCount: 12
-  - Entity: 5
+    ChildCount: 61
+  - Entity: 298
     Root: false
     IsPrefab: false
-    name: Cube
+    name: Grid
     tag: default
     Active: true
     Static: true
     m_CollMode: 0
     Transform:
-      Position: [14.4992228, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [70, 1, 70]
-      Angels: [0, 0, 0]
+      Position: [0, -1.42108564e-14, 2.38418579e-07]
+      Rotation: [-0.707106769, -0, 0, 0.707106769]
+      Scale: [10.0100002, 9.99997425, 9.99997425]
+      Angels: [-90, -0, 0]
     comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap0.tga
-          mat_name: ground.mat
-          mat_source: res\Scenes\Models\Ground\ground.mat
+          lightmapPath: Lightmaps\Scene33\lightmap0.tga
+          mat_name: TexturesCom_Wall_ConcreteBunker5_5x2.5_1K_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Wall_ConcreteBunker5_5x2.5_1K_albedo.mat
           HasMesh: true
-          mesh_source: core\models\cube.fbx
+          mesh_source: res\PBR\Concrate\ground.fbx
           mesh_index: 0
       - RigidBody:
-          m_CollisionType: 0
+          m_CollisionType: 3
           m_BodyMode: 1
           Mass: 1
           LinerDamping: 0.00999999978
@@ -75,11 +81,12 @@ Entities:
           is_trigger: false
           mScaleMultiplier: [1, 1, 1]
           mOffset: [0, 0, 0]
+          mesh_path: res\PBR\Concrate\ground.fbx
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 6
+  - Entity: 299
     Root: false
     IsPrefab: false
     name: Directional Light
@@ -89,31 +96,23 @@ Entities:
     m_CollMode: 0
     Transform:
       Position: [0, 0, 0]
-      Rotation: [-0.892367482, -0.122323781, -0.347020596, 0.261331022]
+      Rotation: [0.303069204, -0.356276572, -0.123371832, -0.875211656]
       Scale: [1, 1, 1]
-      Angels: [-148.5, -43.0999985, 2.9000001]
-    comp_count: 2
+      Angels: [-38.2000008, -315.700012, 0]
+    comp_count: 1
     Components:
       - DirectionalLight:
-          Color: [0.985903382, 1, 0.840707958]
-          Bias: 0.00300000003
+          enabled: true
+          Color: [0.996207714, 1, 0.893805325]
+          Bias: 0.00100000005
           CastShadows: true
-          Intensity: 3
+          Intensity: 1
           Soft: true
-      - BillboardComponent:
-          enabled: true
-          sizex: 1
-          sizey: 1
-          depth_test: false
-          sun_source: true
-          tex_path: core\textures\glow1.png
-          color: [1, 1, 1]
-          use_tex_as_mask: false
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 7
+  - Entity: 300
     Root: false
     IsPrefab: false
     name: Cube
@@ -122,18 +121,216 @@ Entities:
     Static: true
     m_CollMode: 0
     Transform:
-      Position: [-18.6079197, 17.2990971, 12.1746492]
+      Position: [-32.7214279, -0.0249872766, 11.8496504]
+      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
+      Scale: [2.70018411, 1.86337638, 1.86337638]
+      Angels: [-90, 180, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap2.tga
+          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
+          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
+          HasMesh: true
+          mesh_source: res\PBR\wall3\wall.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [0.200000003, 16.2999992, 3.5999999]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 301
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [32.9495659, -0.0249887705, -13.0967455]
+      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
+      Scale: [2.70076442, 1.86366653, 1.86366653]
+      Angels: [-90, 180, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap3.tga
+          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
+          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
+          HasMesh: true
+          mesh_source: res\PBR\wall3\wall.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 302
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-32.6724396, -0.0249887612, -13.2701473]
+      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
+      Scale: [2.70022988, 1.86339927, 1.86339927]
+      Angels: [-90, 180, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap4.tga
+          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
+          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
+          HasMesh: true
+          mesh_source: res\PBR\wall3\wall.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 303
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [32.9495659, -0.0249872208, 11.8496504]
+      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
+      Scale: [2.70037699, 1.86347282, 1.86347282]
+      Angels: [-90, 180, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap5.tga
+          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
+          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
+          HasMesh: true
+          mesh_source: res\PBR\wall3\wall.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [0.200000003, 16.2999992, 3.5999999]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 304
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [32.9495659, -0.0249880236, -0.604959071]
+      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
+      Scale: [2.70057106, 1.86356986, 1.86356986]
+      Angels: [-90, 180, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap6.tga
+          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
+          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
+          HasMesh: true
+          mesh_source: res\PBR\wall3\wall.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 305
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [16.3343582, -0.0249852967, -12.0831547]
+      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
+      Scale: [2.69986582, 1.86321723, 1.86321723]
+      Angels: [-90, 180, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap7.tga
+          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
+          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
+          HasMesh: true
+          mesh_source: res\PBR\wall3\wall.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [0.200000003, 2.70000005, 3.5]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 306
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [0, 3.22954178, 18.6815643]
       Rotation: [0, 0, 0, 1]
-      Scale: [17.5, 6, 8]
+      Scale: [33, 3.5999999, 1]
       Angels: [0, 0, 0]
     comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap1.tga
-          mat_name: Wood_def.mat
-          mat_source: res\Scenes\Models\Textures\Wood_def.mat
+          lightmapPath: Lightmaps\Scene33\lightmap8.tga
+          mat_name: TexturesCom_Wall_Stucco6E_2x2_1K_albedo.mat
+          mat_source: res\PBR\wall3\TexturesCom_Wall_Stucco6E_2x2_1K_albedo.mat
           HasMesh: true
           mesh_source: core\models\cube.fbx
           mesh_index: 0
@@ -146,11 +343,12 @@ Entities:
           is_trigger: false
           mScaleMultiplier: [1, 1, 1]
           mOffset: [0, 0, 0]
+          mesh_path: ""
     script_count: 0
     Scripts:
       []
-    ChildCount: 1
-  - Entity: 8
+    ChildCount: 0
+  - Entity: 307
     Root: false
     IsPrefab: false
     name: Cube
@@ -159,18 +357,18 @@ Entities:
     Static: true
     m_CollMode: 0
     Transform:
-      Position: [0, -0.800000012, 0]
+      Position: [0, 3.22954178, -18.105114]
       Rotation: [0, 0, 0, 1]
-      Scale: [1.10000002, 0.200000003, 1.02999997]
+      Scale: [33, 3.5999999, 1]
       Angels: [0, 0, 0]
     comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap2.tga
-          mat_name: concretewall004b.mat
-          mat_source: res\Scenes\Models\Textures\concretewall004b.mat
+          lightmapPath: Lightmaps\Scene33\lightmap9.tga
+          mat_name: TexturesCom_Wall_Stucco6E_2x2_1K_albedo.mat
+          mat_source: res\PBR\wall3\TexturesCom_Wall_Stucco6E_2x2_1K_albedo.mat
           HasMesh: true
           mesh_source: core\models\cube.fbx
           mesh_index: 0
@@ -183,367 +381,1535 @@ Entities:
           is_trigger: false
           mScaleMultiplier: [1, 1, 1]
           mOffset: [0, 0, 0]
+          mesh_path: ""
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 9
+  - Entity: 308
     Root: false
     IsPrefab: false
-    name: Fence
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-32.6724396, -0.0249880236, -0.604953527]
+      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
+      Scale: [2.70035577, 1.86346221, 1.86346221]
+      Angels: [-90, 180, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap10.tga
+          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
+          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
+          HasMesh: true
+          mesh_source: res\PBR\wall3\wall.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 309
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-18.1951542, -0.024987936, 10.491972]
+      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
+      Scale: [2.70017719, 1.86337292, 1.86337292]
+      Angels: [-90, 180, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap11.tga
+          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
+          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
+          HasMesh: true
+          mesh_source: res\PBR\wall3\wall.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [0.200000003, 2.70000005, 3.5]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 310
+    Root: false
+    IsPrefab: false
+    name: Cylinder.005
     tag: default
     Active: true
     Static: false
     m_CollMode: 0
     Transform:
-      Position: [0, 0, 0]
+      Position: [25.7440434, 4.93798399, 14.6293306]
+      Rotation: [0.884350836, 0.158323199, -0.0773904771, -0.432282358]
+      Scale: [1.5, 1.5, 1.49999988]
+      Angels: [-127.900002, 0, 20.2999992]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: TexturesCom_Various_TireCar_1K_albedo.mat
+          mat_source: res\PBR\Wheels Arch\TexturesCom_Various_TireCar_1K_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Wheels Arch\wheels.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 3
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: res\PBR\Wheels Arch\wheels.fbx
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 311
+    Root: false
+    IsPrefab: false
+    name: Cylinder.005
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [-15.7190895, 4.53888512, 14.3721046]
+      Rotation: [0.884350836, 0.158323199, -0.0773904771, -0.432282358]
+      Scale: [1.5, 1.5, 1.49999988]
+      Angels: [-127.900002, 0, 20.2999992]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: TexturesCom_Various_TireCar_1K_albedo.mat
+          mat_source: res\PBR\Wheels Arch\TexturesCom_Various_TireCar_1K_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Wheels Arch\wheels.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 3
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: res\PBR\Wheels Arch\wheels.fbx
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 312
+    Root: false
+    IsPrefab: false
+    name: Cylinder.005
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [12.1456537, 4.53888512, -6.71440125]
+      Rotation: [0.884350836, 0.158323199, -0.0773904771, -0.432282358]
+      Scale: [1.5, 1.5, 1.49999988]
+      Angels: [-127.900002, 0, 20.2999992]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: TexturesCom_Various_TireCar_1K_albedo.mat
+          mat_source: res\PBR\Wheels Arch\TexturesCom_Various_TireCar_1K_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Wheels Arch\wheels.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 3
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: res\PBR\Wheels Arch\wheels.fbx
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 313
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [4.16043043, -0.00530407159, 14.333766]
+      Rotation: [-0.383045554, 0.594370365, 0.594370306, 0.383045554]
+      Scale: [1.99999928, 1.99999928, 2]
+      Angels: [-90, 114.400002, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap15.tga
+          mat_name: crate.mat
+          mat_source: res\PBR\Crate\crate.mat
+          HasMesh: true
+          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 2]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 314
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-16.2592659, -0.00530779362, 6.43733931]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [1.5, 1.49990487, 1.49990487]
+      Angels: [-90, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap16.tga
+          mat_name: crate.mat
+          mat_source: res\PBR\Crate\crate.mat
+          HasMesh: true
+          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 2]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 315
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [29.8787003, -0.00530588441, -14.4805975]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [1.99999928, 1.9996388, 1.99963951]
+      Angels: [-90, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap17.tga
+          mat_name: crate.mat
+          mat_source: res\PBR\Crate\crate.mat
+          HasMesh: true
+          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 2]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 316
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-4.89136171, -0.00530779362, -11.0291424]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [1.5, 1.49997115, 1.49997115]
+      Angels: [-90, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap18.tga
+          mat_name: crate.mat
+          mat_source: res\PBR\Crate\crate.mat
+          HasMesh: true
+          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 2]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 317
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-7.08120728, -0.0053059049, -14.853858]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [1.99999928, 1.99987149, 1.99987221]
+      Angels: [-90, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap19.tga
+          mat_name: crate.mat
+          mat_source: res\PBR\Crate\crate.mat
+          HasMesh: true
+          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 2]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 318
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-29.7144623, -0.00530588627, -14.3884926]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [1.99999928, 1.99978805, 1.99978876]
+      Angels: [-90, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap20.tga
+          mat_name: crate.mat
+          mat_source: res\PBR\Crate\crate.mat
+          HasMesh: true
+          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 2]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 319
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-20.6998844, 0.211341918, 15.5875931]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [1.99999928, 1.99965906, 1.99965978]
+      Angels: [-90, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap21.tga
+          mat_name: crate.mat
+          mat_source: res\PBR\Crate\crate.mat
+          HasMesh: true
+          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 2]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 320
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [13.4777374, -0.00530593051, -14.8844662]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [1.99999928, 1.99968028, 1.999681]
+      Angels: [-90, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap22.tga
+          mat_name: crate.mat
+          mat_source: res\PBR\Crate\crate.mat
+          HasMesh: true
+          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 2]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 321
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-17.8220367, 0.082564868, -10.7050018]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [0.999999881, 0.999772429, 0.999677718]
+      Angels: [-90, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap23.tga
+          mat_name: TexturesCom_Metal_Corrugated2_1K_albedo.mat
+          mat_source: res\PBR\Tank\TexturesCom_Metal_Corrugated2_1K_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Tank\tank.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 3
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: res\PBR\Tank\tank.fbx
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 322
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [7.91566515, 0.082566835, 8.78658009]
+      Rotation: [-0.696471035, 0.122180052, 0.122180052, 0.696471155]
+      Scale: [0.999999881, 0.999846339, 0.99975872]
+      Angels: [-90, 19.8999996, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap24.tga
+          mat_name: TexturesCom_Metal_Corrugated2_1K_albedo.mat
+          mat_source: res\PBR\Tank\TexturesCom_Metal_Corrugated2_1K_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Tank\tank.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 3
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: res\PBR\Tank\tank.fbx
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 323
+    Root: false
+    IsPrefab: false
+    name: Mesh
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [-0.278865814, 3.79490519, -13.4588108]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [0.0604517497, 0.0604433939, 0.0604433939]
+      Angels: [-90, 0, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: dvig_diffuse.mat
+          mat_source: res\Models\Dvig\dvig_diffuse.mat
+          HasMesh: true
+          mesh_source: res\Models\Dvig\Dvig.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 1
+  - Entity: 324
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: false
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [53.5999985, 0, 0]
+      Rotation: [0, 0, 0, 1]
+      Scale: [82.0999985, 50, 42.5]
+      Angels: [0, 0, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap26.tga
+          mat_name: ""
+          mat_source: ""
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 325
+    Root: false
+    IsPrefab: false
+    name: Cube.002
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [20.0483665, 1.30822514e-06, 5.20156193]
+      Rotation: [-0.10329634, -0.699521124, -0.699521124, 0.10329634]
+      Scale: [1.29960275, 1.30000007, 1.29981542]
+      Angels: [-90, -163.199997, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap27.tga
+          mat_name: TexturesCom_Wood.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\wood.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 326
+    Root: false
+    IsPrefab: false
+    name: Cube.002
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-10.4916544, 3.105676e-07, -4.84486437]
+      Rotation: [-0.644205272, -0.291546881, -0.291546881, 0.644205272]
+      Scale: [1.29999995, 1.30000007, 1.29999995]
+      Angels: [-90, -48.7000008, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap28.tga
+          mat_name: TexturesCom_Wood.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\wood.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 327
+    Root: false
+    IsPrefab: false
+    name: Cube.002
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-12.2741013, 1.44686101e-06, 8.75332928]
+      Rotation: [-0.10329634, -0.699521124, -0.699521124, 0.10329634]
+      Scale: [1.29989302, 1.30000007, 1.29995024]
+      Angels: [-90, -163.199997, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap29.tga
+          mat_name: TexturesCom_Wood.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\wood.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 328
+    Root: false
+    IsPrefab: false
+    name: Cube.002
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [12.6898403, 1.3030218e-06, 7.106812]
+      Rotation: [-0.10329634, -0.699521124, -0.699521124, 0.10329634]
+      Scale: [1.29982054, 1.30000007, 1.29991627]
+      Angels: [-90, -163.199997, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap30.tga
+          mat_name: TexturesCom_Wood.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\wood.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 329
+    Root: false
+    IsPrefab: false
+    name: Cube.002
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [16.5119324, 1.30570936e-06, 6.19925261]
+      Rotation: [-0.10329634, -0.699521124, -0.699521124, 0.10329634]
+      Scale: [1.29976118, 1.30000007, 1.29988849]
+      Angels: [-90, -163.199997, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap31.tga
+          mat_name: TexturesCom_Wood.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\wood.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 330
+    Root: false
+    IsPrefab: false
+    name: NurbsPath
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [22.6182632, 0.17952852, -5.26933575]
+      Rotation: [0.705116332, 0.0530179702, -0.0530179702, 0.705116332]
+      Scale: [2.99999976, 2.9996798, 2.99959111]
+      Angels: [90, 8.60000038, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap32.tga
+          mat_name: TexturesCom_Wood.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\jaba.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 331
+    Root: false
+    IsPrefab: false
+    name: NurbsPath
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-7.62728786, 0.179528698, 6.80730772]
+      Rotation: [0.707106769, 0, 0, 0.707106769]
+      Scale: [3, 2.99969149, 2.99969149]
+      Angels: [90, -0, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap33.tga
+          mat_name: TexturesCom_Wood.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\jaba.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 332
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [19.3864517, -0.113603935, 16.6979713]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap34.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 333
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [0.358214974, -0.141717076, 16.3198032]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap35.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 334
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [3.90760374, -0.141717091, 10.2437983]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap36.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 335
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-13.4642353, 0.0147693157, 16.1732635]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap37.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 336
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-29.6591949, 0.104237676, 9.07617474]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap38.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 337
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-31.224123, -0.162545919, -9.93251514]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap39.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 338
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-26.3309402, -0.113608599, -15.4734898]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap40.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 339
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-10.4220648, -0.113605931, -15.6897669]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap41.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 340
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [12.598361, -0.113605998, -11.1829262]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap42.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 341
+    Root: false
+    IsPrefab: false
+    name: Grid
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [30.5236645, -0.113606043, -11.5229073]
+      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
+      Scale: [5, 5, 2.5]
+      Angels: [-90, -0.200000003, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap43.tga
+          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
+          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
+          HasMesh: true
+          mesh_source: res\PBR\Concrate\pile.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 342
+    Root: false
+    IsPrefab: false
+    name: Plane
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [22.7022743, 0.0392496027, -4.39543343]
+      Rotation: [0, 0.707106769, 0, 0.707106769]
+      Scale: [7.69921732, 1, 11.498435]
+      Angels: [0, 90, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Decal2.mat
+          mat_source: res\Textures\Decal2.mat
+          HasMesh: true
+          mesh_source: core\models\plane.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 343
+    Root: false
+    IsPrefab: false
+    name: Plane
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [3.95146561, 0.039251741, -4.75450182]
+      Rotation: [0, 0.707106769, 0, 0.707106769]
+      Scale: [7.69993734, 1, 11.4998751]
+      Angels: [0, 90, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Decal2.mat
+          mat_source: res\Textures\Decal2.mat
+          HasMesh: true
+          mesh_source: core\models\plane.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 344
+    Root: false
+    IsPrefab: false
+    name: Plane
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [-20.6426144, 0.0392515324, -0.874378443]
+      Rotation: [0, 0.707106769, 0, 0.707106769]
+      Scale: [7.69966841, 1, 11.4993372]
+      Angels: [0, 90, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Decal2.mat
+          mat_source: res\Textures\Decal2.mat
+          HasMesh: true
+          mesh_source: core\models\plane.fbx
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 345
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-29.5321407, -0.00530599523, 3.30148268]
+      Rotation: [-0.707106769, 0, 0, 0.707106769]
+      Scale: [1.99999928, 1.99974048, 1.9997412]
+      Angels: [-90, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: Lightmaps\Scene33\lightmap44.tga
+          mat_name: crate.mat
+          mat_source: res\PBR\Crate\crate.mat
+          HasMesh: true
+          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 2]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 346
+    Root: false
+    IsPrefab: false
+    name: Player
+    tag: Player
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [-18.2719765, 2.43595552, 0.0485320091]
       Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
       Angels: [0, 0, 0]
-    comp_count: 0
+    comp_count: 2
     Components:
-      []
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: ""
+          mat_source: ""
+          HasMesh: true
+          mesh_source: core\models\capsule.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 2
+          m_BodyMode: 2
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          is_trigger: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+    script_count: 1
+    Scripts:
+      - class_name: Charactar
+        Script_Properties:
+          - 4
+          - JumpHeight
+          - 3
+          - 4
+          - Speed
+          - 1
+          - 1200
+          - LookSpeed
+          - 1
+          - 50
+          - maxCamSpin
+          - 1
+          - 90
+    ChildCount: 1
+  - Entity: 347
+    Root: false
+    IsPrefab: false
+    name: Cam
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [0, 1.53691173, 0]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1, 1, 1]
+      Angels: [0, 0, 0]
+    comp_count: 1
+    Components:
+      - CameraComponent:
+          FOV: 70
+          FarView: 300
+          NearView: 0.00100000005
+          Primary: true
     script_count: 0
     Scripts:
       []
-    ChildCount: 12
-  - Entity: 10
+    ChildCount: 0
+  - Entity: 348
     Root: false
     IsPrefab: false
-    name: Model
+    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
     tag: default
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [-26.2648201, 4.12029934, -13.2636786]
-      Rotation: [-0.49999997, -0.49999997, -0.49999997, 0.49999997]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, -90, 0]
+      Position: [152.258011, -7.30505848, -41.0646133]
+      Rotation: [-0.49999997, 0.49999997, 0.49999997, 0.49999997]
+      Scale: [0.199976578, 0.199976578, 0.199976578]
+      Angels: [-90, 90, 0]
     comp_count: 1
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap3.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
+          lightmapPath: ""
+          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
           HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
+          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 11
+  - Entity: 349
     Root: false
     IsPrefab: false
-    name: Model
+    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
     tag: default
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [-20.342617, 4.12029934, -13.2636786]
-      Rotation: [-0.49999997, -0.49999997, -0.49999997, 0.49999997]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, -90, 0]
+      Position: [154.302292, 13.5821495, 152.176758]
+      Rotation: [-0.681882024, 0.187181547, 0.187181547, 0.681882024]
+      Scale: [0.199974909, 0.199972808, 0.199972793]
+      Angels: [-90, 30.7000008, 0]
     comp_count: 1
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap4.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
+          lightmapPath: ""
+          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
           HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
+          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 12
+  - Entity: 350
     Root: false
     IsPrefab: false
-    name: Model
+    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
     tag: default
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [-14.0146646, 4.12029934, -13.2636786]
-      Rotation: [-0.49999997, -0.49999997, -0.49999997, 0.49999997]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, -90, 0]
+      Position: [-134.565521, -7.30505371, -26.8628521]
+      Rotation: [-0.49999997, 0.49999997, 0.49999997, 0.49999997]
+      Scale: [0.199987158, 0.199987158, 0.199987158]
+      Angels: [-90, 90, 0]
     comp_count: 1
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap5.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
+          lightmapPath: ""
+          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
           HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
+          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 13
+  - Entity: 351
     Root: false
     IsPrefab: false
-    name: Model
+    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
     tag: default
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [-8.11284924, 4.12029934, -13.2636786]
-      Rotation: [-0.49999997, -0.49999997, -0.49999997, 0.49999997]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, -90, 0]
+      Position: [-4.49469566, -7.30505371, -100.865227]
+      Rotation: [-0.705898464, 0.0413199402, 0.0413199402, 0.705898464]
+      Scale: [0.199987158, 0.199987113, 0.199987158]
+      Angels: [-90, 6.69999981, 0]
     comp_count: 1
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap6.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
+          lightmapPath: ""
+          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
           HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
+          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 14
+  - Entity: 352
     Root: false
     IsPrefab: false
-    name: Model
+    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
     tag: default
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [-2.18482304, 4.12029934, -13.2636786]
-      Rotation: [-0.49999997, -0.49999997, -0.49999997, 0.49999997]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, -90, 0]
+      Position: [-16.4354706, -7.30505371, 112.527359]
+      Rotation: [-0.0511717945, -0.705252707, -0.705252707, 0.0511717945]
+      Scale: [0.199981153, 0.199984089, 0.199983254]
+      Angels: [-90, -171.699997, 0]
     comp_count: 1
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap7.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
+          lightmapPath: ""
+          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
           HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
+          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 15
+  - Entity: 353
     Root: false
     IsPrefab: false
-    name: Model
+    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
     tag: default
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [0.279052377, 4.12030125, -16.1383934]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, 0, 0]
+      Position: [-164.498016, 13.5821495, 152.176758]
+      Rotation: [-0.70073092, -0.094742544, -0.094742544, 0.70073092]
+      Scale: [0.199974909, 0.19997482, 0.199975565]
+      Angels: [-90, -15.3999996, 0]
     comp_count: 1
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap8.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
+          lightmapPath: ""
+          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
           HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
+          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 16
+  - Entity: 354
     Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
+    IsPrefab: true
+    name: Tree4
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [0.279052377, 4.12030125, -9.27773285]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap9.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 17
+      Position: [13.6384106, 2.05362177, -21.4667435]
+      Rotation: [-0.707106769, -0, 0, 0.707106769]
+      Scale: [4, 3.99971342, 3.99971342]
+      Angels: [-90, -0, 0]
+    path: res\Tree\Tree4.rbp
+  - Entity: 356
     Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
+    IsPrefab: true
+    name: Tree4
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [0.279052377, 4.12030125, -22.0784988]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap10.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 18
+      Position: [-58.0153542, 3.19670701, -31.0576649]
+      Rotation: [-0.707106769, -0, 0, 0.707106769]
+      Scale: [4, 3.99988437, 3]
+      Angels: [-90, -0, 0]
+    path: res\Tree\Tree4.rbp
+  - Entity: 358
     Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
+    IsPrefab: true
+    name: Tree4
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [0.279052377, 4.12030125, -28.3339748]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap11.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 19
+      Position: [18.7790928, -1.08143151, 30.7955189]
+      Rotation: [-0.707106769, -0, 0, 0.707106769]
+      Scale: [4, 3.99989748, 3.99989748]
+      Angels: [-90, -0, 0]
+    path: res\Tree\Tree4.rbp
+  - Entity: 360
     Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
+    IsPrefab: true
+    name: Tree4
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [0.279052377, 4.12030125, -34.8066063]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap12.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 20
+      Position: [43.9444695, -1.08143163, -5.84122086]
+      Rotation: [-0.707106769, -0, 0, 0.707106769]
+      Scale: [4, 3.99986577, 3.99986577]
+      Angels: [-90, -0, 0]
+    path: res\Tree\Tree4.rbp
+  - Entity: 362
     Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
+    IsPrefab: true
+    name: Tree4
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [-32.4526024, 4.12029648, -13.2636786]
-      Rotation: [-0.49999997, -0.49999997, -0.49999997, 0.49999997]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, -90, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap13.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 21
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-38.3809242, 4.12029934, -13.2636786]
-      Rotation: [-0.49999997, -0.49999997, -0.49999997, 0.49999997]
-      Scale: [0.200000003, 3, 0.25]
-      Angels: [-90, -90, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap14.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\f2.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 22
+      Position: [-54.9677734, 3.19670701, 11.1892366]
+      Rotation: [-0.707106769, -0, 0, 0.707106769]
+      Scale: [4, 3.99992299, 3.99992299]
+      Angels: [-90, -0, 0]
+    path: res\Tree\Tree4.rbp
+  - Entity: 364
     Root: false
     IsPrefab: false
     name: Reflection Probe
@@ -552,17 +1918,17 @@ Entities:
     Static: false
     m_CollMode: 0
     Transform:
-      Position: [-15.5776796, 3.37464285, -3.33426857]
+      Position: [0, 2.29988194, 0]
       Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
       Angels: [0, 0, 0]
     comp_count: 1
     Components:
       - ReflectionProbe:
-          box_BoxMin: [-42.5999985, -2.5, -13.3000002]
-          box_BoxMax: [37.5, 22.6000004, 8.60000038]
+          box_BoxMin: [-33.4000015, -3.5999999, -17.7999992]
+          box_BoxMax: [36, 6.5999999, 18.5]
           box_radius: 0
-          Intensity: 1.00999999
+          Intensity: 1
           static_only: true
           BoxProjection: true
           Resolution: 128
@@ -570,1131 +1936,28 @@ Entities:
     Scripts:
       []
     ChildCount: 0
-  - Entity: 23
+  - Entity: 365
     Root: false
     IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [10.3336811, 1.14215374, -3.12624192]
-      Rotation: [0, -0.707106769, 0, 0.707106769]
-      Scale: [43.0999985, 0.100000001, 9.19999981]
-      Angels: [0, -90, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap15.tga
-          mat_name: Road.mat
-          mat_source: res\Scenes\Models\Textures\Road.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 24
-    Root: false
-    IsPrefab: false
-    name: Bars
+    name: Point Light
     tag: default
     Active: true
     Static: false
     m_CollMode: 0
     Transform:
-      Position: [0, 0, 0]
+      Position: [8.79718113, 2.56961012, 12.7270832]
       Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
       Angels: [0, 0, 0]
-    comp_count: 0
-    Components:
-      []
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 5
-  - Entity: 25
-    Root: false
-    IsPrefab: false
-    name: Bar
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [19.6833458, 10.2950974, -16.9708366]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0599999987, 0.0599999987, 0.0599999987]
-      Angels: [-90, 0, 0]
     comp_count: 1
     Components:
-      - RendererComponent:
+      - PointLight:
           enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\powerBar.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 26
-    Root: false
-    IsPrefab: false
-    name: Bar
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [19.6833458, 10.2950993, 7.20356989]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0599999987, 0.0599999987, 0.0599999987]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\powerBar.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 27
-    Root: false
-    IsPrefab: false
-    name: Bar
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [19.6833458, 10.2950993, -40.5277863]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0599999987, 0.0599999987, 0.0599999987]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\powerBar.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 28
-    Root: false
-    IsPrefab: false
-    name: Bar
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [-1.68501556, 10.2950954, -16.4829121]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0599999987, 0.0599999987, 0.0599999987]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\powerBar.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 29
-    Root: false
-    IsPrefab: false
-    name: Bar
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [-1.68501556, 10.2950954, -41.615448]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0599999987, 0.0599999987, 0.0599999987]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\powerBar.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 30
-    Root: false
-    IsPrefab: false
-    name: Houses
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [1, 1, 1]
-      Angels: [0, 0, 0]
-    comp_count: 0
-    Components:
-      []
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 7
-  - Entity: 31
-    Root: false
-    IsPrefab: false
-    name: House
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [32.1998024, 1.13571858, 27.2016487]
-      Rotation: [0, 0, 0, 1]
-      Scale: [2, 2, 2]
-      Angels: [0, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: House.mat
-          mat_source: res\Scenes\Models\House\House.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\house.obj
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 32
-    Root: false
-    IsPrefab: false
-    name: House
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [32.1998024, 1.13571858, -28.312336]
-      Rotation: [0, 0, 0, 1]
-      Scale: [2, 2, 2]
-      Angels: [0, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: House.mat
-          mat_source: res\Scenes\Models\House\House.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\house.obj
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 33
-    Root: false
-    IsPrefab: false
-    name: House
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [32.1998024, 1.13571858, -3.91842651]
-      Rotation: [0, 0, 0, 1]
-      Scale: [2, 2, 2]
-      Angels: [0, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: House.mat
-          mat_source: res\Scenes\Models\House\House.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\house.obj
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 34
-    Root: false
-    IsPrefab: false
-    name: House
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [65.227066, 1.13571846, 20.0302467]
-      Rotation: [0, 0, 0, 1]
-      Scale: [2, 2, 2]
-      Angels: [0, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: House.mat
-          mat_source: res\Scenes\Models\House\House.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\house.obj
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 35
-    Root: false
-    IsPrefab: false
-    name: House
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [-35.965168, 1.13571858, -23.1218567]
-      Rotation: [0, 0, 0, 1]
-      Scale: [2, 2, 2]
-      Angels: [0, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: House.mat
-          mat_source: res\Scenes\Models\House\House.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\house.obj
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 36
-    Root: false
-    IsPrefab: false
-    name: House
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [-12.2722893, 1.13571858, -23.1218567]
-      Rotation: [0, 0, 0, 1]
-      Scale: [2, 2, 2]
-      Angels: [0, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: House.mat
-          mat_source: res\Scenes\Models\House\House.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\house.obj
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 37
-    Root: false
-    IsPrefab: false
-    name: House
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [71.4403229, 1.13571858, -19.8289948]
-      Rotation: [0, 0, 0, 1]
-      Scale: [2, 2, 2]
-      Angels: [0, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: House.mat
-          mat_source: res\Scenes\Models\House\House.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\House\house.obj
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 38
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-18.6079197, 6.99247074, 12.1746492]
-      Rotation: [0, 0, 0, 1]
-      Scale: [17.5, 6, 8]
-      Angels: [0, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap28.tga
-          mat_name: Wood_def.mat
-          mat_source: res\Scenes\Models\Textures\Wood_def.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 1
-  - Entity: 39
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [0, -0.800000012, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [1.10000002, 0.200000003, 1.02999997]
-      Angels: [0, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap29.tga
-          mat_name: concretewall004b.mat
-          mat_source: res\Scenes\Models\Textures\concretewall004b.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 40
-    Root: false
-    IsPrefab: false
-    name: Props
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [1, 1, 1]
-      Angels: [0, 0, 0]
-    comp_count: 0
-    Components:
-      []
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 12
-  - Entity: 41
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-19.0046234, 2.70614171, 2.91852808]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0700000003, 0.0700000003, 0.0700000003]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap30.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\barrel.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 42
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-22.2644081, 2.70614171, 2.91852808]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0700000003, 0.0700000003, 0.0700000003]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap31.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\barrel.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 43
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-9.81516361, 2.70614219, -10.8528938]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0700000003, 0.0700000003, 0.0700000003]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap32.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\barrel.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 44
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-26.9707851, 2.70614219, -10.8528938]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0700000003, 0.0700000003, 0.0700000003]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap33.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\barrel.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 45
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-34.1008034, 2.70614028, 2.93322945]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0700000003, 0.0700000003, 0.0700000003]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap34.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\barrel.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 46
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-1.75086021, 2.08469772, -10.3068571]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0399999991, 0.0399999991, 0.0399999991]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap35.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\rocks.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 47
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-13.1053495, 2.08469772, -10.373044]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0399999991, 0.0399999991, 0.0399999991]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap36.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\rocks.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 48
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-16.032547, 2.08469701, 2.48122931]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0399999991, 0.0399999991, 0.0399999991]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap37.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\rocks.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 49
-    Root: false
-    IsPrefab: false
-    name: Model
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-17.3456154, 2.08469701, -10.5457382]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0399999991, 0.0399999991, 0.0399999991]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap38.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\rocks.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 50
-    Root: false
-    IsPrefab: false
-    name: Brick
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-23.5094395, 2.24109173, -10.1831083]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [0.0799999982, 0.0799999982, 0.0799999982]
-      Angels: [-90, 180, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap39.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\bricks.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 51
-    Root: false
-    IsPrefab: false
-    name: Brick
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-26.9404488, 2.29748917, 1.85417461]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0799999982, 0.0799999982, 0.0799999982]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap40.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\bricks.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 52
-    Root: false
-    IsPrefab: false
-    name: Brick
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-11.1227732, 2.29748917, 1.85417461]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [0.0799999982, 0.0799999982, 0.0799999982]
-      Angels: [-90, 180, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap41.tga
-          mat_name: Prop.mat
-          mat_source: res\Scenes\Models\Prop.mat
-          HasMesh: true
-          mesh_source: res\Scenes\Models\bricks.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 53
-    Root: false
-    IsPrefab: false
-    name: Wood
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [1, 1, 1]
-      Angels: [0, 0, 0]
-    comp_count: 0
-    Components:
-      []
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 8
-  - Entity: 54
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-4.29093409, 1.05238032, -0.328665733]
-      Rotation: [0, 0.237685889, 0, 0.971342087]
-      Scale: [2.79999995, 0.0500000007, 0.300000012]
-      Angels: [0, 27.5, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap42.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 55
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-16.1017265, 1.05237949, -5.976408]
-      Rotation: [0, 0.237685889, 0, 0.971342087]
-      Scale: [2.79999995, 0.0500000007, 0.300000012]
-      Angels: [0, 27.5, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap43.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 56
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-7.66632652, 1.05238032, -6.61869431]
-      Rotation: [0, -0.362438023, 0, 0.932007849]
-      Scale: [2.79999995, 0.0500000007, 0.300000012]
-      Angels: [0, -42.5, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap44.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 57
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-20.5635624, 1.0523802, 0.874701142]
-      Rotation: [0, -0.999506533, 0, 0.0314108469]
-      Scale: [2.79999995, 0.0500000007, 0.300000012]
-      Angels: [0, -176.399994, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap45.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 58
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-22.6193733, 1.0523802, -6.56750822]
-      Rotation: [0, -0.249535024, 0, 0.968365788]
-      Scale: [2.79999995, 0.0500000007, 0.300000012]
-      Angels: [0, -28.8999996, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap46.tga
-          mat_name: wood.mat
-          mat_source: res\Scenes\Models\House\wood.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 59
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-30.0195465, 3.5544579, -11.609251]
-      Rotation: [0, 0, 0, 1]
-      Scale: [1.10000002, 2.5, 0.800000012]
-      Angels: [0, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap47.tga
-          mat_name: cabinets01.mat
-          mat_source: res\Scenes\Models\Textures\cabinets01.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 60
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-6.12669849, 3.55445814, -11.4486046]
-      Rotation: [0, 0, 0, 1]
-      Scale: [1.10000002, 2.5, 0.800000012]
-      Angels: [0, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap48.tga
-          mat_name: cabinets01.mat
-          mat_source: res\Scenes\Models\Textures\cabinets01.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 61
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-31.5269871, 3.5544579, 3.11357546]
-      Rotation: [0, 0, 0, 1]
-      Scale: [1.10000002, 2.5, 0.800000012]
-      Angels: [0, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Test4\lightmap49.tga
-          mat_name: cabinets01.mat
-          mat_source: res\Scenes\Models\Textures\cabinets01.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 62
-    Root: false
-    IsPrefab: false
-    name: New Entity
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [-38.0999985, 6.5999999, -9.80000019]
-      Rotation: [0.0670034736, 0.596922696, -0.0501250029, 0.797923088]
-      Scale: [1, 1, 1]
-      Angels: [9.60000038, 73.5999985, 0]
-    comp_count: 1
-    Components:
-      - CameraComponent:
-          FOV: 70
-          FarView: 300
-          NearView: 0.00100000005
-          Primary: true
+          Color: [0.158763424, 0.2162572, 0.225663722]
+          Bias: 0.0500000007
+          CastShadows: false
+          Intensity: 3
+          Raduis: 8
     script_count: 0
     Scripts:
       []

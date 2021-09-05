@@ -1,9 +1,39 @@
-﻿  SkeletalMeshComponent.cpp
-c:\backup\github\rogy\rogy\engine\animation\Skeleton.h(68): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-c:\backup\github\rogy\rogy\engine\mesh\mesh.h(69): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  SkeletalModel.cpp
-c:\backup\github\rogy\rogy\engine\animation\Skeleton.h(68): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-Engine\animation\SkeletalModel.cpp(84): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-  AudioClip.cpp
-  AudioManager.cpp
-  AudioSource.cpp
+﻿  Camera.cpp
+e:\adv projects\rogy\rogy\engine\core\Camera.h(1): fatal error C1083: Cannot open include file: 'glm/glm.hpp': No such file or directory
+  extra_lists.cpp
+e:\adv projects\rogy\rogy\engine\core\extra_lists.h(2): fatal error C1083: Cannot open include file: 'shader.h': No such file or directory
+  game_editor.cpp
+e:\adv projects\rogy\rogy\engine\core\game_editor.h(3): fatal error C1083: Cannot open include file: 'GL\glew.h': No such file or directory
+  IBL.cpp
+e:\adv projects\rogy\rogy\engine\core\IBL.h(1): fatal error C1083: Cannot open include file: 'GL\glew.h': No such file or directory
+  lighting.cpp
+e:\adv projects\rogy\rogy\engine\core\lighting.h(3): fatal error C1083: Cannot open include file: 'glm\glm.hpp': No such file or directory
+  material.cpp
+Engine\Core\material.cpp(8): fatal error C1083: Cannot open include file: 'GL\glew.h': No such file or directory
+  resources_manger.cpp
+e:\adv projects\rogy\rogy\engine\core\resources_manger.h(1): fatal error C1083: Cannot open include file: 'GL\glew.h': No such file or directory
+  RObject.cpp
+e:\adv projects\rogy\rogy\engine\core\transform.h(1): fatal error C1083: Cannot open include file: 'glm/glm.hpp': No such file or directory
+  Rogy.cpp
+e:\adv projects\rogy\rogy\engine\core\Rogy.h(1): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  RTools.cpp
+Engine\Core\RTools.cpp(1): fatal error C1083: Cannot open include file: 'RTools.h': No such file or directory
+  Scene.cpp
+e:\adv projects\rogy\rogy\engine\core\transform.h(1): fatal error C1083: Cannot open include file: 'glm/glm.hpp': No such file or directory
+  shader.cpp
+Engine\Core\shader.cpp(6): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  shadow_buffer.cpp
+e:\adv projects\rogy\rogy\engine\core\shadow_buffer.h(1): fatal error C1083: Cannot open include file: 'GL\glew.h': No such file or directory
+  sky_box.cpp
+e:\adv projects\rogy\rogy\engine\core\sky_box.h(2): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  transform.cpp
+e:\adv projects\rogy\rogy\engine\core\transform.h(1): fatal error C1083: Cannot open include file: 'glm/glm.hpp': No such file or directory
+  im3d.cpp
+  imgui_impl_glfw.cpp
+imgui\imgui_impl_glfw.cpp(43): fatal error C1083: Cannot open include file: 'GLFW/glfw3.h': No such file or directory
+  imgui_impl_opengl3.cpp
+imgui\imgui_impl_opengl3.cpp(119): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  texture.cpp
+include\texture.cpp(6): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  Main.cpp
+e:\adv projects\rogy\rogy\Engine\Core\Rogy.h(1): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
