@@ -17,13 +17,14 @@ My 3D game engine.
 - Lightmapping (no auto uv mapping for now)
 - Skeletal Animation
 - Post Processing effects (SSAO, ColorCorrection, Vignette, UIBlur)
+- FXAA
+- Atmosphere Sky
+- Bloom
 # In Progress
 - Game-UI
 - Forward+ rendering 
-- Bloom
-- Atmosphere Sky
 - Terrain
-- FXAA
+
 
 # Notes : 
 - Requires Visual studio 2015 (If you have higher version you will need to recompile dependencies for you version)
