@@ -1,6 +1,4 @@
-# Rogy-Engine Development
-My 3D game engine.
-(NOT THE FINAL VERSION- Windows only)
+# Rogy Engine
 
 ![alt text](https://github.com/RogyDev/Rogy-Engine-/blob/main/Rogy/core/BG.png?raw=true)
 # Features:
@@ -22,6 +20,7 @@ My 3D game engine.
 - Bloom
 
 # Notes : 
+- Currently Windows only.
 - Requires Visual studio 2015 (If you have higher version you will need to recompile dependencies for you version)
 - Build in Release/84x 
 - Do not conatin example game projects. - some will be uploaded soon :) -
