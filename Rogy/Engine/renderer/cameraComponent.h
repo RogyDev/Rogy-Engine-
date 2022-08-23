@@ -10,8 +10,8 @@ class CameraComponent : public Component
 	BASE_COMPONENT()
 public:
 	float FOV = 60.0f;
-	float FarView = 300.0f;
-	float NearView = 0.001f;
+	float FarView = 700.0f;
+	float NearView = 0.01f;
 	glm::vec3 position = glm::vec3(0.0f);
 	//glm::vec3 rotationAngels = glm::vec3(0.0f);
 	glm::vec3 up = glm::vec3(0.0f);

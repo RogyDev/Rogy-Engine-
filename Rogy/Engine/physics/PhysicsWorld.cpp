@@ -20,13 +20,20 @@ PhysicsWorld::~PhysicsWorld()
 	delete dispatcher;
 }
 // ------------------------------------------------------------------------
-void PhyTickCallback(btDynamicsWorld *world, btScalar timeStep)
-{
 
-	int numManifolds = world->getDispatcher()->getNumManifolds();
+void PhyPostTickCallback(btDynamicsWorld *world, btScalar timeStep)
+{
+	static_cast<PhysicsWorld*>(world->getWorldUserInfo())->PhyTickCallback(timeStep);
+}
+
+void PhysicsWorld::PhyTickCallback(btScalar timeStep)
+{
+	TimeStep = timeStep;
+	int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
+
 	for (int i = 0;i < numManifolds;i++)
 	{
-		btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
+		btPersistentManifold* contactManifold = dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
 
 		btCollisionObject* obA = (btCollisionObject*)contactManifold->getBody0();
 		btCollisionObject* obB = (btCollisionObject*)contactManifold->getBody1();
@@ -46,25 +53,55 @@ void PhyTickCallback(btDynamicsWorld *world, btScalar timeStep)
 				const btVector3& ptA = pt.getPositionWorldOnA();
 				const btVector3& ptB = pt.getPositionWorldOnB();
 
+				glm::vec3 ptNormB = ToVec3(pt.m_normalWorldOnB);
 				//  NOT implemented - normal on the collided surface.
 				//const btVector3& normalOnB = pt.m_normalWorldOnB;
-
-				if (eA != nullptr && eA->m_CollMode != RB_COLLISION_NONE)
+				bool old_contact = false;
+				bool bothHasColResponse = false;
+				if (eA != nullptr && eB != nullptr) 
 				{
-					if (eA->m_CollMode == RB_COLLISION_ALWAYS || eA->m_CollMode == RB_COLLISION_ONCE && !eA->IsColliding)
-						eA->OnCollision(true, eB, glm::vec3(ptA.getX(), ptA.getY(), ptA.getZ()));
+					if (!(eA->m_CollMode == RB_COLLISION_NONE && eB->m_CollMode == RB_COLLISION_NONE)) {
+						bothHasColResponse = true;
+						// Search 
+						for (size_t i = 0; i < current_contacts.size(); i++)
+						{
+							if (current_contacts[i].idA == eA->ID && current_contacts[i].idB == eB->ID)
+							{
+								current_contacts[i].check = true;
+								old_contact = true; break;
+							}
+						}
+						if (!old_contact)
+							current_contacts.push_back(PhysicsWorld::CollInfo(eA->ID, eB->ID));
+					}
 				}
+				if (bothHasColResponse) {
+					if (eA->m_CollMode == RB_COLLISION_ALWAYS || (eA->m_CollMode == RB_COLLISION_ONCE && !old_contact))
+						eA->OnCollision(true, eB, glm::vec3(ptA.getX(), ptA.getY(), ptA.getZ()), ptNormB);
 
-				if (eB != nullptr && eB->m_CollMode != RB_COLLISION_NONE)
-				{
-					if (eB->m_CollMode == RB_COLLISION_ALWAYS || eB->m_CollMode == RB_COLLISION_ONCE && !eB->IsColliding)
-						eB->OnCollision(true, eA, glm::vec3(ptB.getX(), ptB.getY(), ptB.getZ()));
+					if (eB->m_CollMode == RB_COLLISION_ALWAYS || (eB->m_CollMode == RB_COLLISION_ONCE && !old_contact))
+						eB->OnCollision(true, eA, glm::vec3(ptB.getX(), ptB.getY(), ptB.getZ()), ptNormB);
 				}
 
 				break;
 			}
 		}
 	}
+
+	for (size_t i = 0; i < current_contacts.size(); i++)
+	{
+		if (current_contacts[i].check == false)
+		{
+			lost_contacts.push_back(PhysicsWorld::CollInfo(current_contacts[i].idA, current_contacts[i].idB));
+
+			current_contacts.erase(current_contacts.begin() + i);
+		}
+		else
+			current_contacts[i].check = false;
+	}
+
+	if(IsPlaying)
+		mScriptManager->OnPhyTick(timeStep);
 }
 // ------------------------------------------------------------------------
 btTriangleMesh* PhysicsWorld::GetMeshCollider(Mesh * mesh)
@@ -74,7 +111,7 @@ btTriangleMesh* PhysicsWorld::GetMeshCollider(Mesh * mesh)
 	
 	for (size_t i = 0; i < mesh_cols.size(); i++)
 	{
-		if (mesh_cols[i].mesh_path == mesh->path)
+		if (mesh_cols[i].mesh_path == (mesh->path + std::to_string(mesh->index)))
 			return mesh_cols[i].tm;
 	}
 
@@ -92,15 +129,7 @@ btTriangleMesh* PhysicsWorld::GetMeshCollider(Mesh * mesh)
 		tm->addTriangle(vertex0, vertex1, vertex2);
 	}
 
-	/*for (size_t i = 0; i < mesh->indices.size(); i += 3)
-	{
-		//tm->addIndex(mesh->indices[i]);
-		tm->addTriangle(btVector3(mesh->vertices[i].Position.x, mesh->vertices[i].Position.y, mesh->vertices[i].Position.z),
-			btVector3(mesh->vertices[i + 1].Position.x, mesh->vertices[i + 1].Position.y, mesh->vertices[i + 1].Position.z),
-			btVector3(mesh->vertices[i + 2].Position.x, mesh->vertices[i + 2].Position.y, mesh->vertices[i + 2].Position.z));
-
-	}*/
-	mesh_cols.emplace_back(tm, mesh->path);
+	mesh_cols.emplace_back(tm, (mesh->path + std::to_string(mesh->index)));
 	return tm;
 }
 // ------------------------------------------------------------------------
@@ -124,7 +153,10 @@ void PhysicsWorld::Init()
 							  dispatcher, broadphase, solver, collisionConfiguration);
 
 	dynamicsWorld->setGravity(btVector3(0, -40.81f, 0));
-	dynamicsWorld->setInternalTickCallback(PhyTickCallback);
+	dynamicsWorld->setInternalTickCallback(PhyPostTickCallback, static_cast<void*>(this));
+	dynamicsWorld->getDispatchInfo().m_useContinuous = true;
+	dynamicsWorld->getSolverInfo().m_splitImpulse = false; // Disable by default for performance
+	dynamicsWorld->setSynchronizeAllMotionStates(true);
 }
 // ------------------------------------------------------------------------
 void PhysicsWorld::update()
@@ -138,7 +170,26 @@ void PhysicsWorld::update()
 			bodies.erase(bodies.begin() + i);
 		}
 	}
+	if (!lost_contacts.empty()) {
+		for (size_t i = 0; i < lost_contacts.size(); i++)
+		{
+			RigidBody* rbA = GetBody(lost_contacts[i].idA);
+			RigidBody* rbB = GetBody(lost_contacts[i].idB);
+			if (rbA != nullptr)
+			{
+				Entity* ea = (Entity*)rbA->rigidBody->getUserPointer();
+				if (ea) ea->OnCollision(false, nullptr);
+			}
+			if (rbB != nullptr)
+			{
+				Entity* eb = (Entity*)rbB->rigidBody->getUserPointer();
+				if (eb) eb->OnCollision(false, nullptr);
+			}
+		}
+		lost_contacts.clear();
+	}
 }
+
 // ------------------------------------------------------------------------
 void PhysicsWorld::StepSimulation(float dt)
 {
@@ -249,21 +300,30 @@ RigidBody* PhysicsWorld::GetBody(EnttID entId)
 	}
 	return nullptr;
 }
-bool PhysicsWorld::CheckSphere(glm::vec3 center, float radius)
+bool PhysicsWorld::CheckSphere(glm::vec3 center, glm::vec3 dir, float radius, RayHitInfo* result)
 {
-	/*btSphereShape sphereShape();
-	btRigidBody* tempRigidBody = new btRigidBody(1.0f, nullptr, &sphereShape);
-	tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(center)));
-	// Need to activate the temporary rigid body to get reliable results from static, sleeping objects
-	tempRigidBody->activate();
-	dynamicsWorld->addRigidBody(tempRigidBody);
+	btSphereShape shape(radius);
+	glm::vec3 endPos = center + radius * dir;
 
-	btCollisionWorld::ContactResultCallback callback;
-	dynamicsWorld->contactTest(tempRigidBody, callback);
+	btCollisionWorld::ClosestConvexResultCallback
+		convexCallback(ToBtVector3(center), ToBtVector3(endPos));
+	//convexCallback.m_collisionFilterGroup = (short)0xffff;
+	//convexCallback.m_collisionFilterMask = (short)collisionMask;
 
-	dynamicsWorld->removeRigidBody(tempRigidBody);
-	delete tempRigidBody;
-	*/
+	dynamicsWorld->convexSweepTest(&shape, btTransform(btQuaternion::getIdentity(), convexCallback.m_convexFromWorld),
+		btTransform(btQuaternion::getIdentity(), convexCallback.m_convexToWorld), convexCallback);
+
+	if (convexCallback.hasHit())
+	{
+		if (result != nullptr) {
+			result->body = (Entity*)(convexCallback.m_hitCollisionObject->getUserPointer());
+			result->point = ToVec3(convexCallback.m_hitPointWorld);
+			result->normal = ToVec3(convexCallback.m_hitNormalWorld);
+			result->distance = convexCallback.m_closestHitFraction *  glm::distance(center, result->point);
+			//result->hitFraction = convexCallback.m_closestHitFraction;
+		}
+		return true;
+	}
 	return false;
 }
 // ------------------------------------------------------------------------
@@ -369,6 +429,16 @@ void PhysicsWorld::ChangeShape(RigidBody* rb, RCollisionShapeType toType)
 	rb->GetRigidBody()->setCollisionShape(rb->collisionShape);
 	
 	rb->m_CollisionType = toType;
+}
+TerrainCollider * PhysicsWorld::AddTerrainCollider(Entity* ent, float* data, int width, float maxHeight, float terrain_size)
+{
+	TerrainCollider* mterrain = new TerrainCollider();
+	mterrain->entid = ent->ID;
+	btRigidBody* body = mterrain->Init(data, width, maxHeight, terrain_size);
+	dynamicsWorld->addRigidBody(body);
+	terrains.push_back(mterrain);
+
+	return mterrain;
 }
 // ------------------------------------------------------------------------
 void PhysicsWorld::ClearRigidbodies()

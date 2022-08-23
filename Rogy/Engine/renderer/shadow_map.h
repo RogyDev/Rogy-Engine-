@@ -34,6 +34,9 @@ public:
 	ShadowMapper();
 	~ShadowMapper();
 
+	unsigned int depthMapFBO;
+	unsigned int depthMap;
+
 	unsigned int SHADOW_MAP_CASCADE_COUNT = 2;
 	// 1024, 2048 1524
 	unsigned int TEXEL_SIZE = 1024;
@@ -42,7 +45,8 @@ public:
 	std::vector<ShadowCascade> cascades;
 
 	void Init();
-	void CalcOrthoProjs(Camera* inCam, DirectionalLight* light);
+	void CalcOrthoProjs(int SCR_WIDTH, int SCR_HEIGHT, Camera* inCam, DirectionalLight* light);
+	void CalcOrthoProjss(Camera* inCam, DirectionalLight* light);
 	void Bind(int sc_index);
 	void Unbind();
 	void SetCascadesCount(unsigned int count);
@@ -102,11 +106,9 @@ private:
 // ----------------------------------------------------------------
 struct SpotShadowData
 {
-	unsigned int depthMapFBO;
-	unsigned int depthShadow;
 	unsigned int index;
 	glm::mat4 MVP;
-	bool initialized;
+	glm::vec2 atlas;
 };
 
 class SpotShadowMapper
@@ -115,20 +117,28 @@ public:
 	SpotShadowMapper();
 	~SpotShadowMapper();
 
-	unsigned int TEXEL_SIZE = 256;
+	unsigned int MaxShadowCount = 9;
+	unsigned int TEXEL_SIZE = 512;
+	unsigned int ShadowAtlasCount;
+
+	unsigned int depthMapFBO;
+	unsigned int depthShadow;
+	bool initialized;
+
+	// used to make an optimization if there are/aren't any static lights
+	bool ThereAreStaticLights = false;	// nice namming right there
 
 	std::vector<SpotShadowData*> shadowMaps;
 
-	void CreateShadowMap(SpotShadowData &map);
-	void RemoveShadowMap(SpotShadowData &map);
+	void Init();
+	void Start();
+	glm::mat4 Bind(int indx, glm::vec3 lightPos, glm::vec3 lightDir, float raduis, float angle);
 
 	void ResetShadowResolution(unsigned int newRes);
 
 	SpotShadowData* CreateShadowMap();
-	GLuint GetShadowMap(int indx);
-	bool RemoveShadowMap(unsigned int& indx);
+	bool RemoveShadowMap(int& indx);
 
-	glm::mat4 Bind(int indx, glm::vec3 lightPos, glm::vec3 lightDir, float raduis, float angle);
 	void Unbind();
 
 private:

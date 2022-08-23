@@ -11,6 +11,7 @@
 #include "scene_hierarchy.h"
 #include "material_editor.h"
 
+#include "../nativeScripting/ScriptableEntity.h"
 #include "../scripting/ScriptManager.h"
 
 
@@ -60,7 +61,9 @@ public:
 	void audio_editor(Entity &obj);
 	void grass_editor(Entity &obj);
 	void displacement_editor(Entity &obj);
-	
+	void cpp_script_editor(Entity &obj);
+	void terrainCollider_editor(Entity &obj);
+
 	void cam_editor(Entity &obj);
 
 	void animation_editor(Entity &obj);
@@ -110,14 +113,32 @@ public:
 			if (rc->material->isDefault)
 			{
 				ImGui::Text("Source"); ImGui::SameLine(0, ImGui::GetWindowWidth()*0.2f);
-				if (ImGui::Button("Default-Material"))
+
+				ImGui::Button("Default-Material");
+					
+				if (ImGui::IsItemClicked(1))
+				{
 					ImGui::OpenPopup("mat_edit_menu");
+				}
+				if (ImGui::IsItemClicked(0))
+				{
+					if (rc->material != nullptr && !rc->material->isDefault)
+						mat_editor->EditMaterial(rc->material);
+				}
 			}
 			else
 			{
 				ImGui::Text("Source"); ImGui::SameLine(0, ImGui::GetWindowWidth()*0.2f);
-				if (ImGui::Button(rc->material->getMatPath().c_str()))
+				ImGui::Button(rc->material->getMatPath().c_str());
+				if (ImGui::IsItemClicked(1))
+				{
 					ImGui::OpenPopup("mat_edit_menu");
+				}
+				if (ImGui::IsItemClicked(0))
+				{
+					if (rc->material != nullptr && !rc->material->isDefault)
+						mat_editor->EditMaterial(rc->material);
+				}
 				DisplayInfo(rc->material->getMatName().c_str());
 
 				/*if (showMat && ImGui::Button("Collapse", ImVec2(ImGui::GetWindowWidth(), 0)))
@@ -240,7 +261,7 @@ public:
 	}
 private:
 	EnttID save_ent_id = -1;
-
+	//std::string scrfilter;
 	template<typename T, typename UIFunction>
 	bool DrawComponent(const std::string& name, Entity* entity, UIFunction uiFunction);
 };

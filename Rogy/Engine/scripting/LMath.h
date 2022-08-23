@@ -16,7 +16,8 @@ namespace LMath
 {
 	float Clamp(float val, float min, float max);
 
-	glm::vec3 Lerp(glm::vec3 from, glm::vec3 to, float speed);
+	float Lerp(float a, float b, float f);
+	glm::vec3 LerpV(glm::vec3 from, glm::vec3 to, float speed);
 
 	float Abs(float a);
 	float Sin(float a);

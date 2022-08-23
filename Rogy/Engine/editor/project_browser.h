@@ -47,6 +47,10 @@ public:
 	EProjectBrowser();
 	~EProjectBrowser();
 
+	std::unordered_map<std::string, Texture*> icons;
+
+	bool Stick = true;
+	std::string ProjectDir;
 	std::string res_dir;
 	std::string current_dir;
 	std::string shortcurrent_dir;
@@ -64,7 +68,13 @@ public:
 
 	std::vector<EFileInfo> dir_files;
 
+	void Init();
+
 	void Render(ImFont* icon_font = nullptr);
+
+	bool ImageSelectableV(const char* label, ImTextureID img, bool selected, ImGuiSelectableFlags flags, const ImVec2& size_arg, ImVec4 colr, const char* txt);
+	bool ImageSelectable(const char* label, ImTextureID img, bool* p_selected, ImGuiSelectableFlags flags, const ImVec2& size_arg, ImVec4 colr, const char* txt);
+	ImVec2 addv2(ImVec2& a, ImVec2& b);
 
 	void RefreshDir()
 	{

@@ -29,7 +29,7 @@ float middleGrey = 0.18f;
 uniform sampler2D screenTexture;
 uniform vec2 u_resolution;
 
-uniform sampler2D gDepthMap;
+uniform sampler2D HighlightTex;
 
 uniform float p_exposure;
 
@@ -59,6 +59,7 @@ uniform bool ssao_use;
 
 // Bloom
 uniform sampler2D bloomBlur;
+uniform sampler2D bloomBlur2;
 uniform bool bloom_use;
 
 // Motion Blur
@@ -67,6 +68,7 @@ uniform vec2 MBvelocity;
 uniform float motionBlurScale;
 
 uniform int ToneMap;
+uniform float CamFar;
 
 vec3 applyVignette(vec3 color)
 {
@@ -119,9 +121,16 @@ float computeSOBExposure(float aperture, float shutterSpeed, float iso)
     return middleGrey / lAvg;
 }
 
-vec3 ReinhardTM(vec3 v)
+vec3 ReinhardTM(vec3 x)
 {
-    return v / (p_exposure + v);
+   // return x / (p_exposure + x);
+    float a = 2.51;
+    float b = 0.03;
+    float c = 2.43;
+    float d = 0.59;
+    float e = 0.14;
+    x = x * p_exposure;
+    return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0);
 }
 
 vec3 UnchartedTM(vec3 color)
@@ -162,24 +171,58 @@ vec3 HDRTM(vec3 color)
     return mapped;
 }
 
+// ----------------------------------------------------------//
+vec3 reinhard(vec3 hdrColor){
+	return hdrColor / (1.0 + hdrColor);
+}
+
+vec3 simpleExposure(vec3 hdrColor, float exposure){
+	return 1.0 - exp(-hdrColor * exposure);
+}
+
+vec3 aces(vec3 hdrColor){
+	return clamp(((0.9036 * hdrColor + 0.018) * hdrColor) / ((0.8748 * hdrColor + 0.354) * hdrColor + 0.14), 0.0, 1.0);
+}
+
+vec3 cineon(vec3 hdrColor){
+	vec3 shiftedColor = max(vec3(0.0), hdrColor - 0.004);
+	return (shiftedColor * (6.2 * shiftedColor + 0.5)) / (shiftedColor * (6.2 * shiftedColor + 1.7) + 0.06);
+}
+
+vec3 uncharted2(vec3 hdrColor){
+	vec3 x = 2.0 * hdrColor; // Exposure bias.
+	vec3 newColor = ((x * (0.15 * x + 0.05) + 0.004) / (x * (0.15 * x + 0.5) + 0.06)) - 0.02/0.3;
+	return newColor * 1.3790642467; // White scale
+}
+
+vec4 QThreshold(vec4 color, vec3 curve, float exposure, float threshold)
+{
+    float br = max(max(color.r, color.g), color.b);
+    float rq = clamp(br - curve.x, 0.0, curve.y);
+    rq = curve.z * rq * rq;
+    color.rgb *= max(rq, br - threshold) / max(br, 0.0001);
+    return color * exposure;
+}
+
 uniform float Far;
 uniform float Near;
 
-// Need to linearize the depth because we are using the projection
+// Linearize the depth because we are using the projection
 float LinearizeDepth(float depth) {
 	float z = depth * 2.0 - 1.0;
 	return (2.0 * Near * Far) / (Far + Near - z * (Far - Near));
 }
 
 vec4 SSharpen(in sampler2D tex, in vec2 coords, in vec2 renderSize) {
-  float dx = 1.0 / renderSize.x / sharpen_amount;
-  float dy = 1.0 / renderSize.y / sharpen_amount;
+  float dx = (1.0 / renderSize.x) * sharpen_amount;
+  float dy = (1.0 / renderSize.y) * sharpen_amount;
   vec4 sum = vec4(0.0);
   sum += -1. * texture2D(tex, coords + vec2( -1.0 * dx , 0.0 * dy));
   sum += -1. * texture2D(tex, coords + vec2( 0.0 * dx , -1.0 * dy));
   sum += 5. * texture2D(tex, coords + vec2( 0.0 * dx , 0.0 * dy));
   sum += -1. * texture2D(tex, coords + vec2( 0.0 * dx , 1.0 * dy));
   sum += -1. * texture2D(tex, coords + vec2( 1.0 * dx , 0.0 * dy));
+  
   return sum;
 }
 
@@ -237,11 +280,43 @@ vec3 computeFxaa()
     }
 }
 
-void mainRaw()
+// From http://filmicgames.com/archives/75
+vec3 Uncharted2Tonemap(vec3 x)
+{
+	float A = 0.15;
+	float B = 0.50;
+	float C = 0.10;
+	float D = 0.20;
+	float E = 0.02;
+	float F = 0.30;
+	return ((x*p_exposure*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
+}
+
+vec3 ReinhardToneMap(vec3 x)
+{
+    return (vec3(1.0) - exp(-x * p_exposure));
+}
+
+//http://filmicworlds.com/blog/filmic-tonemapping-operators/
+vec3 FilmicToneMap(vec3 x) 
+{
+  vec3 X = max(vec3(0.0), (x * p_exposure) - 0.004);
+  vec3 result = (X * (6.2 * X + 0.5)) / (X * (6.2 * X + 1.7) + 0.06);
+  return pow(result, vec3(2.2));
+}
+
+void mainA()
 {   
     FragColor = vec4(texture(screenTexture, TexCoords).rgb, 1.0);
 }
+void mains()
+{   
+    float depth = texture(screenTexture, TexCoords).r;
+    float v = LinearizeDepth(depth) / Far;
+    FragColor = vec4(v, v, v, 1.0);
+}
 
+   
 void main()
 {     
 	/*float depth = texture(screenTexture, TexCoords).r;
@@ -251,36 +326,63 @@ void main()
 	vec3 color;
 	
 	
-	if(use_fxaa)
-		 color = computeFxaa();
-	else
-	{
+	//if(use_fxaa)
+		// color = computeFxaa();
+	//else
+	//{
 		if(sharpen)
 			color = SSharpen(screenTexture, TexCoords, u_resolution).rgb;
 		else
+        {
 			color = texture(screenTexture, TexCoords).rgb;
-	}
-	
-	if(bloom_use)
-	{
-		
-		vec3 bloomColor = texture(bloomBlur, TexCoords).rgb * p_exposure;
-        color += bloomColor; // additive blending
-	}	
-	
+            
+            // Cartoon Edge detection
+            /*vec3 normCol = texture(screenTexture, TexCoords).rgb;
+            vec3 offsetCol = texture(screenTexture, TexCoords - vec2(0.002, 0.002)).rgb;
+            if(length(normCol - offsetCol) > 0.1)
+            {
+                normCol = vec3(1.0,0.95,0.001);
+            }
+            color = normCol;*/
+
+          
+        }
+//	}
+
+    // "HighlightTex" contains only the objects we wnat to outline
+   /* float normCol = texture(HighlightTex, TexCoords).r;
+    float offsetCol1 = texture(HighlightTex, TexCoords - vec2(0.000, 0.002)).r;
+    float offsetCol2 = texture(HighlightTex, TexCoords - vec2(0.002, 0.000)).r;
+    float offsetCol3 = texture(HighlightTex, TexCoords - vec2(0.000, -0.002)).r;
+    float offsetCol4= texture(HighlightTex, TexCoords - vec2(-0.002, 0.000)).r;
+    if((normCol - offsetCol1) > 0.1 || (normCol - offsetCol2) > 0.1 || (normCol - offsetCol3) > 0.1 || (normCol - offsetCol4) > 0.1)
+    {
+        color = vec3(0.8,0.7,0.001);
+    }
+*/
 	if(ssao_use)
 	{
 		float AmbientOcclusion = texture(ssao, TexCoords).r;
 		color *= AmbientOcclusion;
 	}
+
+	if(bloom_use)
+	{
+		vec3 bloomColor = texture(bloomBlur, TexCoords).rgb * 0.75;
+        vec3 bloomColor2 = texture(bloomBlur2, TexCoords).rgb * 0.5;
+        //color += bloomColor + bloomColor2; // additive blending
+        color = mix(color, bloomColor + bloomColor2, 0.1);
+	}	
 	
 	if(ToneMap == 0)
-		color = FilmicTM(color);		
+		color = FilmicToneMap(color);		
 	else if	(ToneMap == 1)
-		color = UnrealTM(color);		
+		color = ReinhardTM(color);		
 	else if(ToneMap == 2)
-		color = HDRTM(color);
-	
+		color = cineon(color);
+	else if(ToneMap == 3)
+		color = aces(color);
+
 	if(cc_use)
 	{
 		// contrast
@@ -297,6 +399,12 @@ void main()
 		color = applyVignette(color);
 	}
 	
+    //************************************
+    // Gamma Correction 
+    //************************************
+	const float gamma = 2.2;
+    color = pow(color, vec3(1.0 / gamma));
+
 	FragColor = vec4(color, 1.0);
 } 
 

@@ -88,9 +88,11 @@ bool ScriptManager::AddLuaFile(const char* path, const char* class_name)
 	return true;
 }
 // --------------------------------------------
-void ScriptManager::GetScriptsInPath(const char* path)
+void ScriptManager::GetScriptsInPath(const char* path, bool first)
 {
-	m_loaded_scripts.clear();
+	//std::cout << path << std::endl;
+	if(first)
+		m_loaded_scripts.clear();
 
 	struct dirent **files;
 
@@ -99,7 +101,14 @@ void ScriptManager::GetScriptsInPath(const char* path)
 	{
 		for (int i = 0; i < n; i++)
 		{
-			if (files[i]->d_type == DT_REG)
+			if (files[i]->d_type == DT_DIR && files[i]->d_name[0] != '.')
+			{
+				std::string apath = path;
+				apath += "\\";
+				apath += files[i]->d_name;
+				GetScriptsInPath(apath.c_str());
+			}
+			else if (files[i]->d_type == DT_REG)
 			{
 				std::string fname = files[i]->d_name;
 				
@@ -130,7 +139,7 @@ void ScriptManager::GetScriptsInPath(const char* path)
 // --------------------------------------------
 bool ScriptManager::LoadLuaFile(const char* path, const char* class_name)
 {
-	std::cout << "Compiling script -> " << path  << " | " << class_name << std::endl;
+	std::cout << "Compiling script -> " << class_name  << " | " << path << std::endl;
 
 	if (!RecompilingScripts)
 	{
@@ -152,16 +161,15 @@ bool ScriptManager::LoadLuaFile(const char* path, const char* class_name)
 	strs << infile.rdbuf();
 	std::string str = strs.str();
 	infile.close();
-
 	// Preprocess script
-	ReplaceSTR(str, "//", "--");
+	//ReplaceSTR(str, "//", "--");
 	ReplaceSTR(str, "!=", "~=");
 	ReplaceSTR(str, "@:", "self:");
-	ReplaceSTR(str, "::", "self:");
+	//ReplaceSTR(str, "::", "self:");
 	ReplaceSTR(str, "@", "self.");
 	ReplaceSTR(str, "else if", "elseif");
-	ReplaceSTR(str, ")\n{", ")\n");
-	ReplaceSTR(str, "};\n", "end");
+	//ReplaceSTR(str, ")\n{", ")\n");
+	//ReplaceSTR(str, "};\n", "end");
 
 	// Compile (print errors if found)
 	if (luaL_loadstring(L, str.c_str()))
@@ -247,7 +255,7 @@ void ScriptManager::RecompileScripts(bool auto_reinstance_object)
 		m_Instances[i]->CacheVarsValues();
 
 	LoadMainScripts();
-	GetScriptsInPath("res\\Scripts");
+	GetScriptsInPath(ProjectResourcesFolder.c_str(), true);
 	std::cout << "-------------------------- Compiling scripts ------------------------" << std::endl;
 	// recompile scripts
 	for (size_t i = 0; i < m_loaded_scripts.size(); i++)
@@ -348,6 +356,40 @@ void ScriptManager::OnTick(float dt)
 		if (!m_Instances[i]->hasUpdate) continue;
 
 		m_Instances[i]->PrepareMethod("OnUpdate");
+		lua_pushnumber(L, dt);
+		m_Instances[i]->CallMethod(1);
+
+		aerr = m_Instances[i]->GetLastError();
+		if (aerr != "")
+			debug->Error(aerr);
+	}
+}
+// --------------------------------------------
+void ScriptManager::OnPreTick(float dt)
+{
+	std::string aerr;
+	for (size_t i = 0; i < m_Instances.size(); i++)
+	{
+		if (!m_Instances[i]->hasPreUpdate) continue;
+
+		m_Instances[i]->PrepareMethod("OnPreUpdate");
+		lua_pushnumber(L, dt);
+		m_Instances[i]->CallMethod(1);
+
+		aerr = m_Instances[i]->GetLastError();
+		if (aerr != "")
+			debug->Error(aerr);
+	}
+}
+// --------------------------------------------
+void ScriptManager::OnPhyTick(float dt)
+{
+	std::string aerr;
+	for (size_t i = 0; i < m_Instances.size(); i++)
+	{
+		if (!m_Instances[i]->hasPhysicsUpdate) continue;
+
+		m_Instances[i]->PrepareMethod("OnPhysicsUpdate");
 		lua_pushnumber(L, dt);
 		m_Instances[i]->CallMethod(1);
 

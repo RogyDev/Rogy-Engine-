@@ -20,14 +20,14 @@ class Texture
 		std::string TPath;
 
 		unsigned char* tData;
-		float GetRed(int x, int y);
+		int GetRed(int x, int y);
 		float GetGreen(int x, int y);
-		float GetBlue(int x, int y);
+		int GetBlue(int x, int y);
 		float GetAlpha(int x, int y);
 
         Texture();
         ~Texture();
-		bool setTexture(const char* texPath, std::string tex_Name, bool texFlip = false, bool keepData = false);
+		bool setTexture(const char* texPath, std::string tex_Name, bool texFlip = false, bool keepData = false, bool redOnly = false);
         void setTextureHDR(const char* texPath, std::string texName, bool texFlip);
 		void setTextureHDR(GLuint width, GLuint height, GLenum format, GLenum internalFormat, GLenum type, GLenum minFilter);
         void setTextureCube(std::vector<const char*>& faces, bool texFlip);

@@ -16,6 +16,7 @@ class SkeletalMeshComponent : public Component
 	~SkeletalMeshComponent();
 
 	float scale = 1.0f;
+	float speed = 1.0f;
 
 	glm::mat4 transform;
 	glm::vec3 position;
@@ -34,7 +35,8 @@ class SkeletalMeshComponent : public Component
 	void UnSkipMesh(unsigned int at_index);
 	bool isMeshSkiped(unsigned int at_index);
 
-	void LoadAnimation(std::string anim_name, std::string anim_path, unsigned int at_index = 0);
+	void AddAnimation(Animation* anim);
+	//void LoadAnimation(std::string anim_name, std::string anim_path, unsigned int at_index = 0);
 	void RemoveAnimation(std::string anim_name);
 	void PlayAnimation(std::string anim_name);
 	void Update(float dt);
@@ -86,7 +88,7 @@ class SkeletalMeshComponent : public Component
 			aname = mAnims[i].as<std::string>();
 			asrc = mAnims[i + 1].as<std::string>();
 			aindx = mAnims[i + 2].as<int>();
-			LoadAnimation(aname, asrc);
+			//LoadAnimation(aname, asrc);
 		}
 	}
 };

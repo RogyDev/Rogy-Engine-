@@ -20,11 +20,9 @@ Model* ModelManager::CreateModel(std::string& path)
 			return items[i];
 		}
 	}
-	Model* mdl = new Model(path);
+	Model* mdl = new Model(path, counterID);
 
 	items.push_back(mdl);
-
-	mdl->id = counterID;
 
 	counterID++;
 

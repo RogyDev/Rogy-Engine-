@@ -10,10 +10,29 @@ Scene_hierarchy::~Scene_hierarchy()
 {
 }
 
-void Scene_hierarchy::SetSelection(EnttID eid)
+void Scene_hierarchy::SetSelection(EnttID eid, bool diselect_others, bool deselectIfSelected)
 {
-	sel_entt.clear();
+	if (diselect_others)
+		sel_entt.clear();
+
+	if (deselectIfSelected && !diselect_others)
+	{
+		for (size_t i = 0; i < sel_entt.size(); i++)
+		{
+			if (sel_entt[i] == eid)
+			{
+				sel_entt.erase(sel_entt.begin() + i);
+			}
+		}
+	}
+
 	sel_entt.push_back(eid);
+
+	Entity* e = scene->FindEntity(eid);
+	if (e == nullptr || e->IsRoot()) return;
+
+	EnttID pid = e->parent->ID;
+	auto_open_entt.push_back(pid);
 }
 
 bool Scene_hierarchy::Empty()
@@ -27,9 +46,32 @@ EnttID Scene_hierarchy::GetSelected()
 		return -1;
 	return sel_entt[0];
 }
+bool Scene_hierarchy::IsSelected(EnttID eid)
+{
+	for (size_t i = 0; i < sel_entt.size(); i++)
+	{
+		if (sel_entt[i] == eid)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+bool Scene_hierarchy::TreeNodeExV(const void* ptr_id, ImGuiTreeNodeFlags flags, const char* fmt)
+{
+	ImGuiWindow* window = ImGui::GetCurrentWindow();
+	if (window->SkipItems)
+		return false;
+
+	//ImGuiContext& g = *GImGui;
+	//const char* label_end = g.TempBuffer + ImFormatStringV(g.TempBuffer, IM_ARRAYSIZE(g.TempBuffer), fmt, args);
+	return ImGui::TreeNodeBehavior(window->GetID(ptr_id), flags, fmt);
+}
+
+
 void Scene_hierarchy::LoopInChild(Entity* child)
 {
-	child->is_Selected = false;
+	//child->is_Selected = false;
 
 	bool itemClick = false;
 	EnttID cel_item = 0;
@@ -41,7 +83,10 @@ void Scene_hierarchy::LoopInChild(Entity* child)
 		c_flags |= ImGuiTreeNodeFlags_Leaf;
 	}
 
-	if (sel_entt.size() > 0)
+	if(child->is_Selected)
+		c_flags |= ImGuiTreeNodeFlags_Selected;
+
+	/*if (sel_entt.size() > 0)
 	{
 		for (size_t i = 0; i < sel_entt.size(); i++)
 		{
@@ -51,16 +96,24 @@ void Scene_hierarchy::LoopInChild(Entity* child)
 				child->is_Selected = true;
 			}
 		}
-	}
+	}*/
 	//if (child->ID != -1 && child->IsPrefab())
 	//{
 		//ImGui::PushFont(icon_small); ImGui::Text("4"); ImGui::PopFont(); ImGui::SameLine();
 	//}
 
 	if (child->ID != -1 && child->IsPrefab()) ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.8f, 1.0f, 1.0f));
-		
-	bool is_ON = ImGui::TreeNodeEx((void*)(intptr_t)child->ID, c_flags, child->name.c_str());
 
+	for (size_t i = 0; i < auto_open_entt.size(); i++)
+	{
+		if (auto_open_entt[i] == child->ID)
+			ImGui::SetNextItemOpen(true);
+	}
+
+	//ImGui::SetNextItemWidth(-1);
+	//ImGui::PushItemWidth(-1);
+	bool is_ON = ImGui::TreeNodeEx((void*)(intptr_t)child->ID, c_flags, child->name.c_str());
+	//ImGui::PopItemWidth();
 	if (child->ID != -1 && child->IsPrefab()) ImGui::PopStyleColor();
 	
 
@@ -76,7 +129,10 @@ void Scene_hierarchy::LoopInChild(Entity* child)
 		{
 			IM_ASSERT(payload->DataSize == sizeof(EnttID));
 			EnttID payload_n = *(const int*)payload->Data;
-			scene->SetEntityParent(payload_n, child->ID);
+			for (size_t i = 0; i < sel_entt.size(); i++)
+			{
+				scene->SetEntityParent(sel_entt[i], child->ID);
+			}
 		}
 		ImGui::EndDragDropTarget();
 	}
@@ -156,7 +212,10 @@ void Scene_hierarchy::PastACopy()
 }
 void Scene_hierarchy::Render()
 {
-	ImGui::Begin("Scene", NULL, ImGuiWindowFlags_NoCollapse);// | ImGuiWindowFlags_MenuBar);
+	if (!isOn) return;
+
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.095f, 0.095f, 0.095f, 1.00f));
+	ImGui::Begin("Scene", &isOn, ImGuiWindowFlags_NoCollapse);// | ImGuiWindowFlags_MenuBar);
 	ImGui::BeginChild("scn_Child");
 	ImGui::PushFont(icon_small);
 	if (ImGui::Button("X")) // Add new entity
@@ -182,9 +241,15 @@ void Scene_hierarchy::Render()
 	ImGui::PopFont();
 
 	ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+	//ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0, 0.0f));
+	//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(7.0, 1.0f));
 	LoopInChild(&scene->Root);
 
+	if (!auto_open_entt.empty())
+		auto_open_entt.clear();
 
+	//ImGui::PopStyleVar();
+	//ImGui::PopStyleVar();
 	if (ImGui::BeginPopup("scene_edit_menu"))
 	{
 		if (ImGui::Selectable("New Entity")) // Add new entity
@@ -289,7 +354,7 @@ void Scene_hierarchy::Render()
 		ImGui::EndDragDropTarget();
 	}
 	ImGui::End();
-	
+	ImGui::PopStyleColor();
 
 	if (ImGuiFileDialog::Instance()->FileDialog("ChooseBPModel"))
 	{

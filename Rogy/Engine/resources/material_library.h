@@ -18,12 +18,22 @@ enum ShaderTextureType
 	TEX_NORMAL		   = 5,
 	TEX_AO             = 6,
 	TEX_EMISSION	   = 7,
-	TEX_SHADOWMAP_1	   = 8,
-	TEX_SHADOWMAP_2	   = 9,
-	TEX_SHADOWMAP_3    = 10,
-	TEX_CUBE_SHADOWMAP = 11,
-
+	TEX_DIR_SHADOWMAPS = 8,
+	TEX_SPOT_SHADOWMAPS = 9,
+	TEX_IRRADIANCE_PROBES = 10,
+	TEX_PREFILTER_PROBES = 11,
+	TEX_CUBE_SHADOWMAP = 12,
 };
+
+enum ShaderShadowQuality
+{
+	SQ_LOW = 1,
+	SQ_MEDUIM = 2,
+	SQ_HIGH = 3,
+	SQ_VERYHIGH = 4,
+	SQ_ULTRA = 5,
+};
+
 class MaterialLibrary
 {
 public:
@@ -41,13 +51,20 @@ public:
 	Shader PointDepthShader;
 	Shader NonShader;
 	Shader background;
+	Shader Atmosphere;
 	Shader PointLightPass;
 	Shader BillboardShader;
+	Shader ReflectionShader;
+
+	Shader OutlineObject;
+	Shader OutlineScreen;
 
 	Shader ShaderGeometryPass;
 	Shader shaderSSAO;
 	Shader SSAOBlur;
 	Shader DebugSH;
+
+	Shader GridShader;
 
 	// Particle System Shader
 	Shader PsShader;
@@ -82,10 +99,15 @@ public:
 	Material* GetMaterial(int mID);
 
 	void Clear();
+	void ReloadShaders();
+	void ReloadMainShaders();
 
 	int cascadesCount = 3;
+	ShaderShadowQuality ShadowQuality = ShaderShadowQuality::SQ_MEDUIM;
+
 private:
 	int last_used_id = 0;
+	void SetShaderMatraciesPos(Shader& a_shader);
 };
 
 #endif // ! RMATERIAL_LIBRARY_H

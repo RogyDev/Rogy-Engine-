@@ -28,6 +28,22 @@ bool SkeletalMeshComponent::isMeshSkiped(unsigned int at_index)
 	return false;
 }
 
+void SkeletalMeshComponent::AddAnimation(Animation * anim)
+{
+	if (anim == nullptr) return;
+
+	for (size_t i = 0; i < animations.size(); i++)
+	{
+		if (animations[i]->anim_name == anim->anim_name)
+		{
+			std::cout << "Animation already loaded!" << std::endl;
+			return;
+		}
+	}
+	animations.push_back(anim);
+	animator.PlayAnimation(anim);
+}
+/*
 void SkeletalMeshComponent::LoadAnimation(std::string anim_name, std::string anim_path, unsigned int at_index)
 {
 	for (size_t i = 0; i < animations.size(); i++)
@@ -50,16 +66,16 @@ void SkeletalMeshComponent::LoadAnimation(std::string anim_name, std::string ani
 	animations.push_back(anim);
 	animator.PlayAnimation(anim);
 }
-
+*/
 void SkeletalMeshComponent::RemoveAnimation(std::string anim_name)
 {
 	for (size_t i = 0; i < animations.size(); i++)
 	{
 		if (animations[i]->anim_name == anim_name)
 		{
-			Animation* anim = animations[i];
+			//Animation* anim = animations[i];
 			animations.erase(animations.begin() + i);
-			delete anim;
+			//delete anim;
 			return;
 		}
 	}
@@ -79,6 +95,7 @@ void SkeletalMeshComponent::PlayAnimation(std::string anim_name)
 
 void SkeletalMeshComponent::Update(float dt)
 {
+	dt *= speed;
 	if (mesh == nullptr)
 		return;
 	if (animations.empty())

@@ -30,8 +30,8 @@ uniform sampler2D u_lightmap;
 
 void main()
 {
-	FragColor = vec4(texture(u_lightmap, v_texcoord).rgb, gl_FrontFacing ? 1.0 : 0.0);
-	//FragColor = vec4(texture(u_lightmap, v_texcoord).rgb, 1.0);
+	//FragColor = vec4(texture(u_lightmap, v_texcoord).rgb, gl_FrontFacing ? 1.0 : 0.0);
+	FragColor = vec4(texture(u_lightmap, v_texcoord).rgb, 1.0);
 }
 
 #endif

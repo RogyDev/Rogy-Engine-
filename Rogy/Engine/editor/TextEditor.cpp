@@ -1124,11 +1124,12 @@ void TextEditor::Render(const char* aTitle, const ImVec2& aSize, bool aBorder)
 	mTextChanged = false;
 	mCursorPositionChanged = false;
 
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::ColorConvertU32ToFloat4(mPalette[(int)PaletteIndex::Background]));
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.099f, 0.099f, 0.099f, 1.00f));
+	//ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::ColorConvertU32ToFloat4(mPalette[(int)PaletteIndex::Background]));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
 	if (!mIgnoreImGuiChild)
 		ImGui::BeginChild(aTitle, aSize, aBorder, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar | ImGuiWindowFlags_NoMove);
-
+	ImGui::SetWindowFontScale(0.91f);
 	if (mHandleKeyboardInputs)
 	{
 		HandleKeyboardInputs();
@@ -2013,7 +2014,7 @@ const TextEditor::Palette & TextEditor::GetDarkPalette()
 			0xff70a0e0, // Char literal
 			0xffffffff, // Punctuation
 			0xff408080,	// Preprocessor
-			0xffaaaaaa, // Identifier
+			0xdededede, // Identifier
 			0xff9bc64d, // Known identifier
 			0xffc040a0, // Preproc identifier
 			0xff206020, // Comment (single line)
@@ -3119,7 +3120,7 @@ const TextEditor::LanguageDefinition& TextEditor::LanguageDefinition::Lua()
 		for (auto& k : keywords)
 			langDef.mKeywords.insert(k);
 
-		static const char* const identifiers[] = { "class",
+		static const char* const identifiers[] = { "class", "ScriptComponent" , "Scene", "Input", "Physics", "Debug", "Audio", "PlayerPrefs", "RayHitInfo", "Mathf", "Vector3", "Vector2"
 			"assert", "collectgarbage", "dofile", "error", "getmetatable", "ipairs", "loadfile", "load", "loadstring",  "next",  "pairs",  "pcall",  "print",  "rawequal",  "rawlen",  "rawget",  "rawset",
 			"select",  "setmetatable",  "tonumber",  "tostring",  "type",  "xpcall",  "_G",  "_VERSION","arshift", "band", "bnot", "bor", "bxor", "btest", "extract", "lrotate", "lshift", "replace",
 			"rrotate", "rshift", "create", "resume", "running", "status", "wrap", "yield", "isyieldable", "debug","getuservalue", "gethook", "getinfo", "getlocal", "getregistry", "getmetatable",
@@ -3159,7 +3160,7 @@ const TextEditor::LanguageDefinition& TextEditor::LanguageDefinition::Lua()
 		langDef.mSingleLineComment = "--";
 
 		langDef.mCaseSensitive = true;
-		langDef.mAutoIndentation = false;
+		langDef.mAutoIndentation = true;
 
 		langDef.mName = "Lua";
 

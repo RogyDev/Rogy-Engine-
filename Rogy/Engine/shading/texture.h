@@ -27,7 +27,7 @@ class Texture
 
         Texture();
         ~Texture();
-		bool setTexture(const char* texPath, std::string tex_Name, bool texFlip = false, bool keepData = false);
+		bool setTexture(const char* texPath, std::string tex_Name, bool texFlip = false, bool keepData = false, bool redOnly = false);
         void setTextureHDR(const char* texPath, std::string texName, bool texFlip);
 		void setTextureHDR(GLuint width, GLuint height, GLenum format, GLenum internalFormat, GLenum type, GLenum minFilter);
         void setTextureCube(std::vector<const char*>& faces, bool texFlip);

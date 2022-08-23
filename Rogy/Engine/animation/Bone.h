@@ -101,6 +101,7 @@ public:
 	}
 
 	glm::mat4 GetLocalTransform() { return m_LocalTransform; }
+	void SetLocalTransform(glm::mat4 n) { m_LocalTransform = n; }
 	std::string GetBoneName() const { return m_Name; }
 	int GetBoneID() { return m_ID; }
 

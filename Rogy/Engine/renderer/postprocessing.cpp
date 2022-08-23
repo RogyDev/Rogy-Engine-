@@ -16,6 +16,7 @@ void RPostProcessing::Init()
 	blurShader.loadShader("core/shaders/PostProc/SSOABlur.rsh");
 	bloomShader.loadShader("core/shaders/PostProc/bloom.rsh");
 	bloomBlurShader.loadShader("core/shaders/PostProc/bloomBlur.rsh");
+	SharpenShader.loadShader("core/shaders/PostProc/Sharpen.rsh");
 
 	bloomShader.use();
 	bloomShader.setInt("image", 0);
@@ -28,8 +29,12 @@ void RPostProcessing::Init()
 
 	screenShader.use();
 	screenShader.setInt("screenTexture", 0);
+	screenShader.setInt("HighlightTex", 2);
 	screenShader.setInt("ssao", 1);
 	screenShader.setInt("bloomBlur", 8);
+
+	SharpenShader.use();
+	SharpenShader.setInt("screenTexture", 0);
 }
 
 void RPostProcessing::Bind()
@@ -40,11 +45,23 @@ void RPostProcessing::Bind()
 	}
 }
 
+
 void RPostProcessing::Clear()
 {
 	colorBuffer.Clear();
+	colorBufferAA.Clear();
 	verticalBlur.Clear();
 	BluredScreen.Clear();
+}
+
+void RPostProcessing::ClearDepth()
+{
+	/*if (!depth_init || !ScreenSizeChanged) return;
+
+	glDeleteFramebuffers(1, &ScreenDepthFBO);
+	glDeleteTextures(1, &ScreenDepth);
+
+	depth_init = false;*/
 }
 
 float lerp(float a, float b, float f)
@@ -54,7 +71,32 @@ float lerp(float a, float b, float f)
 
 void RPostProcessing::SetupBuffer(float w, float h)
 {
-	if (!Setup_PP && Use)
+	/*ClearDepth();
+	if (!depth_init)
+	{
+		std::cout << "Init screen depth texture : " << w << ":" << h << std::endl;
+		glGenFramebuffers(1, &ScreenDepthFBO);
+		glGenTextures(1, &ScreenDepth);
+		glBindTexture(GL_TEXTURE_2D, ScreenDepth);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, w, h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+
+		// attach depth texture as FBO's depth buffer
+		glBindFramebuffer(GL_FRAMEBUFFER, ScreenDepthFBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, ScreenDepth, 0);
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		depth_init = true;
+	}*/
+
+	if (ScreenSizeChanged && Use)
 	{
 		Clear();
 
@@ -62,6 +104,20 @@ void RPostProcessing::SetupBuffer(float w, float h)
 
 		Setup_PP = true;
 		Initialized = true;
+
+		/*/ reflection selector
+		glGenFramebuffers(1, &RefFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, RefFBO);
+		glGenTextures(1, &RefBuffer);
+		glBindTexture(GL_TEXTURE_2D, RefBuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, RefBuffer, 0);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			std::cout << "REF Framebuffer not complete!" << std::endl;
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
 
 		// SSAO
 		int qlty = 1;  						   // High
@@ -75,23 +131,48 @@ void RPostProcessing::SetupBuffer(float w, float h)
 
 		gBuffer.Create(ssao_scr_w, ssao_scr_h);
 
+		colorBuffer.isMain = true;
 		colorBuffer.Generate((int)w, (int)h, true);
+		colorBufferAA.Generate((int)w, (int)h, false);
 
-		int g = 8;
+		HighlightTex.Generate((int)w, (int)h, false, true);
+
+		int g = 10;
 		bloomTex.Generate((int)w/g, (int)h/g, false);
 		bloomBlurTex.Generate((int)w/g, (int)h/g, false);
+
+		int r = 20;
+		bloomTex2.Generate((int)w / r, (int)h / r, false);
+		bloomBlurTex2.Generate((int)w / r, (int)h / r, false);
 
 		int b = 6;
 		verticalBlur.Generate((int)w/b, (int)h/b, false);
 		BluredScreen.Generate((int)w/b, (int)h/b, false);
+
+		ScreenSizeChanged = false;
 	}
+}
+
+bool RPostProcessing::ApplyAA()
+{
+	if (Fxaa && Setup_PP && Use)
+	{
+		colorBufferAA.Bind();
+		glClear(GL_COLOR_BUFFER_BIT);
+		SharpenShader.use();
+		SharpenShader.SetFloat("sharpen_amount", sharpen_amount);
+		SharpenShader.SetVec2("u_resolution", (float)colorBufferAA.scr_w, (float)colorBufferAA.scr_h);
+		glActiveTexture(GL_TEXTURE0);
+		colorBuffer.UseTexture();
+		return true;
+	}
+	return false;
 }
 
 bool RPostProcessing::Render(GLuint a, float f, float n)
 {
 	if (Setup_PP && Use) 
 	{
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		screenShader.use();
 
@@ -149,6 +230,10 @@ bool RPostProcessing::Render(GLuint a, float f, float n)
 		{
 			glActiveTexture(GL_TEXTURE8);
 			bloomTex.UseTexture();
+
+			screenShader.setInt("bloomBlur2", 9);
+			glActiveTexture(GL_TEXTURE9);
+			bloomTex2.UseTexture();
 		}
 
 		screenShader.SetVec2("u_resolution", (float)colorBuffer.scr_w, (float)colorBuffer.scr_h);
@@ -159,10 +244,21 @@ bool RPostProcessing::Render(GLuint a, float f, float n)
 		//	BluredScreen.UseTexture();
 		//else
 		//glBindTexture(GL_TEXTURE_2D, a);
-		//screenShader.SetFloat("Far", f);
+		//.SetFloat("Far", f);
 		//screenShader.SetFloat("Near", n);
 		//if(a == 8)
+
+		if (Fxaa)
+			colorBufferAA.UseTexture();
+			//glBindTexture(GL_TEXTURE_2D, RefBuffer);
+		else
 			colorBuffer.UseTexture();
+
+		//glActiveTexture(GL_TEXTURE2);
+		//HighlightTex.UseTexture();
+
+		//glBindTexture(GL_TEXTURE_2D, ScreenDepth);
+
 	//	else
 			//glBindTexture(GL_TEXTURE_2D, a);
 		//bloomTex.UseTexture();
@@ -175,10 +271,10 @@ bool RPostProcessing::Render(GLuint a, float f, float n)
 
 		const float adjSpeed = 0.05f;
 		sceneExposure = sceneExposure + 0.05f  * ((0.5f / lum * 1.0f) - sceneExposure);//glm::lerp(sceneExposure, 0.5f / lum * 1.0f, 0.5f); // Gradually adjust the exposure
-		sceneExposure = glm::clamp(sceneExposure, 0.1f, 1.5f); // Don't let it go over or under a specified min/max range
+		sceneExposure = glm::clamp(sceneExposure, 0.01f, 20.5f); // Don't let it go over or under a specified min/max range
 
-		screenShader.SetFloat("p_exposure", sceneExposure);*/
-
+		screenShader.SetFloat("p_exposure", sceneExposure);
+		exposure = sceneExposure;*/
 		//verticalBlur.UseTexture();
 		//BluredScreen.UseTexture();
 

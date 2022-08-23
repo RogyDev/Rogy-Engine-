@@ -59,10 +59,11 @@ public:
 	std::string new_skyPath;
 	std::string SkyPath;
 	GLuint envCubemap;
-	bool UseClouds = true;
+	bool UseDynamicSky = true;
+	bool UseClouds = false;
 	PBRCapture m_SkyCapture;
 	glm::vec3 ClearColor = glm::vec3(0.2f, 0.3f, 0.3f);
-	glm::vec3 AmbientColor;
+	glm::vec3 SkyColor = glm::vec3(5.5f, 13.0f, 22.4f); // HDR Color
 	int fps;
 	std::string SceneName;
 
@@ -113,6 +114,14 @@ public:
 	ComponentArray<CameraComponent> m_cameras;
 	bool use_GameView = false;
 
+	// Guizmos
+	// ---------------------------------
+	bool DrawOutlines = true;
+	std::vector<glm::mat4> Guizmo_Boxes; // blue boxes
+	std::vector<glm::mat4> Guizmo_Spheres;
+	void AddGuizmoBox(glm::vec3 center, glm::vec3 bmin, glm::vec3 bmax);
+	void AddGuizmoSpheres(glm::vec3 center, float raduis);
+
 	// Lightmapping
 	// ---------------------------------
 	LightmapSettings m_LightmapSettings;
@@ -157,7 +166,7 @@ public:
 
 	void UpdateReflectionProbes();
 	void BakeReflectionProbes();
-	GLuint RenderToCubemap(glm::vec3 position, float resolution, float nearPlane, float farPlane, bool static_only = false);
+	GLuint RenderToCubemap(glm::vec3 position, float resolution, float nearPlane, float farPlane, bool static_only = false, bool skyOnly = false);
 
 	// Billbroad Render queue
 	// ---------------------------------
@@ -176,7 +185,7 @@ public:
 
 	// Displacements
 	// ---------------------------------
-	ComponentArray<Displacement> mDisplacements;
+	ComponentArray<Terrain> mDisplacements;
 	void RenderDisplacements();
 
 	// Grass
@@ -217,8 +226,11 @@ public:
 	void EndFrame();
 
 	void RenderScene(Camera& cam, bool static_only = false, GLuint target_frambuffer = 0, int resolu = 0);
+	void RenderSky(Camera& captureCam);
 
-	void checkForChanges();
+	void BakeGlobalLightData();
+	void BakeAllRefProbs();
+	void BakeAllStaticLights();
 
 	FrameBufferTex entitySelectionBuffer;
 	int GetHighlightedEntity(int mx, int my);
@@ -238,8 +250,24 @@ public:
 	void SerializeSave(YAML::Emitter& out);
 	void SerializeLoad(YAML::Node& out);
 
+	float CurrentTime = 0.0f;
+	bool Grid = false;
+	unsigned int MaterialChanges = 0;
+	unsigned int DrawCalls = 0;
+	unsigned int DrawCallsCSM = 0;
+	unsigned int DrawCallsPointShadows = 0;
+	bool UseInstancing = true;
+	bool UseInstancingForShadows = true;
+	bool DepthPrePass = true;
+	bool Wireframe = false;
+	bool ShouldUpdateCaptureResolution = false;
+	void SetCaptureResolution(int _res);
+	int GetCaptureResolution();
+
 private:
+	
 	void BindMaterial(Shader* pbrShader, Material* mat, bool isDisp = false);
+	void UpdateGlobalLightData();
 
 	void ReIndexPointLightsShadowMaps();
 	void ReIndexSpotLightsShadowMaps();
@@ -250,8 +278,24 @@ private:
 	bool bakingSucceed = false;
 	std::vector<size_t> not_visible;
 	float delTime;
+	bool GlobalLightDataDirty = false;
+
+	unsigned int uboMatrices;
 
 	GLuint skyClouds;
+
+	glm::vec3 A, B, C, D, E, F, G, H, I;
+	glm::vec3 Z; 
+public:
+	float m_normalized_sun_y = 1.15f;
+	float m_albedo = 0.1f;
+	float m_turbidity = 4.0f;
+private:
+	void updatesky(glm::vec3 m_direction);
+	double evaluate_spline(const double* spline, size_t stride, double value);
+	double evaluate(const double * dataset, size_t stride, float turbidity, float albedo, float sunTheta);
+	glm::vec3 hosek_wilkie(float cos_theta, float gamma, float cos_gamma, glm::vec3 A, glm::vec3 B, glm::vec3 C, glm::vec3 D, glm::vec3 E, glm::vec3 F, glm::vec3 G, glm::vec3 H, glm::vec3 I);
+	Texture* noiseTex;
 	//GLuint spot_depthFBO;
 	//GLuint spot_depth;
 	//glm::mat4 spotMVP;

@@ -1,7 +1,8 @@
 #include "model.h"
 
-Model::Model(std::string const &path)
+Model::Model(std::string const &path, unsigned int a_id)
 {
+	id = a_id;
 	loadModel(path);
 }
 
@@ -109,6 +110,7 @@ void Model::CalcBoundingBox(int mesh_index)
 	{
 		meshes[j].path = mesh_dir;
 		meshes[j].index = j;
+		meshes[j].ModelID = id;
 
 		if (meshes[j].vertices.size() <= 0)
 			continue;

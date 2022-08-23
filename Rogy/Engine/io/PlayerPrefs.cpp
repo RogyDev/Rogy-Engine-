@@ -81,7 +81,8 @@ int PlayerPrefs::checkVar(const char * varName)
 // -------------------------------------------------
 void PlayerPrefs::Save()
 {
-	std::ofstream os(save_path.c_str(), std::ios::binary);
+	std::string saveP = save_path + "\\PlayerPrefs";
+	std::ofstream os(saveP.c_str(), std::ios::binary);
 	cereal::BinaryOutputArchive ar(os);
 	ar(infos.size());
 	for (size_t i = 0; i < infos.size(); i++)
@@ -101,7 +102,8 @@ void PlayerPrefs::Save()
 void PlayerPrefs::Load()
 {
 	std::filebuf fb;
-	if (fb.open(save_path.c_str(), std::ios::in))
+	std::string loadP = save_path + "\\PlayerPrefs";
+	if (fb.open(loadP.c_str(), std::ios::in))
 	{
 		std::istream is(&fb);
 		cereal::BinaryInputArchive ar(is);

@@ -133,7 +133,7 @@ public:
 	bool gammaCorrection;
 	int id;
 
-	Model(std::string const &path);
+	Model(std::string const &path, unsigned int a_id);
 	// draws the model, and thus all its meshes
 	void Draw();
 	// Load model from mesh_dir path.

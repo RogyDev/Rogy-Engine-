@@ -32,6 +32,7 @@ class ReflectionProbe : public Component
 	bool  Active        = true;
 	bool  removed	    = false;
 	bool  static_only = true;
+	bool  use_scale = true;
 
 	// Is the reflection probe baked?
 	bool  baked = false;
@@ -61,6 +62,7 @@ class ReflectionProbe : public Component
 		out << YAML::Key << "static_only" << YAML::Value << static_only;
 		out << YAML::Key << "BoxProjection" << YAML::Value << BoxProjection;
 		out << YAML::Key << "Resolution" << YAML::Value << Resolution;
+		out << YAML::Key << "use_scale" << YAML::Value << use_scale;
 
 		out << YAML::EndMap;
 	}
@@ -74,6 +76,11 @@ class ReflectionProbe : public Component
 		static_only = data["static_only"].as<bool>();
 		BoxProjection = data["BoxProjection"].as<bool>();
 		Resolution = data["Resolution"].as<float>();
+
+		if (data["use_scale"].IsDefined())
+			use_scale = data["use_scale"].as<bool>();
+		else
+			use_scale = false;
 	}
 
 private:

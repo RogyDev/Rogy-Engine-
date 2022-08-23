@@ -19,6 +19,7 @@ public:
 	// SoLoud engine
 	SoLoud::Soloud* gSoloud = nullptr;
 	AudioClip* mClip = nullptr;
+	bool Is2D = false;
 
 	glm::vec3 pos;
 
@@ -56,6 +57,7 @@ public:
 		if (mClip != nullptr)	clip_path = mClip->mPath;
 		out << YAML::Key << "clip_path" << YAML::Value << clip_path;
 		out << YAML::Key << "EchoFilter" << YAML::Value << EchoFilter;
+		out << YAML::Key << "Is2D" << YAML::Value << Is2D;
 
 		out << YAML::EndMap;
 	}
@@ -66,12 +68,19 @@ public:
 		PlayOnStart = data["PlayOnStart"].as<bool>();
 		float mindd, maxdd, vol;
 		bool loopin;
-		mindd = data["GetMinDistance"].as<bool>();
+		mindd = data["GetMinDistance"].as<float>();
 		maxdd = data["GetMaxDistance"].as<float>();
 		vol = data["GetVolume"].as<float>();
 		loopin = data["GetLooping"].as<bool>();
 		clip_path = data["clip_path"].as<std::string>();
 		EchoFilter = data["EchoFilter"].as<float>();
+		if(data["Is2D"].IsDefined())
+			Is2D = data["Is2D"].as<bool>();
+
+		SetLooping(loopin);
+		SetMaxDistance(maxdd);
+		SetMinDistance(mindd);
+		SetVolume(vol);
 	}
 
 	std::string clip_path;

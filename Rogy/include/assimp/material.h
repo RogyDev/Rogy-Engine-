@@ -255,7 +255,7 @@ enum aiTextureType
     */
     aiTextureType_OPACITY = 8,
 
-    /** Displacement texture
+    /** Terrain texture
      *
      *  The exact purpose and format is application-dependent.
      *  Higher color values stand for higher vertex displacements.

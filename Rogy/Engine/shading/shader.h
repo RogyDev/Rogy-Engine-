@@ -5,10 +5,10 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <vector>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <unordered_map>
 
 class Shader
 {
@@ -18,6 +18,9 @@ class Shader
         GLuint Program;
 		static unsigned int gNUM_CASCADES;
 		static unsigned int gNUM_LIGHTS;
+		static unsigned int gSHADOW_QUALITY;
+
+		std::unordered_map<std::string, GLuint> mUniformsCache;
 
 		Shader();
 
@@ -48,7 +51,7 @@ class Shader
 		void setBool(const char* uniform_id, bool value);
 		void setInt(const char* uniform_id, int value);
 
-		GLuint GetUniform(const std::string &unif_name) const;
+		GLuint GetUniform(const std::string &unif_name);
 		GLuint GetUniform1(const std::string unif_name);
 		GLuint GetUniform2(const char* unif_name) const;
 

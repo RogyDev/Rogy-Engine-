@@ -129,10 +129,10 @@ void EditorProperty::general_editor(Entity &obj)
 		EndPreps();
 		//ImGui::Text("Child count = %d" , obj.ChildCount());
 
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0.45f, 0.5f, 1));
+		//ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0.45f, 0.5f, 1));
 		if (ImGui::Button("Add Component", ImVec2(ImGui::GetWindowWidth(), 0)))
 			ImGui::OpenPopup("add_com");
-		ImGui::PopStyleColor();
+	//	ImGui::PopStyleColor();
 
 		if (ImGui::BeginPopup("add_com"))
 		{
@@ -238,15 +238,32 @@ void EditorProperty::general_editor(Entity &obj)
 				obj.AddComponent<UIWidget>(ui_renderer->uiWidgets.AddComponent(obj.ID));
 			ImGui::Separator();
 			// # Scripts  ---------------------------------------------------------------------------
-			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 0.7f), "# Custom (Scripts)");
+			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 0.7f), "# Scripts");
+			static std::string scrfilter;
+			ImGui::SetNextItemWidth(270.0f);
+			ImGui::InputTextWithHint("##_scrfilter", "Search...", &scrfilter);
+			ImGui::BeginChild("Scripts", ImVec2(270.0f, 100.0f));
 			for (size_t i = 0; i < scrMnger->m_loaded_scripts.size(); i++)
 			{
 				const char* className = scrMnger->m_loaded_scripts[i].class_name.c_str();
-				if (scrMnger->m_loaded_scripts[i].valide && ImGui::Selectable(className))
+				bool startswith = true;
+				if (!scrfilter.empty())
+				{
+					for (size_t i = 0; i < scrfilter.size(); i++)
+					{
+						if (scrfilter[i] != className[i])
+						{
+							startswith = false;
+							break;
+						}
+					}
+				}
+				if (startswith && scrMnger->m_loaded_scripts[i].valide && ImGui::Selectable(className))
 				{
 					obj.AddScript(scrMnger->InstanceComponentClass(obj.ID, className));
 				}
 			}
+			ImGui::EndChild();
 			ImGui::EndPopup();
 		}
 		ImGui::Separator();
@@ -283,7 +300,10 @@ void EditorProperty::general_editor(Entity &obj)
 					{
 						std::string anim_nn = filePathName;
 						anim_nn += to_string(i);
-						smc->LoadAnimation(anim_nn, filePathName, i);
+						//smc->LoadAnimation(anim_nn, filePathName, i);
+						Animation* anim = res->GetAnimation(anim_nn, filePathName, smc->mesh, i);
+						if (anim != nullptr)
+							smc->AddAnimation(anim);
 					}
 				}
 			}
@@ -301,9 +321,15 @@ void EditorProperty::general_editor(Entity &obj)
 		{
 			std::string filePathName = ImGuiFileDialog::Instance()->GetFilepathName();
 			RGetRelativePath(filePathName);
+
+			SkeletalMeshComponent* skAnim = obj.GetComponent<SkeletalMeshComponent>();
 			// action
-			if (obj.HasComponent<SkeletalMeshComponent>())
-				obj.GetComponent<SkeletalMeshComponent>()->LoadAnimation(filePathName, filePathName);
+			if (skAnim != nullptr) 
+			{
+				Animation* anim = res->GetAnimation(filePathName, filePathName, skAnim->mesh);
+				if (anim != nullptr)
+					skAnim->AddAnimation(anim);
+			}
 		}
 		// close
 		ImGuiFileDialog::Instance()->CloseDialog("ChooseFileModelsk_anim");
@@ -374,82 +400,87 @@ void EditorProperty::scriptC_editor(Entity &obj, ScriptInstance* script)
 			}
 
 			NextPreps();
-			for (size_t i = 0; i < script->properties.size(); i++)
-			{
-				const char* var_name = script->properties[i].name.c_str();
-				ImGui::PushID(var_name + i);
-				//std::string hide = "##";
-				if (script->properties[i].type == VAR_Int)
+			//try{
+				for (size_t i = 0; i < script->properties.size(); i++)
 				{
-					int var = script->GetVarInt(var_name);
-					int temp_var = var;
-					SetWeightPrep();
-					//ImGui::DragInt(std::string(hide + script->class_name + var_name).c_str(), &var);
-					ImGui::DragInt("##var", &var);
-					if (var != temp_var)
-						script->SetVar(var_name, var);
-				}
-				else if (script->properties[i].type == VAR_Float)
-				{
-					float var = script->GetVarFloat(var_name);
-					float temp_var = var;
-					SetWeightPrep();
-					//ImGui::DragFloat(std::string(hide + script->class_name + var_name).c_str(), &var, 0.1f);
-					ImGui::DragFloat("##var", &var, 0.1f);
-					if (var != temp_var)
-						script->SetVar(var_name, var);
-				}
-				else if (script->properties[i].type == VAR_String)
-				{
-					std::string var = script->GetVarString(var_name);
-					std::string temp_var = var;
-					SetWeightPrep();
-					//ImGui::InputText(std::string(hide + script->class_name + var_name).c_str(), &var);
-					ImGui::InputText("##var", &var);
-					if (var != temp_var)
-						script->SetVar(var_name, var);
-				}
-				else if (script->properties[i].type == VAR_Bool)
-				{
-					bool var = script->GetVarBool(var_name);
-					bool temp_var = var;
-					//ImGui::Checkbox(std::string(hide + script->class_name + var_name).c_str(), &var);
-					ImGui::Checkbox("##var", &var);
-					if (var != temp_var)
-						script->SetVar(var_name, var);
-				}
-				else if (script->properties[i].type == VAR_VEC3)
-				{
-					glm::vec3 scr_vec = script->GetVec3(script->properties[i].name);
-					glm::vec3 old_vec = scr_vec;
-					//EditVec3_xyz(("##scr_vec" + script->properties[i].name).c_str(), scr_vec);
-					EditVec3_xyz(("##scr_vec" + script->properties[i].name).c_str(), scr_vec);
-					if(scr_vec != old_vec)
-						script->SetVec3(script->properties[i].name, scr_vec);
-				}
-				else if (script->properties[i].type == VAR_ASSET)
-				{
-					std::string& asset_path = script->GetAssetPath(script->properties[i].name);
-					//asset_path += "##";
-					asset_path += " (Asset)";
-					//ImGui::InputText(std::string(hide + script->class_name + var_name).c_str(), &asset_path);
-					SetWeightPrep();
-					ImGui::InputText("##var", &asset_path);
-					//ImGui::Button((asset_path + script->properties[i].name).c_str());
-					if (ImGui::BeginDragDropTarget())
+					const char* var_name = script->properties[i].name.c_str();
+					ImGui::PushID(var_name + i);
+					//std::string hide = "##";
+					if (script->properties[i].type == VAR_Int)
 					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RES_FILE_RBP"))
-						{
-							IM_ASSERT(payload->DataSize == sizeof(std::string));
-							std::string payload_n = *(std::string*)payload->Data;
-							script->SetAssetPath(script->properties[i].name, payload_n);
-							std::cout << "Get prefab in : " << payload_n << std::endl;
-						}
-						ImGui::EndDragDropTarget();
+						int var = script->GetVarInt(var_name);
+						int temp_var = var;
+						SetWeightPrep();
+						//ImGui::DragInt(std::string(hide + script->class_name + var_name).c_str(), &var);
+						ImGui::DragInt("##var", &var);
+						if (var != temp_var)
+							script->SetVar(var_name, var);
 					}
+					else if (script->properties[i].type == VAR_Float)
+					{
+						float var = script->GetVarFloat(var_name);
+						float temp_var = var;
+						SetWeightPrep();
+						//ImGui::DragFloat(std::string(hide + script->class_name + var_name).c_str(), &var, 0.1f);
+						ImGui::DragFloat("##var", &var, 0.1f);
+						if (var != temp_var)
+							script->SetVar(var_name, var);
+					}
+					else if (script->properties[i].type == VAR_String)
+					{
+						std::string var = script->GetVarString(var_name);
+						std::string temp_var = var;
+						SetWeightPrep();
+						//ImGui::InputText(std::string(hide + script->class_name + var_name).c_str(), &var);
+						ImGui::InputText("##var", &var);
+						if (var != temp_var)
+							script->SetVar(var_name, var);
+					}
+					else if (script->properties[i].type == VAR_Bool)
+					{
+						bool var = script->GetVarBool(var_name);
+						bool temp_var = var;
+						//ImGui::Checkbox(std::string(hide + script->class_name + var_name).c_str(), &var);
+						ImGui::Checkbox("##var", &var);
+						if (var != temp_var)
+							script->SetVar(var_name, var);
+					}
+					else if (script->properties[i].type == VAR_VEC3)
+					{
+						glm::vec3 scr_vec = script->GetVec3(script->properties[i].name);
+						glm::vec3 old_vec = scr_vec;
+						//EditVec3_xyz(("##scr_vec" + script->properties[i].name).c_str(), scr_vec);
+						ImGui::SetNextItemWidth(ImGui::GetWindowWidth() / 1.8f);
+						ImGui::DragFloat3("##scr_vec", (float*)&scr_vec, 0.1f);
+						if (scr_vec != old_vec)
+							script->SetVec3(script->properties[i].name, scr_vec);
+					}
+					else if (script->properties[i].type == VAR_ASSET)
+					{
+						std::string& asset_path = script->GetAssetPath(script->properties[i].name);
+						//asset_path += "##";
+						asset_path += " (Asset)";
+						//ImGui::InputText(std::string(hide + script->class_name + var_name).c_str(), &asset_path);
+						SetWeightPrep();
+						ImGui::InputText("##var", &asset_path);
+						//ImGui::Button((asset_path + script->properties[i].name).c_str());
+						if (ImGui::BeginDragDropTarget())
+						{
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RES_FILE_RBP"))
+							{
+								IM_ASSERT(payload->DataSize == sizeof(std::string));
+								std::string payload_n = *(std::string*)payload->Data;
+								script->SetAssetPath(script->properties[i].name, payload_n);
+								std::cout << "Get prefab in : " << payload_n << std::endl;
+							}
+							ImGui::EndDragDropTarget();
+						}
+					}
+					ImGui::PopID();
 				}
-				ImGui::PopID();
-			}
+				//ImGui::PopID();
+			//}
+			//catch (std::exception e) { std::cout << "lua exeption \n"; }
 			EndPreps();
 			ImGui::Separator();
 		}
@@ -466,30 +497,110 @@ void EditorProperty::scriptC_editor(Entity &obj, ScriptInstance* script)
 	}
 }
 // -----------------------------------------------------------------------
+static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 107.0f)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	auto boldFont = io.Fonts->Fonts[0];
+
+	ImGui::PushID(label.c_str());
+
+	ImGui::Columns(2, 0, false);
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label.c_str());
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+	//float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	//ImVec2 buttonSizes = { lineHeight + 3.0f, lineHeight };
+	ImVec2 buttonSize = { 0.0f , 0.0f };
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	ImGui::PushFont(boldFont);
+	ImGui::Button("X", buttonSize);
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.15f, 0.45f, 0.15f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+	ImGui::PushFont(boldFont);
+	ImGui::Button("Y", buttonSize);
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.08f, 0.22f, 0.65f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+	ImGui::PushFont(boldFont);
+	ImGui::Button("Z", buttonSize);
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+
+	ImGui::PopStyleVar();
+
+	ImGui::Columns(1);
+
+	ImGui::PopID();
+}
+// -----------------------------------------------------------------------
 void transform_editor(Entity &obj)
 {
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		EditorProperty::BeginPreps("editTr");
+		/*EditorProperty::BeginPreps("editTr");
 		EditorProperty::PrepName("Position");
 		EditorProperty::PrepName("Rotation");
 		EditorProperty::PrepName("Scale");
 		EditorProperty::NextPreps();
 
 		glm::vec3 get_pos = obj.transform.GetLocalPosition();
-		EditVec3_xyz("##pos", get_pos);
+		//EditVec3_xyz("##pos", get_pos);
+		DrawVec3Control("##pos", get_pos);
 		obj.SetTranslation(get_pos, true);
 		
 		glm::vec3 get_ang = obj.transform.GetEurlerAngels();
-		EditVec3_xyz("##rot", get_ang);
+		//EditVec3_xyz("##rot", get_ang);
+		DrawVec3Control("##rot", get_ang);
 		//obj.transform.SetAngels(get_ang);
 		obj.SetRotation(get_ang);
 
 		glm::vec3 get_sca = obj.transform.GetLocalScale();
-		EditVec3_xyz("##sca", get_sca);
+		//EditVec3_xyz("##sca", get_sca);
+		DrawVec3Control("##sca", get_sca);
 		obj.SetScale(get_sca);
 
-		EditorProperty::EndPreps();
+		EditorProperty::EndPreps();*/
+
+		glm::vec3 get_pos = obj.transform.GetLocalPosition();
+		DrawVec3Control("Position", get_pos);
+		obj.SetTranslation(get_pos, true);
+
+		glm::vec3 get_ang = obj.transform.GetEurlerAngels();
+		DrawVec3Control("Rotation", get_ang);
+		obj.SetRotation(get_ang);
+
+		glm::vec3 get_sca = obj.transform.GetLocalScale();
+		DrawVec3Control("Scale", get_sca);
+		obj.SetScale(get_sca);
+
 		ImGui::Separator();
 	}
 }
@@ -802,7 +913,9 @@ void EditorProperty::point_light_editor(Entity& obj)
 		ImGui::Checkbox("##ppLight_active", &point_light->CastShadows);
 		SetWeightPrep(); ImGui::DragFloat("##PLight_bias", &point_light->Bias, 0.01f);
 		EndPreps();
-
+		//ImGui::Checkbox("inFrustum", &point_light->inFrustum);
+		//bool yes = point_light->isActive();
+		//ImGui::Checkbox("isActive()", &yes);
 		if (removeComponent)
 			ent->RemoveComponent<PointLight>();
 	});
@@ -815,7 +928,7 @@ void EditorProperty::spot_light_editor(Entity &obj)
 		[](Entity* ent, SpotLight* spot_light, bool removeComponent)
 	{
 		BeginPreps("edit_pl");
-		PrepName("Active");
+		PrepName("Enabled");
 		PrepName("Intensity");
 		PrepName("Color");
 		PrepName("Raduis");
@@ -836,6 +949,7 @@ void EditorProperty::spot_light_editor(Entity &obj)
 		ImGui::Checkbox("##sssppLight_active", &spot_light->CastShadows);
 		SetWeightPrep(); ImGui::DragFloat("##ssPLight_bias", &spot_light->Bias, 0.01f);
 		ImGui::DragInt("##PsLight_rLiaanear", (int*)&spot_light->shadow_index);
+		//ImGui::Checkbox("VISIBLE", &spot_light->visible);
 		EndPreps();
 
 		if (removeComponent)
@@ -852,6 +966,7 @@ void EditorProperty::ref_probe_editor(Entity &obj)
 		BeginPreps("edit_ple");
 		PrepName("Intensity");
 		PrepName("Static Only");
+		PrepName("Transform Scale");
 		PrepName("Box Projection");
 		PrepName("Box");
 		PrepName("");
@@ -859,6 +974,7 @@ void EditorProperty::ref_probe_editor(Entity &obj)
 		NextPreps();
 		ImGui::DragFloat("##rp_Intensity", &ref_probe->Intensity, 0.01f);
 		ImGui::Checkbox("##prpLight_sos", &ref_probe->static_only);
+		ImGui::Checkbox("##prpLight_ssos", &ref_probe->use_scale);
 		ImGui::Checkbox("##prpLight_active", &ref_probe->BoxProjection);
 		EditVec3_xyz("##rbox", ref_probe->box.BoxMin);
 		EditVec3_xyz("##rbox2", ref_probe->box.BoxMax);
@@ -875,13 +991,16 @@ void EditorProperty::ref_probe_editor(Entity &obj)
 void EditorProperty::rb_editor(Entity &obj)
 {
 	bool remove = DrawComponent<RigidBody>("Rigid Body", &obj, // Draw Properties
-		[](Entity* ent, RigidBody* rigidbody, bool removeComponent)
+	[](Entity* ent, RigidBody* rigidbody, bool removeComponent)
 	{
 		BeginPreps("edit_rbody");
 		PrepName("Mode");
 		PrepName("Mass");
 		PrepName("Liner Damping");
 		PrepName("Anguler Damping");
+		PrepName("Friction");
+		PrepName("Bounciness");
+		//PrepName("Gravity");
 		PrepName("OnCollison Notification");
 		NextPreps();
 
@@ -904,11 +1023,23 @@ void EditorProperty::rb_editor(Entity &obj)
 		rigidbody->SetMass(mass);
 		rigidbody->SetDamping(ld, ad);
 
+		ld = rigidbody->Friction;
+		SetWeightPrep(); ImGui::DragFloat("##rb_Friction", &ld, 0.1f);
+		rigidbody->SetFriction(ld);
+
+		ld = rigidbody->Bounciness;
+		SetWeightPrep(); ImGui::DragFloat("##rb_Bounciness", &ld, 0.1f);
+		rigidbody->SetBounciness(ld);
+
 		int cMode = 0;
 		if (ent->m_CollMode == RB_STATIC)
 			cMode = 1;
 		else if (ent->m_CollMode == RB_CHARACTAR)
 			cMode = 2;
+		//float g = rigidbody->Gravity.y;
+		//SetWeightPrep(); ImGui::DragFloat("##rb_gravity", &g, 0.1f);
+		//if (g != rigidbody->Gravity.y)
+			//rigidbody->SetGravityY(g);
 		seted_mode = cMode;
 		SetWeightPrep();	ImGui::Combo("##coll_modeds_type", &seted_mode, "None\0Once\0Always");
 		if (cMode != seted_mode) // Mode changed
@@ -919,7 +1050,8 @@ void EditorProperty::rb_editor(Entity &obj)
 		BeginPreps("edit_rbodyColl");
 		PrepName("Shape");
 		PrepName("Offset");
-		PrepName("Is Trigger");
+		PrepName("Kinematic");
+		PrepName("Trigger");
 		if (rigidbody->m_CollisionType == SPHERE_COLLIDER)
 			PrepName("Raduis");
 		else if (rigidbody->m_CollisionType == CAPSULE_COLLIDER)
@@ -948,7 +1080,13 @@ void EditorProperty::rb_editor(Entity &obj)
 			rigidbody->ChangeShape((RCollisionShapeType)seted);
 		}
 		SetWeightPrep(); ImGui::DragFloat3("##rboffseteditrg", (float*)&rigidbody->mOffset, 0.01f);
-		bool is_t = rigidbody->is_trigger;
+		bool is_t = rigidbody->is_kinematic;
+		ImGui::Checkbox("##rbTrkine", &is_t);
+		if (is_t != rigidbody->is_kinematic)
+		{
+			rigidbody->SetKinematic(is_t);
+		}
+		is_t = rigidbody->is_trigger;
 		ImGui::Checkbox("##rbTr", &is_t);
 		if (is_t != rigidbody->is_trigger)
 		{
@@ -991,7 +1129,7 @@ void EditorProperty::rb_editor(Entity &obj)
 		if (obj.HasComponent<RendererComponent>())
 		{
 			btTriangleMesh* m = phy_world->GetMeshCollider(obj.GetComponent<RendererComponent>()->mesh);
-			obj.GetComponent<RigidBody>()->SetCollisionMesh(m, obj.GetComponent<RendererComponent>()->mesh->path);
+			obj.GetComponent<RigidBody>()->SetCollisionMesh(m, obj.GetComponent<RendererComponent>()->mesh->path, obj.GetComponent<RendererComponent>()->mesh->index);
 		}
 	}
 }
@@ -1033,10 +1171,11 @@ void EditorProperty::animation_editor(Entity & obj)
 		PrepName("Mesh");
 		PrepName("Cast shadows");
 		PrepName("Scale");
+		PrepName("Speed");
 		
 		NextPreps();
 		if (ImGui::Button("Set ##setRCmesh"))
-			ImGuiFileDialog::Instance()->OpenModal("ChooseFileModelsk", "Choose File", ".fbx\0.obj\0.3ds\0.dae\0\0", ".");
+			ImGuiFileDialog::Instance()->OpenModal("ChooseFileModelsk", "Choose File", ".fbx\0.obj\0.glb\0.dae\0\0", ".");
 
 		if (anim->mesh) {
 			ImGui::SameLine();
@@ -1044,6 +1183,7 @@ void EditorProperty::animation_editor(Entity & obj)
 		}
 		ImGui::Checkbox("##skAnim_cs", &anim->CastShadows);
 		SetWeightPrep(); ImGui::DragFloat("##sk_anim_scale", &anim->scale, 0.01f);
+		SetWeightPrep(); ImGui::DragFloat("##sk_anim_speed", &anim->speed, 0.01f);
 		EndPreps();
 		if (ImGui::TreeNode("##meshesTree", "Meshs"))
 		{
@@ -1154,7 +1294,7 @@ void EditorProperty::UIwidget_editor(Entity & obj)
 			ImGui::OpenPopup("ui_widget_modification");
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.17f, 0.17f, 0.17f, 1.0f));
 		ImGui::BeginChild("UI Widgets", ImVec2(ImGui::GetWindowWidth(), 100));
-		std::string uniqName;
+		//std::string uniqName;
 		for (size_t i = 0; i < uiw->widgets.size(); i++)
 		{
 			ImGui::PushID(i);
@@ -1220,6 +1360,7 @@ void EditorProperty::UIwidget_editor(Entity & obj)
 						PrepName("Color");
 						PrepName("Wrap");
 						PrepName("Text");
+						PrepName("Font Index");
 						NextPreps();
 						SetWeightPrep(); ImGui::InputText("##UIWidget_tname", &text->name);
 						SetWeightPrep(); ImGui::DragFloat2("##UIWidget_tpos", (float*)&text->Position, 0.1f);
@@ -1229,6 +1370,7 @@ void EditorProperty::UIwidget_editor(Entity & obj)
 						SetWeightPrep(); ImGui::ColorEdit4("##UIWidget_tcol", (float*)&text->color, ImGuiColorEditFlags_NoInputs);
 						SetWeightPrep(); ImGui::Checkbox("##UIWidget_twrap", &text->Wrap);
 						SetWeightPrep(); ImGui::InputTextMultiline("##UIWidget_ttext", &text->text);
+						SetWeightPrep(); ImGui::DragInt("##UIWidget_tfont", (int*)&text->fontIndex, 1);
 						EndPreps();
 						break;
 					}
@@ -1250,6 +1392,7 @@ void EditorProperty::UIwidget_editor(Entity & obj)
 						PrepName("Frame Rounding");
 						PrepName("Image");
 						PrepName("OnClick Invoke");
+						PrepName("Font Index");
 						//PrepName("Text as Button");
 						NextPreps();
 						SetWeightPrep(); ImGui::InputText("##UIWidget_tname", &button->name);
@@ -1272,6 +1415,7 @@ void EditorProperty::UIwidget_editor(Entity & obj)
 							SetWeightPrep(); if (ImGui::Button("(None)")) { ImGuiFileDialog::Instance()->OpenModal("SetUIImagetex", "Choose Image", ".png\0.jpg\0.bmp\0.tga", "."); }
 						}
 						SetWeightPrep(); ImGui::InputText("##UIWidget_onclickF", &button->invokeFunc);
+						SetWeightPrep(); ImGui::DragInt("##UIWidget_tfont", (int*)&button->fontIndex, 1);
 						//SetWeightPrep(); ImGui::Checkbox("##UIWidget_txtasb", &button->TextAsButton);
 						EndPreps();
 						break;
@@ -1378,6 +1522,7 @@ void EditorProperty::UIwidget_editor(Entity & obj)
 						PrepName("Read only"); 
 						PrepName("Hint");
 						PrepName("text");
+						PrepName("Font Index");
 						NextPreps();
 						SetWeightPrep(); ImGui::InputText("##UIWidget_text_ename", &itext->name);
 						SetWeightPrep(); ImGui::DragFloat2("##UIWidget_text_pos", (float*)&itext->Position, 0.1f);
@@ -1392,6 +1537,7 @@ void EditorProperty::UIwidget_editor(Entity & obj)
 						ImGui::Checkbox("##UIWidget_itext_ro", &itext->readOnly);
 						SetWeightPrep(); ImGui::InputText("##UIWidget_Hintttext", &itext->Hint);
 						SetWeightPrep(); ImGui::InputTextMultiline("##UIWidget_ttext", &itext->text);
+						SetWeightPrep(); ImGui::DragInt("##UIWidget_tfont", (int*)&itext->fontIndex, 1);
 						EndPreps();
 						break;
 					}
@@ -1527,6 +1673,7 @@ void EditorProperty::audio_editor(Entity & obj)
 	{
 		BeginPreps("edit_audioSource");
 		PrepName("Clip");
+		PrepName("2D");
 		PrepName("Looping");
 		PrepName("Play on Start");
 		PrepName("Volume");
@@ -1544,6 +1691,8 @@ void EditorProperty::audio_editor(Entity & obj)
 			ImGui::SameLine();
 			ImGui::Text(comp->mClip->mPath.c_str());
 		}
+		ImGui::Checkbox("##psCompRAlooping2d", &comp->Is2D);
+
 		float vol = comp->GetVolume();
 		float minD = comp->GetMinDistance();
 		float maxD = comp->GetMaxDistance();
@@ -1627,36 +1776,193 @@ void EditorProperty::grass_editor(Entity & obj)
 // -----------------------------------------------------------------------
 SceneManager* ascn;
 
-void editDisp(Entity* ent, Displacement* comp, bool removeComponent)
+void editDisp(Entity* ent, Terrain* comp, bool removeComponent)
 {
-	if (ImGui::Button("Edit ##editDisp", ImVec2(ImGui::GetWindowWidth(), 0)))
+	if (ImGui::BeginTabBar("TerrainEditTabBar", ImGuiTabBarFlags_None))
 	{
-		ascn->editDisp = ent->ID;
-		ascn->PushRequest(SR_EDIT_DISP);
-	}
-	EditorProperty::BeginPreps("edit_Displacement");
-	EditorProperty::PrepName("Raduis");
-	EditorProperty::PrepName("Intensity");
-	EditorProperty::PrepName("DoOneHeight");
-	EditorProperty::PrepName("Height");
-	EditorProperty::PrepName("Set Alpha");
-	EditorProperty::NextPreps();
-	EditorProperty::SetWeightPrep(); ImGui::DragFloat("##disp_ee", &comp->Raduis, 0.1f, 0.0f);
-	EditorProperty::SetWeightPrep(); ImGui::DragFloat("##disp_eee", &comp->Intensity, 0.1f, 0.0f, 100.0f);
-	ImGui::Checkbox("##disp_eeee", &comp->useOneHeight);
-	EditorProperty::SetWeightPrep(); ImGui::DragFloat("##disp_eeeee", &comp->SameHeight, 0.1f, 0.0f, 100.0f);
-	ImGui::Checkbox("##disp_eeeeee", &comp->edit_alpha);
-	EditorProperty::EndPreps();
+		if (ImGui::BeginTabItem("Settings"))
+		{
+			EditorProperty::BeginPreps("edit_terrain_props");
+			EditorProperty::PrepName("Size");
+			EditorProperty::PrepName("MaxHeight");
+			EditorProperty::PrepName("FrustumCulling");
+			EditorProperty::PrepName("DEBUG");
 
+			EditorProperty::NextPreps();
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##terrain_Size", &comp->Size);
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##terrain_MaxHeight", &comp->MaxHeight);
+			ImGui::Checkbox("##frcc", &comp->FrustumCulling);
+			EditorProperty::SetWeightPrep(); ImGui::DragInt("##terrain_dbg", &comp->Debug);
+		
+
+			EditorProperty::EndPreps();
+
+			if (ImGui::Button("Update ##editDisp", ImVec2(ImGui::GetWindowWidth(), 0)))
+				comp->UpdateMesh();
+
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("LOD levels"))
+		{
+			EditorProperty::BeginPreps("edit_terrain_lods");
+			EditorProperty::PrepName("Decimate");
+			EditorProperty::PrepName("LOD0 Distance");
+			EditorProperty::PrepName("LOD1 Distance");
+			EditorProperty::PrepName("LOD2 Distance");
+			EditorProperty::PrepName("LOD3 Distance");
+
+			EditorProperty::NextPreps();
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##terrain_Decimate", &comp->Decimate);
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##LOD0_distance", &comp->LOD0_distance);
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##LOD1_distance", &comp->LOD1_distance);
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##LOD2_distance", &comp->LOD2_distance);
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##LOD3_distance", &comp->LOD3_distance);
+
+			EditorProperty::EndPreps();
+
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Painting"))
+		{
+			EditorProperty::BeginPreps("edit_terrain_paints");
+			EditorProperty::PrepName("Splatmap");
+			EditorProperty::PrepName("Materials ");
+			ImGui::SameLine(); 
+			ImGui::Text(std::to_string(0).c_str());
+			ImGui::SameLine();
+			ImGui::Text("/");
+			ImGui::SameLine();
+			ImGui::Text(std::to_string(4).c_str());
+			EditorProperty::NextPreps();
+			EditorProperty::SetWeightPrep(); ImGui::Button("(None)");
+			EditorProperty::SetWeightPrep(); ImGui::Button("  Add  ");
+			ImGui::SameLine(); ImGui::Button("Remove");
+			EditorProperty::EndPreps();
+
+			//if (ImGui::Button("Materials", ImVec2(ImGui::GetWindowWidth(), 0)))
+				//ImGui::OpenPopup("terrain_add_mat");
+			ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.17f, 0.17f, 0.17f, 1.0f));
+			ImGui::BeginChild("terrain materials", ImVec2(ImGui::GetWindowWidth(), 100));
+			 
+			ImGui::EndChild();
+			ImGui::PopStyleColor();
+
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Trees"))
+		{
+			EditorProperty::BeginPreps("edit_terrain_trees");
+			EditorProperty::PrepName("Prefabs ");
+			EditorProperty::NextPreps();
+			EditorProperty::SetWeightPrep(); ImGui::Button("  Add  ");
+			ImGui::SameLine(); ImGui::Button("Remove");
+			EditorProperty::EndPreps();
+
+			ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.17f, 0.17f, 0.17f, 1.0f));
+			ImGui::BeginChild("Terrain prefabs", ImVec2(ImGui::GetWindowWidth(), 100));
+
+			ImGui::EndChild();
+			ImGui::PopStyleColor();
+
+			ImGui::EndTabItem();
+		}
+		/*if (ImGui::BeginTabItem("Edit"))
+		{
+			if (ImGui::Button("Edit ##editDisp", ImVec2(ImGui::GetWindowWidth(), 0)))
+			{
+				ascn->editDisp = ent->ID;
+				ascn->PushRequest(SR_EDIT_DISP);
+			}
+			EditorProperty::BeginPreps("edit_Displacement");
+			EditorProperty::PrepName("Raduis");
+			EditorProperty::PrepName("Intensity");
+			EditorProperty::PrepName("DoOneHeight");
+			EditorProperty::PrepName("Height");
+			EditorProperty::PrepName("Set Alpha");
+			EditorProperty::NextPreps();
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##disp_ee", &comp->Raduis, 0.1f, 0.0f);
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##disp_eee", &comp->Intensity, 0.1f, 0.0f, 100.0f);
+			ImGui::Checkbox("##disp_eeee", &comp->useOneHeight);
+			EditorProperty::SetWeightPrep(); ImGui::DragFloat("##disp_eeeee", &comp->SameHeight, 0.1f, 0.0f, 100.0f);
+			ImGui::Checkbox("##disp_eeeeee", &comp->edit_alpha);
+			EditorProperty::EndPreps();
+
+			ImGui::EndTabItem();
+		}*/
+		ImGui::EndTabBar();
+	}
+
+	ImGui::Separator();
+	//EditorProperty::PrepName("VertexCount: ");
+	//ImGui::SameLine();
+	//ImGui::TextColored(ImVec4(0.85f, 0.85f, 0.85f, 1.0f), std::to_string(comp->VertexCount).c_str());
 }
 
+void EditorProperty::cpp_script_editor(Entity & obj)
+{
+	bool remove = DrawComponent<NativeScriptComponent>("CppTest (C++)", &obj,
+	// Draw Properties
+	[](Entity* ent, NativeScriptComponent* comp, bool removeComponent)
+	{
+		BeginPreps("edit_cppscr");
+		//comp->Instance->varNames[0] = "how";
+		for (size_t i = 0; i < comp->Instance->varsNames.size(); i++)
+		{
+			PrepName(comp->Instance->varsNames[i].c_str());
+			std::cout << "varNames " << i << " " << comp->Instance->varsNames[i] << "\n";
+		}
+		//PrepName("speed");
+		NextPreps();
+		for (size_t i = 0; i < comp->Instance->varsNames.size(); i++)
+		{
+			auto vname = comp->Instance->varsNames[i];
+			SetWeightPrep();
+			auto var_type = (ScriptableEntity::NScriptVarType)comp->Instance->varsType[i];
+			if (var_type == ScriptableEntity::NScriptVarType::NSVT_FLOAT) {
+				ImGui::DragFloat(("##cpp_speed" + vname).c_str(), (float*)comp->Instance->vars[i], 0.01f);
+			}
+			else if (var_type == ScriptableEntity::NScriptVarType::NSVT_INT){
+				ImGui::DragInt(("##cpp_speed" + vname).c_str(), (int*)comp->Instance->vars[i], 0.01f);
+			}
+			else if (var_type == ScriptableEntity::NScriptVarType::NSVT_BOOL) {
+				ImGui::Checkbox(("##cpp_speed" + vname).c_str(), (bool*)comp->Instance->vars[i]);
+			}
+			else if (var_type == ScriptableEntity::NScriptVarType::NSVT_STR) {
+				ImGui::InputText(("##cpp_speed" + vname).c_str(), (string*)comp->Instance->vars[i]);
+			}
+			else
+				std::cout << "avar is " << vname << " " << comp->Instance->varsType[i] << "\n";
+		}
+		//SetWeightPrep(); ImGui::DragFloat("##cpp_speed", &((CppTest*)comp->Instance)->speed, 0.01f);
+		EndPreps();
+	});
+
+	if (remove)
+		obj.RemoveComponent<NativeScriptComponent>();
+}
+// -----------------------------------------------------------------------
+void EditorProperty::terrainCollider_editor(Entity & obj)
+{
+	bool remove = DrawComponent<TerrainCollider>("Terrain Collider", &obj,
+		// Draw Properties
+		[](Entity* ent, TerrainCollider* comp, bool removeComponent)
+	{
+		BeginPreps("edit_terrainCol");
+		NextPreps();
+		EndPreps();
+	});
+
+	if (remove)
+		obj.RemoveComponent<TerrainCollider>();
+}
+// -----------------------------------------------------------------------
 void EditorProperty::displacement_editor(Entity & obj)
 {
 	ascn = nodes->scene;
-	bool remove = DrawComponent<Displacement>("Displacemet", &obj, editDisp);
+	bool remove = DrawComponent<Terrain>("Terrain", &obj, editDisp);
 
 	if (remove)
-		obj.RemoveComponent<Displacement>();
+		obj.RemoveComponent<Terrain>();
 }
 // -----------------------------------------------------------------------
 void EditorProperty::components_editor(Entity &obj)
@@ -1689,14 +1995,19 @@ void EditorProperty::components_editor(Entity &obj)
 			UIwidget_editor(obj);
 		else if (Component::IsComponentType<SkeletalMeshComponent>(obj.m_components[i]))
 			animation_editor(obj);
-		else if (Component::IsComponentType<Displacement>(obj.m_components[i]))
+		else if (Component::IsComponentType<Terrain>(obj.m_components[i]))
 			displacement_editor(obj);
+		else if (Component::IsComponentType<NativeScriptComponent>(obj.m_components[i]))
+			cpp_script_editor(obj);
+		else if (Component::IsComponentType<TerrainCollider>(obj.m_components[i]))
+			terrainCollider_editor(obj);
 	}
 
 	for (size_t i = 0; i < obj.m_scripts.size(); i++)
 		scriptC_editor(obj, obj.m_scripts[i]);
 }
 // -----------------------------------------------------------------------
+
 void EditorProperty::Render()
 {
 	ImGui::Begin("Properties", NULL, ImGuiWindowFlags_NoCollapse);
@@ -1712,8 +2023,7 @@ void EditorProperty::Render()
 			if (ourEntity->ID == oid)
 			{
 				ImGui::PushFont(nodes->icon_small);
-				ImGui::Text("4"); ImGui::SameLine();
-				if (ImGui::Button("3")) // Save Prefab
+				if (ImGui::Button("4")) // Save Prefab
 				{
 					if (ourEntity->IsPrefab())
 						ourEntity->SaveEntityFile(ourEntity->path.c_str());

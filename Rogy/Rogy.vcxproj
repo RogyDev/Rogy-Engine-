@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\animation\Animator.cpp" />
     <ClCompile Include="Engine\animation\SkeletalMeshComponent.cpp" />
     <ClCompile Include="Engine\animation\SkeletalModel.cpp" />
     <ClCompile Include="Engine\audio\AudioClip.cpp" />
@@ -48,6 +49,8 @@
     <ClCompile Include="Engine\physics\GLDebugDrawer.cpp" />
     <ClCompile Include="Engine\physics\PhysicsWorld.cpp" />
     <ClCompile Include="Engine\physics\RigidBody.cpp" />
+    <ClCompile Include="Engine\physics\TerrainCollider.cpp" />
+    <ClCompile Include="Engine\physics\Vehicle.cpp" />
     <ClCompile Include="Engine\renderer\ForwardPlusRenderer.cpp" />
     <ClCompile Include="Engine\renderer\ParticleSystem.cpp" />
     <ClCompile Include="Engine\renderer\rendererComponent.cpp" />
@@ -337,7 +340,10 @@
     <ClInclude Include="Engine\physics\GLDebugDrawer.h" />
     <ClInclude Include="Engine\physics\PhysicsWorld.h" />
     <ClInclude Include="Engine\physics\RigidBody.h" />
+    <ClInclude Include="Engine\physics\TerrainCollider.h" />
+    <ClInclude Include="Engine\physics\Vehicle.h" />
     <ClInclude Include="Engine\ProjectSettings.h" />
+    <ClInclude Include="Engine\renderer\AtmosphereSky.h" />
     <ClInclude Include="Engine\renderer\ForwardPlusRenderer.h" />
     <ClInclude Include="Engine\renderer\framebuffer_texture.h" />
     <ClInclude Include="Engine\renderer\GrassComponent.h" />
@@ -626,9 +632,14 @@
     <None Include="Engine\core\stl\containers\simple_ptr.tpp" />
     <None Include="Engine\core\stl\containers\smart_ptr.tpp" />
     <None Include="Engine\core\stl\containers\triple.tpp" />
-    <None Include="res\tmp.ss" />
     <None Include="ThirdParty\SoLoud\src\audiosource\speech\Elements.def" />
     <None Include="ThirdParty\SoLoud\src\c_api\soloud.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="core\rlogo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="logo.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B56C9C7D-FC4F-489F-8568-99B42D636A58}</ProjectGuid>
@@ -686,13 +697,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)/imgui;$(ProjectDir)/ThirdParty/Bullet;$(ProjectDir)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\FreeType\include;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\Bullet;$(ProjectDir)ThirdParty\SoLoud\include;$(ProjectDir)include;$(ProjectDir)ThirdParty\Recast\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;assimp-vc140-mt.lib;STB_IMAGE.lib;OpenAL32.lib;FreeType.lib;yaml-cpp.lib;lua53.lib;lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -706,7 +717,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;assimp-vc140-mt.lib;FreeType.lib;yaml-cpp.lib;OpenAL32.lib;lua.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -723,7 +734,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;assimp-vc140-mt.lib;STB_IMAGE.lib;lua.lib;lua53.lib;OpenAL32.lib;FreeType.lib;yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;assimp-vc140-mt.lib;STB_IMAGE.lib;OpenAL32.lib;FreeType.lib;yaml-cpp.lib;lua53.lib;lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -733,10 +744,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)/ThirdParty\FreeType\include;$(ProjectDir)/ThirdParty\Recast\Include;$(ProjectDir)/ThirdParty\SoLoud\include;$(ProjectDir)/include;$ProjectDir/ThirdParty;$(ProjectDir)/ThirdParty/imgui;$(ProjectDir)/ThirdParty/Bullet;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;assimp-vc140-mt.lib;STB_IMAGE.lib;OpenAL32.lib;FreeType.lib;yaml-cpp.lib;lua53.lib;lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

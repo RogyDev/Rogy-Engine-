@@ -188,9 +188,6 @@
     <ClCompile Include="Engine\renderer\postprocessing.cpp">
       <Filter>Engine\Renderer\PostProcessing</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\renderer\shadow_map.cpp">
-      <Filter>Engine\Renderer\shadows</Filter>
-    </ClCompile>
     <ClCompile Include="ThirdParty\ImGuiFileDialog\ImGuiFileDialog.cpp">
       <Filter>Engine\Editor\ImGuiFileDialog</Filter>
     </ClCompile>
@@ -913,6 +910,18 @@
     </ClCompile>
     <ClCompile Include="Engine\mesh\displacement.cpp">
       <Filter>Engine\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\physics\Vehicle.cpp">
+      <Filter>Engine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\renderer\shadow_map.cpp">
+      <Filter>Engine\Renderer\shadows</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\animation\Animator.cpp">
+      <Filter>Engine\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\physics\TerrainCollider.cpp">
+      <Filter>Engine\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1906,11 +1915,17 @@
     <ClInclude Include="Engine\renderer\LightsBuffer.h">
       <Filter>Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\renderer\AtmosphereSky.h">
+      <Filter>Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\physics\Vehicle.h">
+      <Filter>Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\physics\TerrainCollider.h">
+      <Filter>Engine\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\tmp.ss">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="Engine\core\stl\containers\simple_ptr.tpp">
       <Filter>Engine\Core\stl\containers</Filter>
     </None>
@@ -1945,5 +1960,15 @@
     <None Include="ThirdParty\SoLoud\src\c_api\soloud.def">
       <Filter>SoLoud</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="core\rlogo.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="logo.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

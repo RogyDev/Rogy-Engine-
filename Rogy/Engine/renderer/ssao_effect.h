@@ -36,6 +36,10 @@ public:
 	int    kernelSize = 10;
 	float  radius     = 3.0f;
 	float  bias       = 0.1f;
+	//int saoTurns	  = 1.0f;
+	//float saoScale	  = 1.0f;
+
+	unsigned int blurAmount = 1;
 
 	void Create(int w, int h);
 	void Clear();

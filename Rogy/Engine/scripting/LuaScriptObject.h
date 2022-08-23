@@ -4,7 +4,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <luainc.h>
+#include <luainc.h> // lua
+//#include <lua/lua.hpp> // luajit
 
 #include <glm/glm.hpp>
 
@@ -138,9 +139,11 @@ public:
 	int ent_id = -2;
 
 	bool hasUpdate = false;
+	bool hasPreUpdate = false;
 	bool hasStart = false;
 	bool hasDestroy = false;
 	bool hasOnCollision = false;
+	bool hasPhysicsUpdate = false;
 
 	/* Vector of the object public properties */
 	std::vector<ScriptVar> properties;

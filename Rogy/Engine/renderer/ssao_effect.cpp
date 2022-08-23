@@ -116,6 +116,7 @@ void SSAOEffect::Bind(glm::mat4 proj)
 	shaderSSAO->SetFloat("power"     , ssao_power);
 
 	shaderSSAO->SetMat4("projection", proj);
+	//shaderSSAO->SetVec2("u_resolution", glm::vec2(SCR_W, SCR_H));
 }
 
 void SSAOEffect::UnBind()

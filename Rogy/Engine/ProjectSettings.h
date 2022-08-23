@@ -19,14 +19,20 @@ struct RProjectSettings
 
 	// Graphics quality
 	// -------------------------------
+	int CaptureResulotion;
+	int ReflectionProbeLimit;
 	bool EnableShadows;
 	float ShadowDistance;
 	int CascadesCount;
 	int CascadedShadowMapsResolution;
 	float CascadeSplits[3];
+	bool useDepthPrePass;
+	bool useInstancing;
+	bool useInstancingForShadows;
 
 	int SpotShadowsResolution;
 	int PointShadowResolution;
+	int SpotShadowsLimit;
 
 	template <class Archive>
 	void serialize(Archive & ar)
@@ -49,6 +55,13 @@ struct RProjectSettings
 		ar(CascadedShadowMapsResolution);
 		ar(SpotShadowsResolution);
 		ar(PointShadowResolution);
+		ar(SpotShadowsLimit);
+
+		ar(useDepthPrePass);
+		ar(useInstancing);
+		ar(useInstancingForShadows);
+		ar(CaptureResulotion);
+		ar(ReflectionProbeLimit);
 	}
 
 	RProjectSettings()
@@ -67,10 +80,18 @@ struct RProjectSettings
 		CascadedShadowMapsResolution = 1024;
 		SpotShadowsResolution = 256;
 		PointShadowResolution = 256;
+		SpotShadowsLimit = 9;
+
+		useDepthPrePass = true;
+		useInstancing = true;
+		useInstancingForShadows = true;
 
 		CascadeSplits[0] = 0.1f;
 		CascadeSplits[1] = 0.4f;
 		CascadeSplits[2] = 1.0f;
+
+		CaptureResulotion = 128;
+		ReflectionProbeLimit = 8;
 	}
 };
 

@@ -8,6 +8,7 @@ int main()
 	cout << "Initializing Rogy Engine ..." << endl;
 	
 	// Enable/Disable Editor mode in top Rogy.h
+	engine.ProjectResourcesFolder = "Assets";
 
 	if (!engine.Init())
 		return -1;

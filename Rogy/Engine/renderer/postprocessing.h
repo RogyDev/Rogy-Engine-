@@ -51,6 +51,7 @@ public:
 	// framebuffer configuration
 	// -------------------------
 	FrameBufferTex colorBuffer;
+	FrameBufferTex colorBufferAA;
 	/*float scr_w, scr_h;
 	unsigned int rbo;
 	unsigned int framebuffer;
@@ -64,6 +65,16 @@ public:
 	FrameBufferTex bloomTex;
 	FrameBufferTex bloomBlurTex;
 
+	FrameBufferTex bloomTex2;
+	FrameBufferTex bloomBlurTex2;
+
+	FrameBufferTex HighlightTex;
+
+	GLuint RefFBO;
+	GLuint RefBuffer;
+	/*GLuint ScreenDepthFBO;
+	GLuint ScreenDepth;
+	bool depth_init = false;*/
 
 	// SSAO
 	// ------------------------------
@@ -78,7 +89,9 @@ public:
 	// create framebuffer to hold SSAO processing stage 
 	SSAOEffect ssaoEffect;
 	
-
+	// true to initalize on start, and then it willl be setted to false
+	bool ScreenSizeChanged = true;
+	// Are the textures initialized and ready to use?
 	bool Setup_PP = true;
 	bool Initialized = false;
 	bool Use = false;
@@ -94,16 +107,19 @@ public:
 	Shader blurShader;
 	Shader bloomShader;
 	Shader bloomBlurShader;
-	
+	Shader SharpenShader;
+
 	void Init();
 	void SetupBuffer(float w, float h);
 	void Bind();
+	bool ApplyAA();
 	bool Render(GLuint a, float f, float n);
 	bool VerticalBlur(FrameBufferTex& fbt);
 	bool HorizontalBlur();
 	bool Usable();
 
 	void Clear();
+	void ClearDepth();
 
 private:
 

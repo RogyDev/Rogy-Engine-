@@ -2,9 +2,12 @@
 #ifndef R_PHYSICS_WORLD
 #define R_PHYSICS_WORLD
 
+#include "Vehicle.h"
 #include "RigidBody.h"
+#include "TerrainCollider.h"
 #include "../scene/Entity.h"
 #include "../mesh/mesh.h"
+#include "../scripting/ScriptManager.h"
 
 struct RayHitInfo
 {
@@ -31,6 +34,21 @@ struct RColMeshShape
 class PhysicsWorld
 {
 public:
+
+	struct CollInfo
+	{
+		unsigned int idA;
+		unsigned int idB;
+		bool check = false;
+		CollInfo(unsigned int aidA,
+			unsigned int aidB)
+		{
+			idA = aidA;
+			idB = aidB;
+			check = true;
+		}
+	};
+
 	PhysicsWorld();
 	~PhysicsWorld();
 
@@ -50,10 +68,15 @@ public:
 
 	std::vector<RigidBody*> bodies;
 
+	std::vector<TerrainCollider*> terrains;
+
 	std::vector<RColMeshShape> mesh_cols;
 
 	btTriangleMesh* GetMeshCollider(Mesh* mesh);
 
+	ScriptManager* mScriptManager = nullptr;
+
+	glm::vec3 grv;
 	glm::vec3 GetGravity();
 	void SetGravity(glm::vec3& val);
 
@@ -68,13 +91,15 @@ public:
 	Entity* RaycastRef(glm::vec3 origin, glm::vec3 dir, float range);
 	bool RaycastHitPoint(glm::vec3 origin, glm::vec3 dir, float range, glm::vec3& point);
 
-	bool CheckSphere(glm::vec3 center, float radius);
+	bool CheckSphere(glm::vec3 center, glm::vec3 dir, float radius, RayHitInfo* result = nullptr);
 
 	void AddRigidBody(Entity* ent, float Mass = 1.0f);
 	RigidBody* GetBody(EnttID entId);
 	void RemoveRigidBody(Entity* ent);
 	RigidBody* CreateRigidBody(Transform& trans, EnttID entId, float Mass = 1.0f);
 	void ChangeShape(RigidBody* rb, RCollisionShapeType toType);
+
+	TerrainCollider* AddTerrainCollider(Entity* ent, float* data, int width, float maxHeight, float terrain_size);
 
 	void ClearRigidbodies();
 
@@ -124,8 +149,15 @@ public:
 		out_direction = glm::normalize(lRayDir_world);
 	}
 
+	float TimeStep;
+	void PhyTickCallback(btScalar timeStep);
+	bool IsPlaying = false;
+	
 private:
+	
 	unsigned int id_indx = 0;
+	std::vector<PhysicsWorld::CollInfo> current_contacts;
+	std::vector<PhysicsWorld::CollInfo> lost_contacts;
 };
 
 

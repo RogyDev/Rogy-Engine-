@@ -29,13 +29,14 @@ class UIWidgetComponent
 {
 public:
 	bool Enabled = true;
-	ImVec2 Position = ImVec2(1.0f, 1.0f);
-	ImVec2 Size = ImVec2(50.0f, 50.0f);
+	glm::vec2 Position = glm::vec2(1.0f, 1.0f);
+	glm::vec2 Size = glm::vec2(50.0f, 50.0f);
 	float Rotation = 0.0f;
 	float Alpha = 1.0f;
 	UIWidgetType type;
 	unsigned int ID;
 	std::string name;
+	unsigned int fontIndex;
 
 	glm::vec2 toGlm(ImVec2& v){
 		return glm::vec2(v.x, v.y);
@@ -56,8 +57,8 @@ public:
 		//out << YAML::BeginMap;
 		out << YAML::Key << "Type" << YAML::Value << (size_t)type;
 		out << YAML::Key << "Enabled" << YAML::Value << Enabled;
-		out << YAML::Key << "Position"; RYAML::SerVec2(out, toGlm(Position));
-		out << YAML::Key << "Size"; RYAML::SerVec2(out, toGlm(Size));
+		out << YAML::Key << "Position"; RYAML::SerVec2(out, (Position));
+		out << YAML::Key << "Size"; RYAML::SerVec2(out, (Size));
 		out << YAML::Key << "Rotation" << YAML::Value << Rotation;
 		out << YAML::Key << "Alpha" << YAML::Value << Alpha;
 		out << YAML::Key << "name" << YAML::Value << name;
@@ -66,8 +67,8 @@ public:
 	void LoadBase(YAML::Node& data)
 	{
 		Enabled = data["Enabled"].as<bool>();
-		Position = toIm(RYAML::GetVec2(data["Position"]));
-		Size = toIm(RYAML::GetVec2(data["Size"]));
+		Position = RYAML::GetVec2(data["Position"]);
+		Size = RYAML::GetVec2(data["Size"]);
 		Rotation = data["Rotation"].as<float>();
 		Alpha = data["Alpha"].as<float>();
 		name = data["name"].as<std::string>();

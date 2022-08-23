@@ -27,6 +27,8 @@ void Editor_Debug::Render()
 
 		ImGui::EndMenuBar();
 	}
+	size_t msgCount = debuger->messages.size();
+	ImGui::Text(std::to_string(msgCount).c_str());
 
 	if (debuger == nullptr)
 	{
@@ -37,7 +39,7 @@ void Editor_Debug::Render()
 	ImGui::BeginChild("#dddBBTOOLS");
 
 	ImGui::Separator();
-	for (size_t i = 0; i < debuger->messages.size(); i++)
+	for (size_t i = 0; i < msgCount; i++)
 	{
 		if (debuger->messages[i].type == LT_Message)
 		{

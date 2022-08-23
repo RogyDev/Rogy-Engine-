@@ -67,3 +67,24 @@ Texture* ResourcesManager::GetTextureName(std::string tex_name)
 	}
 	return nullptr;
 }
+
+Animation* ResourcesManager::GetAnimation(std::string animName, std::string animPath, SK_Model* mesh, unsigned int at_index)
+{
+	for (size_t i = 0; i < mAnimations.size(); i++)
+	{
+		if (mAnimations[i]->anim_name == animName)
+			return mAnimations[i];
+	}
+
+	Animation* anim = new Animation;
+	anim->anim_name = animName;
+	if (!anim->LoadAnimation(animPath, mesh, at_index))
+	{
+		delete anim;
+		return nullptr;
+	}
+
+	mAnimations.push_back(anim);
+	return anim;
+	
+}

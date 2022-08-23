@@ -69,7 +69,9 @@ public:
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 	float frameRateLimit = 0.0f;
+	float time = 0.0f;
 	int FPS = 0;
+	float PhyDeltaTime = 0.0f;
 
 	//void Rogy::myTickCallback(btDynamicsWorld *world, btScalar timeStep);
 
@@ -123,6 +125,8 @@ public:
 	// StartUp.
 	void StartUp();
 
+	void OnPhysicsUpdate(float dt);
+
 	void UpdateEntity(Entity* enti);
 
 	bool InitGraphics();
@@ -162,6 +166,7 @@ public:
 		return instance;
 	}
 
+	std::string ProjectResourcesFolder = "res";
 private:
 	void PushAllRenders();
 	bool isPlaying = false;
@@ -170,7 +175,8 @@ private:
 	int lmSetIndex = 0;
 	bool mainSceneLoaded = false;
 	bool gizHovred = false;
-
+	bool Quiting = false;
+	
 #ifdef EDITOR_MODE
 	struct EDIT_ICON
 	{

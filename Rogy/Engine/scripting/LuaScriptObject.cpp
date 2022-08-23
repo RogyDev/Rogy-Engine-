@@ -63,15 +63,19 @@ void ScriptInstance::ResgisterPublicMembers()
 		//std::cout << luaL_typename(L, -2) << " = " << luaL_typename(L, -1) << std::endl;
 		//std::cout << lua_tostring(L, -2) << " = " << lua_tonumber(L, -1) << std::endl;
 		std::string var_name = lua_tostring(L, -2);
-
+		
 		if (lua_isfunction(L, -1) && var_name == "OnStart")
 			hasStart = true;
 		if (lua_isfunction(L, -1) && var_name == "OnUpdate")
 			hasUpdate = true;
+		if (lua_isfunction(L, -1) && var_name == "OnPreUpdate")
+			hasPreUpdate = true;
 		if (lua_isfunction(L, -1) && var_name == "OnDestroy")
 			hasDestroy = true;
 		if (lua_isfunction(L, -1) && var_name == "OnCollision")
 			hasOnCollision = true;
+		if (lua_isfunction(L, -1) && var_name == "OnPhysicsUpdate")
+			hasPhysicsUpdate = true;
 
 		const char* vn = var_name.c_str();
 		if (var_name[0] == '_'/* || lua_isfunction(L, -1)*/)
@@ -80,7 +84,7 @@ void ScriptInstance::ResgisterPublicMembers()
 			continue;
 		}
 
-		if (lua_isinteger(L, -1))
+		if (lua_isnumber(L, -1))
 		{
 			properties.push_back(ScriptVar(VAR_Int, var_name));
 		}
@@ -139,7 +143,7 @@ void ScriptInstance::SetVar(const char* var_name, int val)
 	Use();
 	// Type check
 	lua_getfield(L, -1, var_name);
-	if (!lua_isinteger(L, -1))	return;
+	if (!lua_isnumber(L, -1))	return;
 
 	// Set the field
 	PrepareMethod("set");
@@ -279,7 +283,7 @@ int ScriptInstance::GetVarInt(const char* var_name)
 	Use();
 	lua_getfield(L, -1, var_name);
 
-	if (!lua_isinteger(L, -1))
+	if (!lua_isnumber(L, -1))
 	{
 		CheckVarType(var_name);
 		return 0;
@@ -348,7 +352,7 @@ void ScriptInstance::CheckVarType(const char* var_name)
 	{
 		if (properties[i].name == var_name)
 		{
-			if (lua_isinteger(L, -1))
+			if (lua_isnumber(L, -1))
 				properties[i].type = VAR_Int;
 
 			else if (lua_isnumber(L, -1))
@@ -380,7 +384,8 @@ void ScriptInstance::CallMethod(const char* methodName)
 	lua_rawgeti(L, LUA_REGISTRYINDEX, ref_idx);
 	lua_getfield(L, -1, methodName);
 	lua_pushvalue(L, -2);
-	if (lua_pcall(L, 1, 0, 0)) {
+	if (lua_pcall(L, 1, 0, 0)) 
+	{
 		std::cerr << "execution error : ";
 		std::cerr << lua_tostring(L, -1) << std::endl;
 		last_error = lua_tostring(L, -1);

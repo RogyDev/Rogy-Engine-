@@ -84,6 +84,8 @@ public:
 	bool saving = false;
 
 	// Serialization
+	static glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest);
+	static glm::quat RLookAt(glm::vec3 direction, glm::vec3 desiredUp);
 	static void SerVec3(YAML::Emitter& out, const glm::vec3& v);
 	static void SerQuat(YAML::Emitter& out, const glm::quat& v);
 	static glm::vec3 GetVec3(YAML::Node& out);

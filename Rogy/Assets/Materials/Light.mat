@@ -1,0 +1,25 @@
+Material:
+  - type: 0
+    name: Assets\Materials\Light.mat
+    tag: ""
+    albedo_x: 1
+    albedo_y: 1
+    albedo_z: 1
+    metallic: 0
+    roughness: 0.5
+    ao: 1
+    uv_x: 1
+    uv_y: 1
+    val1: 0
+    val2: 0
+    cutout: false
+    use_emission: true
+    emission_x: 1
+    emission_y: 0.990278661
+    emission_z: 0.67338711
+    emission_power: 26
+    use_tex_albedo: false
+    use_tex_normal: false
+    use_tex_metal: false
+    use_tex_rough: false
+    use_tex_emission: false

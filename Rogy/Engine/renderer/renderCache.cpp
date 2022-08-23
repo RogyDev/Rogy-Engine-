@@ -92,7 +92,7 @@ void RCache::BindTexEmmi(GLuint tex_id)
 
 void RCache::BindTexNormal(GLuint tex_id)
 {
-	if (m_norm != tex_id)
+	//if (m_norm != tex_id)
 	{
 		m_norm = tex_id;
 		glActiveTexture(GL_TEXTURE5);

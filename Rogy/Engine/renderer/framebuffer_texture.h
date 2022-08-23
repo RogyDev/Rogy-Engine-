@@ -10,6 +10,9 @@ public:
 	FrameBufferTex(){}
 	~FrameBufferTex(){}
 
+	unsigned int gPosition;
+	bool isMain = true;
+
 	void Generate(int SCR_W, int SCR_H, bool For3dRendering = true, bool oneColor = false)
 	{
 		if (scr_w == SCR_W && scr_h == SCR_H) return;
@@ -39,6 +42,19 @@ public:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+
+		if (isMain)
+		{
+			glGenTextures(1, &gPosition);
+			glBindTexture(GL_TEXTURE_2D, gPosition);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, SCR_W, SCR_H, 0, GL_RGB, GL_FLOAT, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gPosition, 0);
+			// tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
+			unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+			glDrawBuffers(2, attachments);
+		}
 
 		if (for3dRendering) {
 			// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)	

@@ -12,6 +12,7 @@ void MaterialLibrary::Init()
 {
 	Shader::gNUM_LIGHTS = MAX_LIGHT_COUNT;
 	Shader::gNUM_CASCADES = cascadesCount;
+	Shader::gSHADOW_QUALITY = (int)ShadowQuality;
 
 	// Load Shaders
 	// ------------------------------------------------
@@ -22,8 +23,9 @@ void MaterialLibrary::Init()
 	DepthShader		  .loadShader("core/shaders/ShadowMapping/dir_shadow.rsh");
 	NonShader		  .loadShader("core/shaders/NonShader.rsh");
 	PbrShader		  .loadShader("core/shaders/iblShader.rsh");
-	PbrShaderDisp	  .loadShader("core/shaders/iblShader.rsh", "DISPLACEMENT");
+	//PbrShaderDisp	  .loadShader("core/shaders/iblShader.rsh", "DISPLACEMENT");
 	background		  .loadShader("core/shaders/background.rsh");
+	Atmosphere		  .loadShader("core/shaders/Atmosphere.rsh");
 	PointLightPass	  .loadShader("core/shaders/ShadowMapping/point_shadows_pass.rsh");
 	PointDepthShader  .setShader_g("core/shaders/ShadowMapping/point_shadows_depth.vs", 
 								   "core/shaders/ShadowMapping/point_shadows_depth.fs",
@@ -35,10 +37,21 @@ void MaterialLibrary::Init()
 	mgrass.loadShader("core\\shaders\\grass.rsh");
 	SkelShader.loadShader("core/shaders/Skeletal.rsh");
 	DepthShader_sk.loadShader("core/shaders/ShadowMapping/dir_shadow_sk.rsh");
-	mousePickID.loadShader("core\\shaders\\\MousePick\\MPick.rsh");
+	mousePickID.loadShader("core\\shaders\\MousePick\\MPick.rsh");
 	PbrShader2.loadShader("core/shaders/iblShader.rsh", "DISPLACEMENT");
+	GridShader.loadShader("core/shaders/Grid.rsh");
+	OutlineObject.loadShader("core/shaders/Outline.rsh");
+	OutlineScreen.loadShader("core/shaders/PostProc/OutlineStage.rsh");
 	// Prepare shaders
 	// ------------------------------------------------
+	SetShaderMatraciesPos(PbrShader);
+	SetShaderMatraciesPos(OutlineScreen);
+	SetShaderMatraciesPos(GridShader);
+	SetShaderMatraciesPos(PbrShader2);
+
+	OutlineScreen.use();
+	OutlineScreen.setInt("HighlightTex", 0);
+
 	mgrass.use();
 	mgrass.setInt("BBTexture", 0);
 	mgrass.setInt("shadowMaps", 1);
@@ -79,10 +92,16 @@ void MaterialLibrary::Init()
 	shaderSSAO.setInt("gNormal"  , 6);
 	shaderSSAO.setInt("texNoise" , 7);
 
+	ReflectionShader.use();
+	shaderSSAO.setInt("gPosition", 5);
+
 	// PBR Background
 	background.use();
 	background.setInt("environmentMap", 0);
 	background.setInt("CloudsTex", 1);
+
+	Atmosphere.use();
+	background.setInt("CloudsTex", 0);
 
 	// Billboard shader
 	BillboardShader.use();
@@ -90,8 +109,8 @@ void MaterialLibrary::Init()
 
 	// PBR Shader
 	PbrShader.use();
-	PbrShader.setInt("env_probe.irradianceMap", TEX_IRRADIANCE_MAP);
-	PbrShader.setInt("env_probe.prefilterMap" , TEX_PREFILTER_MAP);
+	//PbrShader.setInt("env_probe.irradianceMap", TEX_IRRADIANCE_MAP);
+	//PbrShader.setInt("env_probe.prefilterMap" , TEX_PREFILTER_MAP);
 
 	PbrShader.setInt("material.tex_albedo"   , TEX_ALBEDO);
 	PbrShader.setInt("material.tex_metal"    , TEX_METALLIC);
@@ -101,19 +120,20 @@ void MaterialLibrary::Init()
 
 	PbrShader.setInt("tex_lightmap" , TEX_AO);
 
-	PbrShader.setInt("shadowMaps[0]", TEX_SHADOWMAP_1);
-	PbrShader.setInt("shadowMaps[1]", TEX_SHADOWMAP_2);
-	PbrShader.setInt("shadowMaps[2]", TEX_SHADOWMAP_3);
+	PbrShader.setInt("shadowMaps", TEX_DIR_SHADOWMAPS);
+
+	PbrShader.setInt("texSpot_shadows", TEX_SPOT_SHADOWMAPS);
+
+	PbrShader.setInt("irradianceMaps", TEX_IRRADIANCE_PROBES);
+	PbrShader.setInt("prefilterMaps", TEX_PREFILTER_PROBES);
 
 	for (int i = 0; i < 8; i++)
 	{
 		PbrShader.setInt(("tex_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + i);
 	}
 
-	for (int i = 0; i < 8; i++)
-	{
-		PbrShader.setInt(("texSpot_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + 8 + i);
-	}
+
+	//PbrShader2.setInt("tex_screenDepth", 6);
 
 	PbrShader.SetVec3("material.albedo", glm::vec3(1));
 	PbrShader.SetFloat("material.ao", 1.0f);
@@ -136,9 +156,7 @@ void MaterialLibrary::Init()
 
 	PbrShader2.setInt("tex_lightmap", TEX_AO);
 
-	PbrShader2.setInt("shadowMaps[0]", TEX_SHADOWMAP_1);
-	PbrShader2.setInt("shadowMaps[1]", TEX_SHADOWMAP_2);
-	PbrShader2.setInt("shadowMaps[2]", TEX_SHADOWMAP_3);
+	PbrShader2.setInt("shadowMaps", TEX_DIR_SHADOWMAPS);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -149,7 +167,7 @@ void MaterialLibrary::Init()
 	{
 		PbrShader2.setInt(("texSpot_shadows[" + std::to_string(i) + "]").c_str(), TEX_CUBE_SHADOWMAP + 8 + i);
 	}
-
+	
 	PbrShader2.SetVec3("material.albedo", glm::vec3(1));
 	PbrShader2.SetFloat("material.ao", 1.0f);
 
@@ -157,7 +175,7 @@ void MaterialLibrary::Init()
 	{
 		PbrShader2.setBool(("p_lights[" + std::to_string(i) + "].active").c_str(), false);
 	}
-	// Displacement Shader
+	// Terrain Shader
 	PbrShaderDisp.use();
 	PbrShaderDisp.setInt("env_probe.irradianceMap", TEX_IRRADIANCE_MAP);
 	PbrShaderDisp.setInt("env_probe.prefilterMap", TEX_PREFILTER_MAP);
@@ -169,9 +187,7 @@ void MaterialLibrary::Init()
 
 	PbrShaderDisp.setInt("tex_lightmap", TEX_AO);
 
-	PbrShaderDisp.setInt("shadowMaps[0]", TEX_SHADOWMAP_1);
-	PbrShaderDisp.setInt("shadowMaps[1]", TEX_SHADOWMAP_2);
-	PbrShaderDisp.setInt("shadowMaps[2]", TEX_SHADOWMAP_3);
+	PbrShaderDisp.setInt("shadowMaps", TEX_DIR_SHADOWMAPS);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -199,9 +215,7 @@ void MaterialLibrary::Init()
 
 	SkelShader.setInt("tex_lightmap", TEX_AO);
 
-	SkelShader.setInt("shadowMaps[0]", TEX_SHADOWMAP_1);
-	SkelShader.setInt("shadowMaps[1]", TEX_SHADOWMAP_2);
-	SkelShader.setInt("shadowMaps[2]", TEX_SHADOWMAP_3);
+	SkelShader.setInt("shadowMaps", TEX_DIR_SHADOWMAPS);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -283,4 +297,50 @@ void MaterialLibrary::Clear()
 {
 	materials.clear();
 	materials.shrink_to_fit();
+
+}
+
+void MaterialLibrary::ReloadShaders()
+{
+	PbrShader.deleteShader();
+	PbrShader2.deleteShader();
+	PbrShaderDisp.deleteShader();
+	SkelShader.deleteShader();
+	DepthShader.deleteShader();
+	DepthShader_sk.deleteShader();
+	PointDepthShader.deleteShader();
+	NonShader.deleteShader();
+	background.deleteShader();
+	Atmosphere.deleteShader();
+	PointLightPass.deleteShader();
+	BillboardShader.deleteShader();
+
+	ShaderGeometryPass.deleteShader();
+	shaderSSAO.deleteShader();
+	SSAOBlur.deleteShader();
+	DebugSH.deleteShader();
+
+	GridShader.deleteShader();
+
+	// Particle System 
+	PsShader.deleteShader();
+	PsShaderShadow.deleteShader();
+
+	LM.deleteShader();
+
+	mgrass.deleteShader();
+
+	mousePickID.deleteShader();
+
+	Init();
+}
+
+void MaterialLibrary::ReloadMainShaders()
+{
+}
+
+void MaterialLibrary::SetShaderMatraciesPos(Shader & a_shader)
+{
+	unsigned int uniformBlockIndex = glGetUniformBlockIndex(a_shader.Program, "Matrices");
+	glUniformBlockBinding(a_shader.Program, uniformBlockIndex, 0);
 }

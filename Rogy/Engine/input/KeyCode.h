@@ -127,11 +127,14 @@ namespace RKey
 	static int CONTROLLER_BUTTON_B = GLFW_GAMEPAD_BUTTON_B;
 	static int CONTROLLER_BUTTON_X = GLFW_GAMEPAD_BUTTON_X;
 	static int CONTROLLER_BUTTON_Y = GLFW_GAMEPAD_BUTTON_Y;
+
 	static int CONTROLLER_BUTTON_BACK = GLFW_GAMEPAD_BUTTON_BACK;
 	static int CONTROLLER_BUTTON_GUIDE = GLFW_GAMEPAD_BUTTON_GUIDE;
 	static int CONTROLLER_BUTTON_START = GLFW_GAMEPAD_BUTTON_START;
+
 	static int CONTROLLER_BUTTON_LEFTSTICK = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
 	static int CONTROLLER_BUTTON_RIGHTSTICK = GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
+
 	static int CONTROLLER_BUTTON_DPAD_UP = GLFW_GAMEPAD_BUTTON_DPAD_UP;
 	static int CONTROLLER_BUTTON_DPAD_DOWN = GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
 	static int CONTROLLER_BUTTON_DPAD_LEFT = GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
@@ -139,8 +142,10 @@ namespace RKey
 
 	static int CONTROLLER_AXIS_LEFTX = GLFW_GAMEPAD_AXIS_LEFT_X;
 	static int CONTROLLER_AXIS_LEFTY = GLFW_GAMEPAD_AXIS_LEFT_Y;
+
 	static int CONTROLLER_AXIS_RIGHTX = GLFW_GAMEPAD_AXIS_RIGHT_X;
 	static int CONTROLLER_AXIS_RIGHTY = GLFW_GAMEPAD_AXIS_RIGHT_Y;
+
 	static int CONTROLLER_AXIS_TRIGGERLEFT = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
 	static int CONTROLLER_AXIS_TRIGGERRIGHT = GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
 
@@ -311,6 +316,20 @@ namespace RKey
 			.addVariable<int>("DownArrow", &RKey::KEY_DOWN, false)
 			.addVariable<int>("LeftArrow", &RKey::KEY_LEFT, false)
 			.addVariable<int>("RightArrow", &RKey::KEY_RIGHT, false)
+
+			.addVariable<int>("ButtonX", &RKey::CONTROLLER_BUTTON_X, false)
+			.addVariable<int>("ButtonY", &RKey::CONTROLLER_BUTTON_Y, false)
+			.addVariable<int>("ButtonA", &RKey::CONTROLLER_BUTTON_A, false)
+			.addVariable<int>("ButtonB", &RKey::CONTROLLER_BUTTON_B, false)
+			.addVariable<int>("ButtonStart", &RKey::CONTROLLER_BUTTON_START, false)
+			.addVariable<int>("ButtonGuid", &RKey::CONTROLLER_BUTTON_GUIDE, false)
+			.addVariable<int>("ButtonBack", &RKey::CONTROLLER_BUTTON_BACK, false)
+			.addVariable<int>("ButtonLStick", &RKey::CONTROLLER_BUTTON_LEFTSTICK, false)
+			.addVariable<int>("ButtonRStick", &RKey::CONTROLLER_BUTTON_RIGHTSTICK, false)
+			.addVariable<int>("ButtonLX", &RKey::CONTROLLER_AXIS_LEFTX, false)
+			.addVariable<int>("ButtonLY", &RKey::CONTROLLER_AXIS_LEFTY, false)
+			.addVariable<int>("ButtonRX", &RKey::CONTROLLER_AXIS_RIGHTX, false)
+			.addVariable<int>("ButtonRY", &RKey::CONTROLLER_AXIS_RIGHTY, false)
 
 			.endNamespace();
 	};

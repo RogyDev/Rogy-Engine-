@@ -68,7 +68,7 @@ public:
 	~Entity();
 
 	bool IsColliding = false;
-	void OnCollision(bool enter, Entity* trgt, glm::vec3 atPos);
+	void OnCollision(bool enter, Entity* trgt, glm::vec3 contactPos = glm::vec3(0.f), glm::vec3 contactNormal = glm::vec3(0.f));
 
 	bool AddScript(ScriptInstance* scr);
 	bool RemoveScript(std::string& scrName);
@@ -133,6 +133,7 @@ public:
 			if (m_components[i]->type_id == T::TYPE_ID)
 			{
 				m_components[i]->removed = true;
+
 				m_components.erase(m_components.begin() + i);
 				return true;
 			}
@@ -189,6 +190,7 @@ public:
 	Entity* Find_entityN(std::string obj_name, Entity* in_obj);
 	Entity* GetChild(std::string obj_name);
 	Entity* GetChildWithTag(Entity* in_obj, std::string obj_tag);
+	Entity* GetParentWithTag(Entity* in_obj, std::string obj_tag);
 
 	void BroadcastFunc(Entity* in_obj, std::string func_name);
 
@@ -203,6 +205,9 @@ public:
 	bool doRBActive = false;
 	bool dontDestroyOnLoad = false;
 	RPhyBodyCollMode m_CollMode = RB_COLLISION_NONE;
+
+	glm::vec3 ContactPos, ContactNormal;
+
 private:
 	bool willDestroy = false;
 	float destroyIn = 0.0f;

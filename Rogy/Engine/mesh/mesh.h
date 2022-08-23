@@ -60,6 +60,7 @@ public:
 	std::string name;
 	std::string path;
 	int index;
+	int ModelID;
 	glm::mat4 transformation;
 	bool isDisplacement = false;
 	bool init = false;
@@ -90,6 +91,17 @@ public:
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
+
+	void DrawInstanced(int amount)
+	{
+		// draw mesh
+		glBindVertexArray(VAO);
+		//glDrawArraysInstanced(GL_TRIANGLES, 0, indices.size(), amount);
+		glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, amount);
+		//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+	}
+
 
 	void clear()
 	{

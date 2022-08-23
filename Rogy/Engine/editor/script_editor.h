@@ -35,6 +35,7 @@ public:
 	void SaveScript(std::string path);
 
 	void Render(ImFont* code_font = nullptr);
+	bool scriptOpend = false;
 
 private:
 

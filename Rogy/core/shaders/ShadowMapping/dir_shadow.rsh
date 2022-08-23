@@ -7,10 +7,12 @@ out vec2 TexCoords;
 
 // Uniforms
 uniform mat4 lightSpaceMatrix;
-uniform mat4 model;
+//uniform mat4 model;
+uniform mat4[100] models;
 
 void main() 
 {
+	mat4 model = models[gl_InstanceID];
 	TexCoords = aTexCoords;
 	gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
 }
@@ -26,9 +28,12 @@ void main()
 {
 	if(use_alpha)
 	{
-		vec3 tr = texture(alpha, TexCoords).rgb;
-	 	if((tr.r) < 0.5)
+		if((texture(alpha, TexCoords).a) < 0.5)
        		discard;
+
+		/*vec3 tr = texture(alpha, TexCoords).rgb;
+	 	if((tr.r) < 0.5)
+       		discard;*/
 	}
 	//fragmentdepth = gl_FragCoord.z;
 }

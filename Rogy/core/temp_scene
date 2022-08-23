@@ -1,37 +1,42 @@
 Renderer:
-  - SkyPath: core\textures\background.jpg
+  - UseDynamicSky: true
+    SkyPath: C:\Backup\Rogy\Rogy\FPSDemo\Scenes\CLOUDS1.png
     UseClouds: false
     postProc_Use: true
-    usefog: true
-    fogNear: 100
-    fogFar: 500
-    AmbientLevel: 1.5
-    fogColor: [0, 0.165459216, 0.28761059]
+    usefog: false
+    fogNear: 40
+    fogFar: 300
+    AmbientLevel: 0.5
+    fogColor: [1, 1, 1]
+    SkyColor: [5.5, 13, 22.3999996]
   - ToneMap: 0
     vignette_use: true
     vignette_softness: 1
-    vignette_radius: 1
+    vignette_radius: 1.20000005
     bloom_use: true
-    bloom_threshold: 2
-    sharpen: true
-    sharpen_amount: 7
+    bloom_threshold: 1
+    sharpen: false
+    sharpen_amount: 0.200000003
     cc_use: true
-    cc_brightness: 0.00999999978
-    cc_saturation: 0.300000012
-    cc_contrast: 1.5
+    cc_brightness: 0
+    cc_saturation: 0.100000001
+    cc_contrast: 1
     use_ssao: true
-    kernelSize: 10
-    radius: 10
-    ssao_power: 200
+    kernelSize: 5
+    radius: 7.98999977
+    ssao_power: 1
     bias: 0.100000001
+    blurAmount: 1
     mb_use: false
-    exposure: 3
-Scene: Scene33
+    exposure: 0.600000024
+    blur_use: false
+    Fxaa: false
+Scene: Scene
 Entities:
   - Entity: 4294967295
     Root: true
     IsPrefab: false
-    name: Scene33
+    name: Scene
     tag: default
     Active: true
     Static: false
@@ -47,46 +52,50 @@ Entities:
     script_count: 0
     Scripts:
       []
-    ChildCount: 61
-  - Entity: 298
+    ChildCount: 46
+  - Entity: 0
     Root: false
     IsPrefab: false
-    name: Grid
+    name: Cube
     tag: default
     Active: true
     Static: true
     m_CollMode: 0
     Transform:
-      Position: [0, -1.42108564e-14, 2.38418579e-07]
-      Rotation: [-0.707106769, -0, 0, 0.707106769]
-      Scale: [10.0100002, 9.99997425, 9.99997425]
-      Angels: [-90, -0, 0]
+      Position: [0, -1.76901531, 0]
+      Rotation: [0, 0, 0, 1]
+      Scale: [200, 1, 200]
+      Angels: [0, 0, 0]
     comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap0.tga
-          mat_name: TexturesCom_Wall_ConcreteBunker5_5x2.5_1K_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Wall_ConcreteBunker5_5x2.5_1K_albedo.mat
+          lightmapPath: ""
+          mat_name: Gravel.mat
+          mat_source: FPSDemo\ObjPlacement\Gravel032_1K-JPG\Gravel.mat
           HasMesh: true
-          mesh_source: res\PBR\Concrate\ground.fbx
+          mesh_source: core\models\cube.fbx
           mesh_index: 0
       - RigidBody:
-          m_CollisionType: 3
+          m_CollisionType: 0
           m_BodyMode: 1
           Mass: 1
           LinerDamping: 0.00999999978
           AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
           is_trigger: false
+          is_kinematic: false
           mScaleMultiplier: [1, 1, 1]
           mOffset: [0, 0, 0]
-          mesh_path: res\PBR\Concrate\ground.fbx
+          mesh_path: ""
+          mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 299
+  - Entity: 1
     Root: false
     IsPrefab: false
     name: Directional Light
@@ -96,1473 +105,463 @@ Entities:
     m_CollMode: 0
     Transform:
       Position: [0, 0, 0]
-      Rotation: [0.303069204, -0.356276572, -0.123371832, -0.875211656]
-      Scale: [1, 1, 1]
-      Angels: [-38.2000008, -315.700012, 0]
+      Rotation: [-0.210034013, 0.25016582, 0.05568951, 0.94350493]
+      Scale: [23.6000004, 1, 1]
+      Angels: [-25.1000004, 29.7000008, 0]
     comp_count: 1
     Components:
       - DirectionalLight:
           enabled: true
-          Color: [0.996207714, 1, 0.893805325]
-          Bias: 0.00100000005
+          Color: [1, 0.960397184, 0.899193525]
+          Bias: 0.00300000003
           CastShadows: true
           Intensity: 1
-          Soft: true
+          Soft: false
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 300
+  - Entity: 2
     Root: false
     IsPrefab: false
-    name: Cube
+    name: House
     tag: default
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
-      Position: [-32.7214279, -0.0249872766, 11.8496504]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [2.70018411, 1.86337638, 1.86337638]
-      Angels: [-90, 180, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap2.tga
-          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
-          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
-          HasMesh: true
-          mesh_source: res\PBR\wall3\wall.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [0.200000003, 16.2999992, 3.5999999]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 301
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [32.9495659, -0.0249887705, -13.0967455]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [2.70076442, 1.86366653, 1.86366653]
-      Angels: [-90, 180, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap3.tga
-          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
-          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
-          HasMesh: true
-          mesh_source: res\PBR\wall3\wall.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 302
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-32.6724396, -0.0249887612, -13.2701473]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [2.70022988, 1.86339927, 1.86339927]
-      Angels: [-90, 180, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap4.tga
-          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
-          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
-          HasMesh: true
-          mesh_source: res\PBR\wall3\wall.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 303
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [32.9495659, -0.0249872208, 11.8496504]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [2.70037699, 1.86347282, 1.86347282]
-      Angels: [-90, 180, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap5.tga
-          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
-          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
-          HasMesh: true
-          mesh_source: res\PBR\wall3\wall.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [0.200000003, 16.2999992, 3.5999999]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 304
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [32.9495659, -0.0249880236, -0.604959071]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [2.70057106, 1.86356986, 1.86356986]
-      Angels: [-90, 180, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap6.tga
-          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
-          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
-          HasMesh: true
-          mesh_source: res\PBR\wall3\wall.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 305
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [16.3343582, -0.0249852967, -12.0831547]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [2.69986582, 1.86321723, 1.86321723]
-      Angels: [-90, 180, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap7.tga
-          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
-          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
-          HasMesh: true
-          mesh_source: res\PBR\wall3\wall.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [0.200000003, 2.70000005, 3.5]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 306
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [0, 3.22954178, 18.6815643]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0, 1]
-      Scale: [33, 3.5999999, 1]
+      Scale: [1, 1, 1]
       Angels: [0, 0, 0]
-    comp_count: 2
+    comp_count: 0
     Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap8.tga
-          mat_name: TexturesCom_Wall_Stucco6E_2x2_1K_albedo.mat
-          mat_source: res\PBR\wall3\TexturesCom_Wall_Stucco6E_2x2_1K_albedo.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
       []
-    ChildCount: 0
-  - Entity: 307
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [0, 3.22954178, -18.105114]
-      Rotation: [0, 0, 0, 1]
-      Scale: [33, 3.5999999, 1]
-      Angels: [0, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap9.tga
-          mat_name: TexturesCom_Wall_Stucco6E_2x2_1K_albedo.mat
-          mat_source: res\PBR\wall3\TexturesCom_Wall_Stucco6E_2x2_1K_albedo.mat
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 308
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-32.6724396, -0.0249880236, -0.604953527]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [2.70035577, 1.86346221, 1.86346221]
-      Angels: [-90, 180, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap10.tga
-          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
-          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
-          HasMesh: true
-          mesh_source: res\PBR\wall3\wall.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 309
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-18.1951542, -0.024987936, 10.491972]
-      Rotation: [3.09086197e-08, 0.707106769, 0.707106769, -3.09086197e-08]
-      Scale: [2.70017719, 1.86337292, 1.86337292]
-      Angels: [-90, 180, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap11.tga
-          mat_name: TexturesCom_Stripes0097_2_seamless_S.mat
-          mat_source: res\PBR\wall3\TexturesCom_Stripes0097_2_seamless_S.mat
-          HasMesh: true
-          mesh_source: res\PBR\wall3\wall.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [0.200000003, 2.70000005, 3.5]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 310
-    Root: false
-    IsPrefab: false
-    name: Cylinder.005
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [25.7440434, 4.93798399, 14.6293306]
-      Rotation: [0.884350836, 0.158323199, -0.0773904771, -0.432282358]
-      Scale: [1.5, 1.5, 1.49999988]
-      Angels: [-127.900002, 0, 20.2999992]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: TexturesCom_Various_TireCar_1K_albedo.mat
-          mat_source: res\PBR\Wheels Arch\TexturesCom_Various_TireCar_1K_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Wheels Arch\wheels.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 3
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-          mesh_path: res\PBR\Wheels Arch\wheels.fbx
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 311
-    Root: false
-    IsPrefab: false
-    name: Cylinder.005
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [-15.7190895, 4.53888512, 14.3721046]
-      Rotation: [0.884350836, 0.158323199, -0.0773904771, -0.432282358]
-      Scale: [1.5, 1.5, 1.49999988]
-      Angels: [-127.900002, 0, 20.2999992]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: TexturesCom_Various_TireCar_1K_albedo.mat
-          mat_source: res\PBR\Wheels Arch\TexturesCom_Various_TireCar_1K_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Wheels Arch\wheels.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 3
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-          mesh_path: res\PBR\Wheels Arch\wheels.fbx
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 312
-    Root: false
-    IsPrefab: false
-    name: Cylinder.005
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [12.1456537, 4.53888512, -6.71440125]
-      Rotation: [0.884350836, 0.158323199, -0.0773904771, -0.432282358]
-      Scale: [1.5, 1.5, 1.49999988]
-      Angels: [-127.900002, 0, 20.2999992]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: TexturesCom_Various_TireCar_1K_albedo.mat
-          mat_source: res\PBR\Wheels Arch\TexturesCom_Various_TireCar_1K_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Wheels Arch\wheels.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 3
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-          mesh_path: res\PBR\Wheels Arch\wheels.fbx
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 313
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [4.16043043, -0.00530407159, 14.333766]
-      Rotation: [-0.383045554, 0.594370365, 0.594370306, 0.383045554]
-      Scale: [1.99999928, 1.99999928, 2]
-      Angels: [-90, 114.400002, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap15.tga
-          mat_name: crate.mat
-          mat_source: res\PBR\Crate\crate.mat
-          HasMesh: true
-          mesh_source: res\PBR\Crate\crate.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 2]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 314
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-16.2592659, -0.00530779362, 6.43733931]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [1.5, 1.49990487, 1.49990487]
-      Angels: [-90, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap16.tga
-          mat_name: crate.mat
-          mat_source: res\PBR\Crate\crate.mat
-          HasMesh: true
-          mesh_source: res\PBR\Crate\crate.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 2]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 315
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [29.8787003, -0.00530588441, -14.4805975]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [1.99999928, 1.9996388, 1.99963951]
-      Angels: [-90, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap17.tga
-          mat_name: crate.mat
-          mat_source: res\PBR\Crate\crate.mat
-          HasMesh: true
-          mesh_source: res\PBR\Crate\crate.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 2]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 316
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-4.89136171, -0.00530779362, -11.0291424]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [1.5, 1.49997115, 1.49997115]
-      Angels: [-90, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap18.tga
-          mat_name: crate.mat
-          mat_source: res\PBR\Crate\crate.mat
-          HasMesh: true
-          mesh_source: res\PBR\Crate\crate.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 2]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 317
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-7.08120728, -0.0053059049, -14.853858]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [1.99999928, 1.99987149, 1.99987221]
-      Angels: [-90, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap19.tga
-          mat_name: crate.mat
-          mat_source: res\PBR\Crate\crate.mat
-          HasMesh: true
-          mesh_source: res\PBR\Crate\crate.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 2]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 318
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-29.7144623, -0.00530588627, -14.3884926]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [1.99999928, 1.99978805, 1.99978876]
-      Angels: [-90, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap20.tga
-          mat_name: crate.mat
-          mat_source: res\PBR\Crate\crate.mat
-          HasMesh: true
-          mesh_source: res\PBR\Crate\crate.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 2]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 319
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-20.6998844, 0.211341918, 15.5875931]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [1.99999928, 1.99965906, 1.99965978]
-      Angels: [-90, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap21.tga
-          mat_name: crate.mat
-          mat_source: res\PBR\Crate\crate.mat
-          HasMesh: true
-          mesh_source: res\PBR\Crate\crate.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 2]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 320
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [13.4777374, -0.00530593051, -14.8844662]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [1.99999928, 1.99968028, 1.999681]
-      Angels: [-90, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap22.tga
-          mat_name: crate.mat
-          mat_source: res\PBR\Crate\crate.mat
-          HasMesh: true
-          mesh_source: res\PBR\Crate\crate.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 2]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 321
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-17.8220367, 0.082564868, -10.7050018]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.999999881, 0.999772429, 0.999677718]
-      Angels: [-90, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap23.tga
-          mat_name: TexturesCom_Metal_Corrugated2_1K_albedo.mat
-          mat_source: res\PBR\Tank\TexturesCom_Metal_Corrugated2_1K_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Tank\tank.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 3
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-          mesh_path: res\PBR\Tank\tank.fbx
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 322
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [7.91566515, 0.082566835, 8.78658009]
-      Rotation: [-0.696471035, 0.122180052, 0.122180052, 0.696471155]
-      Scale: [0.999999881, 0.999846339, 0.99975872]
-      Angels: [-90, 19.8999996, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap24.tga
-          mat_name: TexturesCom_Metal_Corrugated2_1K_albedo.mat
-          mat_source: res\PBR\Tank\TexturesCom_Metal_Corrugated2_1K_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Tank\tank.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 3
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          is_trigger: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-          mesh_path: res\PBR\Tank\tank.fbx
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 323
-    Root: false
-    IsPrefab: false
-    name: Mesh
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [-0.278865814, 3.79490519, -13.4588108]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [0.0604517497, 0.0604433939, 0.0604433939]
-      Angels: [-90, 0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: dvig_diffuse.mat
-          mat_source: res\Models\Dvig\dvig_diffuse.mat
-          HasMesh: true
-          mesh_source: res\Models\Dvig\Dvig.fbx
-          mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 1
-  - Entity: 324
+  - Entity: 3
     Root: false
     IsPrefab: false
     name: Cube
     tag: default
-    Active: false
+    Active: true
     Static: true
     m_CollMode: 0
     Transform:
-      Position: [53.5999985, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [82.0999985, 50, 42.5]
-      Angels: [0, 0, 0]
-    comp_count: 1
+      Position: [8.51155949, -0.668673158, 7.80869532]
+      Rotation: [-0.242984161, -0, 0, 0.970030248]
+      Scale: [1.38137865, 0.25000003, 0.830174685]
+      Angels: [-28.1254692, -0, 0]
+    comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap26.tga
+          lightmapPath: ""
+          mat_name: Blend.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Blend.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 4
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [23.8099861, 2.98138499, 18.0776653]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 5
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [12.0607061, 11.1826305, 8.25110054]
+      Rotation: [0, 0, 0, 1]
+      Scale: [12.3690128, 4.24084091, 0.606720209]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 6
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [16.7212563, 7.29502916, 18.2170715]
+      Rotation: [-0.705870867, -0, 0, 0.708340585]
+      Scale: [0.330000013, 9.96108627, 8.25899315]
+      Angels: [-89.799881, -0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 7
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [8.28533745, 5.86747265, 8.15545082]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1.7010076, 1.07820892, 0.39047128]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 8
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [8.35214901, 6.09832621, 27.5630379]
+      Rotation: [0, 0, 0, 1]
+      Scale: [8.20635033, 0.829277873, 0.230000004]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 9
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [12.0563564, 11.4957266, 17.7607727]
+      Rotation: [0, 0, 0, 1]
+      Scale: [12.2882662, 4.24875641, 10]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Blend.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Blend.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 10
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [12.0607061, 11.1923141, 27.1863174]
+      Rotation: [0, 0, 0, 1]
+      Scale: [12.3690128, 4.28632498, 0.606720209]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 11
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [12.111804, 7.34628201, 17.7607727]
+      Rotation: [0, 0, 0, 1]
+      Scale: [12.3437138, 0.5, 10]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 12
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [2.7906518, 0.933374405, 17.0274448]
+      Rotation: [0, -0.252069384, 0, 0.967709184]
+      Scale: [1, 1, 1]
+      Angels: [0, -29.2000027, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
           mat_name: ""
           mat_source: ""
           HasMesh: true
           mesh_source: core\models\cube.fbx
           mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 325
-    Root: false
-    IsPrefab: false
-    name: Cube.002
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [20.0483665, 1.30822514e-06, 5.20156193]
-      Rotation: [-0.10329634, -0.699521124, -0.699521124, 0.10329634]
-      Scale: [1.29960275, 1.30000007, 1.29981542]
-      Angels: [-90, -163.199997, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap27.tga
-          mat_name: TexturesCom_Wood.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\wood.fbx
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 326
-    Root: false
-    IsPrefab: false
-    name: Cube.002
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-10.4916544, 3.105676e-07, -4.84486437]
-      Rotation: [-0.644205272, -0.291546881, -0.291546881, 0.644205272]
-      Scale: [1.29999995, 1.30000007, 1.29999995]
-      Angels: [-90, -48.7000008, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap28.tga
-          mat_name: TexturesCom_Wood.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\wood.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 327
-    Root: false
-    IsPrefab: false
-    name: Cube.002
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-12.2741013, 1.44686101e-06, 8.75332928]
-      Rotation: [-0.10329634, -0.699521124, -0.699521124, 0.10329634]
-      Scale: [1.29989302, 1.30000007, 1.29995024]
-      Angels: [-90, -163.199997, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap29.tga
-          mat_name: TexturesCom_Wood.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\wood.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 328
-    Root: false
-    IsPrefab: false
-    name: Cube.002
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [12.6898403, 1.3030218e-06, 7.106812]
-      Rotation: [-0.10329634, -0.699521124, -0.699521124, 0.10329634]
-      Scale: [1.29982054, 1.30000007, 1.29991627]
-      Angels: [-90, -163.199997, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap30.tga
-          mat_name: TexturesCom_Wood.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\wood.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 329
-    Root: false
-    IsPrefab: false
-    name: Cube.002
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [16.5119324, 1.30570936e-06, 6.19925261]
-      Rotation: [-0.10329634, -0.699521124, -0.699521124, 0.10329634]
-      Scale: [1.29976118, 1.30000007, 1.29988849]
-      Angels: [-90, -163.199997, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap31.tga
-          mat_name: TexturesCom_Wood.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\wood.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 330
-    Root: false
-    IsPrefab: false
-    name: NurbsPath
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [22.6182632, 0.17952852, -5.26933575]
-      Rotation: [0.705116332, 0.0530179702, -0.0530179702, 0.705116332]
-      Scale: [2.99999976, 2.9996798, 2.99959111]
-      Angels: [90, 8.60000038, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap32.tga
-          mat_name: TexturesCom_Wood.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\jaba.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 331
-    Root: false
-    IsPrefab: false
-    name: NurbsPath
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-7.62728786, 0.179528698, 6.80730772]
-      Rotation: [0.707106769, 0, 0, 0.707106769]
-      Scale: [3, 2.99969149, 2.99969149]
-      Angels: [90, -0, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap33.tga
-          mat_name: TexturesCom_Wood.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Wood.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\jaba.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 332
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [19.3864517, -0.113603935, 16.6979713]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap34.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 333
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [0.358214974, -0.141717076, 16.3198032]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap35.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 334
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [3.90760374, -0.141717091, 10.2437983]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap36.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 335
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-13.4642353, 0.0147693157, 16.1732635]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap37.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 336
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-29.6591949, 0.104237676, 9.07617474]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap38.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 337
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-31.224123, -0.162545919, -9.93251514]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap39.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 338
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-26.3309402, -0.113608599, -15.4734898]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap40.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 339
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [-10.4220648, -0.113605931, -15.6897669]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap41.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 340
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [12.598361, -0.113605998, -11.1829262]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap42.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 341
-    Root: false
-    IsPrefab: false
-    name: Grid
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [30.5236645, -0.113606043, -11.5229073]
-      Rotation: [-0.707105696, -0.0012341335, -0.0012341335, 0.707105696]
-      Scale: [5, 5, 2.5]
-      Angels: [-90, -0.200000003, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap43.tga
-          mat_name: TexturesCom_Ground_Rubble_512_albedo.mat
-          mat_source: res\PBR\Concrate\TexturesCom_Ground_Rubble_512_albedo.mat
-          HasMesh: true
-          mesh_source: res\PBR\Concrate\pile.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 342
-    Root: false
-    IsPrefab: false
-    name: Plane
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [22.7022743, 0.0392496027, -4.39543343]
-      Rotation: [0, 0.707106769, 0, 0.707106769]
-      Scale: [7.69921732, 1, 11.498435]
-      Angels: [0, 90, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: Decal2.mat
-          mat_source: res\Textures\Decal2.mat
-          HasMesh: true
-          mesh_source: core\models\plane.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 343
-    Root: false
-    IsPrefab: false
-    name: Plane
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [3.95146561, 0.039251741, -4.75450182]
-      Rotation: [0, 0.707106769, 0, 0.707106769]
-      Scale: [7.69993734, 1, 11.4998751]
-      Angels: [0, 90, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: Decal2.mat
-          mat_source: res\Textures\Decal2.mat
-          HasMesh: true
-          mesh_source: core\models\plane.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 344
-    Root: false
-    IsPrefab: false
-    name: Plane
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [-20.6426144, 0.0392515324, -0.874378443]
-      Rotation: [0, 0.707106769, 0, 0.707106769]
-      Scale: [7.69966841, 1, 11.4993372]
-      Angels: [0, 90, 0]
-    comp_count: 1
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: Decal2.mat
-          mat_source: res\Textures\Decal2.mat
-          HasMesh: true
-          mesh_source: core\models\plane.fbx
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 345
+  - Entity: 13
     Root: false
     IsPrefab: false
     name: Cube
@@ -1571,20 +570,20 @@ Entities:
     Static: true
     m_CollMode: 0
     Transform:
-      Position: [-29.5321407, -0.00530599523, 3.30148268]
-      Rotation: [-0.707106769, 0, 0, 0.707106769]
-      Scale: [1.99999928, 1.99974048, 1.9997412]
-      Angels: [-90, 0, 0]
+      Position: [29.4155102, 2.9813869, -38.693615]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
     comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
-          lightmapPath: Lightmaps\Scene33\lightmap44.tga
-          mat_name: crate.mat
-          mat_source: res\PBR\Crate\crate.mat
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
           HasMesh: true
-          mesh_source: res\PBR\Crate\crate.fbx
+          mesh_source: core\models\cube.fbx
           mesh_index: 0
       - RigidBody:
           m_CollisionType: 0
@@ -1592,24 +591,238 @@ Entities:
           Mass: 1
           LinerDamping: 0.00999999978
           AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
           is_trigger: false
-          mScaleMultiplier: [1, 1, 2]
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
           mOffset: [0, 0, 0]
           mesh_path: ""
+          mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 346
+  - Entity: 14
     Root: false
     IsPrefab: false
-    name: Player
-    tag: Player
+    name: Cube
+    tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [-18.2719765, 2.43595552, 0.0485320091]
+      Position: [23.8099861, 2.98138499, 27.2419777]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 15
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [8.35214901, 0.670425773, 27.5741978]
+      Rotation: [0, 0, 0, 1]
+      Scale: [8.20635033, 1.70714557, 0.127226129]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 16
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [3.35358, 2.83056307, 8.14957142]
+      Rotation: [0, 0, 0, 1]
+      Scale: [3.64837766, 4.11511898, 0.396350682]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 18
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-0.010761261, 7.20221424, 17.7595406]
+      Rotation: [-0.705870867, -0, 0, 0.708340585]
+      Scale: [1.09469306, 9.95999908, 8.35311985]
+      Angels: [-89.799881, -0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 19
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [13.2157211, 2.83056307, 8.14957142]
+      Rotation: [0, 0, 0, 1]
+      Scale: [3.34277892, 4.11511898, 0.396350682]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 20
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [26.2593975, -1.66100108e-06, -32.8775482]
       Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
       Angels: [0, 0, 0]
@@ -1622,46 +835,78 @@ Entities:
           mat_name: ""
           mat_source: ""
           HasMesh: true
-          mesh_source: core\models\capsule.fbx
+          mesh_source: core\models\cube.fbx
           mesh_index: 0
       - RigidBody:
-          m_CollisionType: 2
-          m_BodyMode: 2
+          m_CollisionType: 0
+          m_BodyMode: 1
           Mass: 1
           LinerDamping: 0.00999999978
           AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
           is_trigger: false
+          is_kinematic: false
           mScaleMultiplier: [1, 1, 1]
           mOffset: [0, 0, 0]
           mesh_path: ""
-    script_count: 1
+          mesh_index: 0
+    script_count: 0
     Scripts:
-      - class_name: Charactar
-        Script_Properties:
-          - 4
-          - JumpHeight
-          - 3
-          - 4
-          - Speed
-          - 1
-          - 1200
-          - LookSpeed
-          - 1
-          - 50
-          - maxCamSpin
-          - 1
-          - 90
-    ChildCount: 1
-  - Entity: 347
+      []
+    ChildCount: 0
+  - Entity: 21
     Root: false
     IsPrefab: false
-    name: Cam
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [14.1533079, 0.923893034, 12.1058121]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1, 1, 1]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: ""
+          mat_source: ""
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 22
+    Root: false
+    IsPrefab: false
+    name: FreeCam
     tag: default
     Active: true
     Static: false
     m_CollMode: 0
     Transform:
-      Position: [0, 1.53691173, 0]
+      Position: [8.50040436, 5.80000019, -4.40375042]
       Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
       Angels: [0, 0, 0]
@@ -1669,247 +914,1016 @@ Entities:
     Components:
       - CameraComponent:
           FOV: 70
-          FarView: 300
-          NearView: 0.00100000005
+          FarView: 700
+          NearView: 0.00999999978
           Primary: true
-    script_count: 0
+    script_count: 1
     Scripts:
-      []
+      - class_name: FreeCam
+        Script_Properties:
+          - 2
+          - MaxCamSpin
+          - 1
+          - 90
+          - LookSpeed
+          - 1
+          - 8
     ChildCount: 0
-  - Entity: 348
+  - Entity: 23
     Root: false
     IsPrefab: false
-    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
+    name: Cube
     tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [152.258011, -7.30505848, -41.0646133]
-      Rotation: [-0.49999997, 0.49999997, 0.49999997, 0.49999997]
-      Scale: [0.199976578, 0.199976578, 0.199976578]
-      Angels: [-90, 90, 0]
-    comp_count: 1
+      Position: [39.9869461, -0.358493149, 20.895813]
+      Rotation: [0, 0, 0, 1]
+      Scale: [5, 0.5, 5]
+      Angels: [0, 0, 0]
+    comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
           lightmapPath: ""
-          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
-          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_name: Red.mat
+          mat_source: FPSDemo\Materials\Red.mat
           HasMesh: true
-          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 349
+  - Entity: 24
     Root: false
     IsPrefab: false
-    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
+    name: Cube
     tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [154.302292, 13.5821495, 152.176758]
-      Rotation: [-0.681882024, 0.187181547, 0.187181547, 0.681882024]
-      Scale: [0.199974909, 0.199972808, 0.199972793]
-      Angels: [-90, 30.7000008, 0]
-    comp_count: 1
+      Position: [13.358984, 0, -22.0313797]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1, 1, 1]
+      Angels: [0, 0, 0]
+    comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
           lightmapPath: ""
-          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
-          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_name: ""
+          mat_source: ""
           HasMesh: true
-          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 350
+  - Entity: 25
     Root: false
     IsPrefab: false
-    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
+    name: Cube
     tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [-134.565521, -7.30505371, -26.8628521]
-      Rotation: [-0.49999997, 0.49999997, 0.49999997, 0.49999997]
-      Scale: [0.199987158, 0.199987158, 0.199987158]
-      Angels: [-90, 90, 0]
-    comp_count: 1
+      Position: [29.0038414, 1.90734863e-06, -8.63895416]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1, 1, 1]
+      Angels: [0, 0, 0]
+    comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
           lightmapPath: ""
-          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
-          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_name: ""
+          mat_source: ""
           HasMesh: true
-          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 351
+  - Entity: 26
     Root: false
     IsPrefab: false
-    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
+    name: Cube
     tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [-4.49469566, -7.30505371, -100.865227]
-      Rotation: [-0.705898464, 0.0413199402, 0.0413199402, 0.705898464]
-      Scale: [0.199987158, 0.199987113, 0.199987158]
-      Angels: [-90, 6.69999981, 0]
-    comp_count: 1
+      Position: [23.8099861, 2.98138499, 8.63486195]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
           lightmapPath: ""
-          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
-          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
           HasMesh: true
-          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 352
+  - Entity: 27
     Root: false
     IsPrefab: false
-    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
+    name: Cube
     tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [-16.4354706, -7.30505371, 112.527359]
-      Rotation: [-0.0511717945, -0.705252707, -0.705252707, 0.0511717945]
-      Scale: [0.199981153, 0.199984089, 0.199983254]
-      Angels: [-90, -171.699997, 0]
-    comp_count: 1
+      Position: [18.0124798, 2.98138499, -23.8961678]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
           lightmapPath: ""
-          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
-          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
           HasMesh: true
-          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 353
+  - Entity: 28
     Root: false
     IsPrefab: false
-    name: S_Nordic_Beach_Rock_Formation_vfgkajyga_lod5_Var1
+    name: Cube
     tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [-164.498016, 13.5821495, 152.176758]
-      Rotation: [-0.70073092, -0.094742544, -0.094742544, 0.70073092]
-      Scale: [0.199974909, 0.19997482, 0.199975565]
-      Angels: [-90, -15.3999996, 0]
-    comp_count: 1
+      Position: [-6.48805237, 2.98138499, -6.43272018]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
     Components:
       - RendererComponent:
           enabled: true
           CastShadows: true
           lightmapPath: ""
-          mat_name: T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
-          mat_source: res\Models\Rock\T_Nordic_Beach_Rock_Formation_vfgkajyga_1K_D.mat
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
           HasMesh: true
-          mesh_source: res\Models\Rock\S_Nordic_Beach_Rock.FBX
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
           mesh_index: 0
     script_count: 0
     Scripts:
       []
     ChildCount: 0
-  - Entity: 354
+  - Entity: 29
     Root: false
-    IsPrefab: true
-    name: Tree4
+    IsPrefab: false
+    name: Cube
+    tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [13.6384106, 2.05362177, -21.4667435]
-      Rotation: [-0.707106769, -0, 0, 0.707106769]
-      Scale: [4, 3.99971342, 3.99971342]
-      Angels: [-90, -0, 0]
-    path: res\Tree\Tree4.rbp
-  - Entity: 356
+      Position: [60.3114815, 2.9813869, -4.71281242]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 30
     Root: false
-    IsPrefab: true
-    name: Tree4
+    IsPrefab: false
+    name: Cube
+    tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [-58.0153542, 3.19670701, -31.0576649]
-      Rotation: [-0.707106769, -0, 0, 0.707106769]
-      Scale: [4, 3.99988437, 3]
-      Angels: [-90, -0, 0]
-    path: res\Tree\Tree4.rbp
-  - Entity: 358
+      Position: [35.3684006, 2.98138666, -11.429493]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 31
     Root: false
-    IsPrefab: true
-    name: Tree4
+    IsPrefab: false
+    name: Cube
+    tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [18.7790928, -1.08143151, 30.7955189]
-      Rotation: [-0.707106769, -0, 0, 0.707106769]
-      Scale: [4, 3.99989748, 3.99989748]
-      Angels: [-90, -0, 0]
-    path: res\Tree\Tree4.rbp
-  - Entity: 360
+      Position: [48.0104637, 2.98138666, -24.8891907]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 32
     Root: false
-    IsPrefab: true
-    name: Tree4
+    IsPrefab: false
+    name: Cube
+    tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [43.9444695, -1.08143163, -5.84122086]
-      Rotation: [-0.707106769, -0, 0, 0.707106769]
-      Scale: [4, 3.99986577, 3.99986577]
-      Angels: [-90, -0, 0]
-    path: res\Tree\Tree4.rbp
-  - Entity: 362
+      Position: [68.6630478, 2.98138475, -38.57864]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 33
     Root: false
-    IsPrefab: true
-    name: Tree4
+    IsPrefab: false
+    name: Cube
+    tag: default
     Active: true
-    Static: false
+    Static: true
     m_CollMode: 0
     Transform:
-      Position: [-54.9677734, 3.19670701, 11.1892366]
-      Rotation: [-0.707106769, -0, 0, 0.707106769]
-      Scale: [4, 3.99992299, 3.99992299]
-      Angels: [-90, -0, 0]
-    path: res\Tree\Tree4.rbp
-  - Entity: 364
+      Position: [55.5505142, 2.98138499, -21.0802021]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 34
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [78.1922836, 2.98138857, -98.216301]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 35
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [64.6465912, 2.98138499, -9.66028023]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 36
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [86.2323456, 2.98138475, -16.2263374]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 37
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [88.8032532, 2.98138475, -36.5828438]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 38
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [99.9720078, 2.98138356, -80.9830627]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 39
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [72.1955032, 2.98138332, -76.9978333]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 40
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [50.139267, 2.98138523, -91.2784653]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 41
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [25.0174637, 2.98138595, -70.5460892]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 42
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [49.8190422, 2.98138666, -56.7831764]
+      Rotation: [0, 0, 0, 1]
+      Scale: [0.600000024, 3.98138499, 0.600000024]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Plaster002_1K_Color - Copy.mat
+          mat_source: FPSDemo\ObjPlacement\Plaster002\Plaster002_1K_Color - Copy.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 43
+    Root: false
+    IsPrefab: false
+    name: Point Light
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [8.16039944, 7.89998102, 18.2058773]
+      Rotation: [0.715692759, 0, 0, 0.698415279]
+      Scale: [1, 1, 1]
+      Angels: [91.4000015, 0, 0]
+    comp_count: 1
+    Components:
+      - SpotLight:
+          enabled: true
+          Color: [0.960517287, 1, 0.858870983]
+          Bias: 0.00100000005
+          CastShadows: true
+          Intensity: 80000
+          Raduis: 20.0599995
+          CutOff: 54.0999985
+          OuterCutOff: 20.7000008
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 44
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [8.36809063, -0.558388412, 17.9948864]
+      Rotation: [0, 0, 0, 1]
+      Scale: [8.60000038, 0.5, 9.61615181]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Wood084B_1K_Color.mat
+          mat_source: FPSDemo\ObjPlacement\Wood\Wood084B_1K_Color.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 45
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [0.026391983, 0, -7.2189188]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1, 1, 1]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: ""
+          mat_source: ""
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 46
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [39.9869461, -0.358493149, 9.43923569]
+      Rotation: [0, 0, 0, 1]
+      Scale: [5, 0.5, 5]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Blue.mat
+          mat_source: FPSDemo\Materials\Blue.mat
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 47
     Root: false
     IsPrefab: false
     name: Reflection Probe
@@ -1918,46 +1932,21 @@ Entities:
     Static: false
     m_CollMode: 0
     Transform:
-      Position: [0, 2.29988194, 0]
+      Position: [8.71105003, 3.48362327, 18.0083637]
       Rotation: [0, 0, 0, 1]
-      Scale: [1, 1, 1]
+      Scale: [8.10000038, 3.71641994, 9.57999992]
       Angels: [0, 0, 0]
     comp_count: 1
     Components:
       - ReflectionProbe:
-          box_BoxMin: [-33.4000015, -3.5999999, -17.7999992]
-          box_BoxMax: [36, 6.5999999, 18.5]
+          box_BoxMin: [-8.10000038, -3.71641994, -9.57999992]
+          box_BoxMax: [8.10000038, 3.71641994, 9.57999992]
           box_radius: 0
           Intensity: 1
-          static_only: true
+          static_only: false
           BoxProjection: true
           Resolution: 128
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 365
-    Root: false
-    IsPrefab: false
-    name: Point Light
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [8.79718113, 2.56961012, 12.7270832]
-      Rotation: [0, 0, 0, 1]
-      Scale: [1, 1, 1]
-      Angels: [0, 0, 0]
-    comp_count: 1
-    Components:
-      - PointLight:
-          enabled: true
-          Color: [0.158763424, 0.2162572, 0.225663722]
-          Bias: 0.0500000007
-          CastShadows: false
-          Intensity: 3
-          Raduis: 8
+          use_scale: true
     script_count: 0
     Scripts:
       []

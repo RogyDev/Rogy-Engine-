@@ -10,6 +10,7 @@
 
 unsigned int Shader::gNUM_CASCADES = 3;
 unsigned int Shader::gNUM_LIGHTS = 50;
+unsigned int Shader::gSHADOW_QUALITY = 1;
 
 Shader::Shader()
 {
@@ -64,6 +65,8 @@ GLuint LoadShaders_File(const char * shader_file_path, const GLchar* defines) {
 	Shader_Code += std::to_string(Shader::gNUM_CASCADES) + "\n";
 	Shader_Code += "#define MAX_LIGHT_COUNT ";
 	Shader_Code += std::to_string(Shader::gNUM_LIGHTS) + "\n";
+	Shader_Code += "#define SHADOW_QUALITY ";
+	Shader_Code += std::to_string(Shader::gSHADOW_QUALITY) + "\n";
 
 	std::ifstream VertexShaderStream(shader_file_path, std::ios::in);
 	if (VertexShaderStream.is_open()) {
@@ -527,12 +530,24 @@ void Shader::setInt(GLuint uniform_id, int value)
 
 GLuint Shader::GetUniform1(const std::string unif_name)
 {
-	return glGetUniformLocation(Program, unif_name.c_str());
+	auto locationSearch = mUniformsCache.find(unif_name);
+	if (locationSearch != mUniformsCache.end())
+		return locationSearch->second;
+
+	GLuint location = glGetUniformLocation(Program, unif_name.c_str());
+	mUniformsCache[unif_name] = location;
+	return location;
 }
 
-GLuint Shader::GetUniform(const std::string &unif_name) const
+GLuint Shader::GetUniform(const std::string &unif_name)
 {
-	return glGetUniformLocation(Program, unif_name.c_str());
+	auto locationSearch = mUniformsCache.find(unif_name);
+	if (locationSearch != mUniformsCache.end())
+		return locationSearch->second;
+
+	GLuint location = glGetUniformLocation(Program, unif_name.c_str());
+	mUniformsCache[unif_name] = location;
+	return location;
 }
 
 GLuint Shader::GetUniform2(const char* unif_name) const

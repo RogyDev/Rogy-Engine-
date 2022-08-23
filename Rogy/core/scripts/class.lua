@@ -4,8 +4,9 @@ Class = {}
 function Class:init(...) end
 
 -- create a subclass
-function Class:extend(objs)
-	local obj = objs or {}
+function Class:extend(objs)	
+	--local obj = objs or {}
+	local obj = {}
 
 	local function copyTable(table, destination)
 		local table = table or {}
@@ -37,6 +38,7 @@ function Class:extend(objs)
 
 	-- allow for getters and setters
 	mt.__index = function(table, key)
+		--print("Class:extend(objs)")
 		local val = rawget(table._, key)
 		if val and type(val) == "table" and (val.get ~= nil or val.value ~= nil) then
 			if val.get then
@@ -83,7 +85,7 @@ function Class:extend(objs)
       return debug.getregistry()[ref];
     end
   end
-  
+ 	for k, v in pairs(objs) do obj[k] = v end
 	return obj
 end
 

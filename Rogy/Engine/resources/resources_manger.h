@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 
+#include "../animation/Animation.h"
 #include "../shading/texture.h"
 #include "modelmanger.h"
 #include "../scene/Scene.h"
@@ -20,6 +21,8 @@ public:
 
 	ModelManager mMeshs;
 
+	std::vector<Animation*> mAnimations;
+
 	std::vector<Texture*> mTextures;
 
 	void Init();
@@ -29,6 +32,8 @@ public:
 	bool	 RemoveTexture(std::string tex_name);
 	Texture* GetTexture(std::string tex_name);
 	Texture* GetTextureName(std::string tex_name);
+
+	Animation* GetAnimation(std::string animName, std::string animPath, SK_Model* mesh, unsigned int at_index = 0);
 	
 private:
 

@@ -122,7 +122,7 @@ bool Rogy::InitGraphics()
 	//glfwSwapInterval(1); // Vsync
 
 	// limit frame rate
-	//frameRateLimit = 60.0f;
+	//frameRateLimit = 80.0f;
 
 	// Initialize Render Engine
 	// ----------------------------
@@ -135,6 +135,8 @@ bool Rogy::Init()
 {
 	RGetCurrentPath();
 	Rogy::getIns(this);
+
+	m_PlayerPrefs.save_path = ProjectResourcesFolder;
 
 	LoadProjectSettings();
 
@@ -167,6 +169,7 @@ bool Rogy::Init()
 
 #ifdef EDITOR_MODE
 	EditorMode = true;
+	//window.Maximize();
 #else
 	mScene.game_view = true;
 	BeginPlay();
@@ -181,10 +184,12 @@ bool Rogy::Init()
 	// Initialize Physics
 	// ---------------------------
 	m_PhysicsWorld.Init();
+	m_PhysicsWorld.mScriptManager = &m_ScriptManager;
 
 	// Initialize Scripting
 	// ---------------------------
 	m_ScriptManager.debug = &m_Debug;
+	m_ScriptManager.ProjectResourcesFolder = ProjectResourcesFolder;
 	RecompileScripts();
 
 	// Initialize Audio
@@ -198,6 +203,7 @@ bool Rogy::Init()
 
 	// Initialize Editor
 	// ----------------------------
+	editor.ProjectResourcesFolder = ProjectResourcesFolder;
 	editor.SCR_height = SCR_height;
 	editor.SCR_weight = SCR_weight;
 	editor.MainViewport = &MainViewport;
@@ -228,12 +234,14 @@ bool Rogy::Init()
 			editor.prep_editor.audio_mnger = &m_Audio;
 			editor.prep_editor.ui_renderer = &m_UI;
 
+			editor.prj_browser.ProjectDir = ProjectResourcesFolder;
 			editor.prj_browser.mScene = &mScene;
 			editor.prj_browser.rnder = &renderer;
 
 			editor.mat_editor.renderer = &renderer;
 			editor.mat_editor.res = &resManager; 
 			editor.prg_settings.rndr = &renderer;
+			//editor.prg_settings.ui = &m_UI;
 		}
 	}
 	else return false; 
@@ -281,6 +289,17 @@ void Rogy::GrassEdit()
 	// Grass Edit
 	if (grass != nullptr)
 	{
+		glm::vec3 ray_Start, ray_Dir, grass_Pos;
+		int mouse_X = int(m_Input.GetMouseXPos() - MainViewport.left_pos);
+		int mouse_Y = int(m_Input.GetMouseYPos() - MainViewport.top_pos - 57);
+		m_PhysicsWorld.ScreenPosToWorldRay(mouse_X, mouse_Y
+			, (int)MainViewport.weight, (int)MainViewport.height,
+			renderer.MainCam.GetViewMatrix(), renderer.MainCam.GetProjectionMatrix()
+			, ray_Start, ray_Dir);
+
+		if (m_PhysicsWorld.RaycastHitPoint(renderer.MainCam.transform.Position, ray_Dir, 10000.0f, grass_Pos))
+			renderer.AddGuizmoSpheres(grass_Pos, grass->Edit_Raduis);
+
 		if (m_Input.GetMouseButtonDown(0))
 		{
 			m_PhysicsWorld.updateAABBs();
@@ -336,7 +355,7 @@ void Rogy::StartUp()
 
 	/* ----------------------------------------------
 	 Set a unique id for each component by registering it
-	 Warning : Shouldn't reordered; because components types are
+	 Warning : ThisM  reordered; because components types are
 	 serialized with theire ID.
 	 ----------------------------------------------*/
 	REGISTER_COMPONENT(BillboardComponent);
@@ -353,7 +372,45 @@ void Rogy::StartUp()
 	REGISTER_COMPONENT(GrassComponent);
 	REGISTER_COMPONENT(UIWidget);
 	REGISTER_COMPONENT(SkeletalMeshComponent);
-	REGISTER_COMPONENT(Displacement);
+	REGISTER_COMPONENT(Terrain);
+	REGISTER_COMPONENT(TerrainCollider);
+
+	//uint64_t handle = glGetImageHandleARB()
+	/*
+	Entity* disp = mScene.AddEntity("Terrain");
+	m_Debug.Log("Terrain ID: " + std::to_string(disp->ID));
+	Terrain* d = renderer.mDisplacements.AddComponent(disp->ID);
+	d->MaxHeight = 150;
+	d->Size = 150;
+	d->Init(resManager.CreateTexture("Terrain.png", "Terrain.png", false, true));
+	d->mat0 = renderer.LoadMaterial("FPSDemo\\Mat1.mat");
+	disp->AddComponent<Terrain>(d);
+	disp->DontDestroyOnLoad();
+
+	float texWidth = d->mHeightmap->getTexWidth() / 2;
+	static std::vector<float> data;
+	data.reserve((texWidth*texWidth));
+	int idx = 0;
+	for (size_t x = 0; x < texWidth; x++)
+	{
+		for (size_t y = 0; y < texWidth; y++)
+		{
+			data[idx] = (((float)d->mHeightmap->GetBlue(y * 2, x * 2)) / 256.0f) * d->MaxHeight;
+			idx++;
+		}
+	}
+	disp->AddComponent<TerrainCollider>(m_PhysicsWorld.AddTerrainCollider(disp, &data[0], texWidth, d->MaxHeight, d->Size * 2));*/
+	/*
+	Entity* wpn = mScene.AddEntity("C++Test");
+	RendererComponent* wpn_mesh = renderer.m_renderers.AddComponent(wpn->ID);
+	wpn->AddComponent<RendererComponent>(wpn_mesh);
+	wpn_mesh->mesh = resManager.mMeshs.CreateModel(std::string("core\\models\\cube.fbx"))->GetFirstMesh();
+	wpn_mesh->material = renderer.materials.GetMaterialN("");
+
+	NativeScriptComponent* cpp_script = new NativeScriptComponent();
+	cpp_script->Bind<CppTest>();
+	cpp_script->entid = wpn->ID;
+	wpn->AddComponent<NativeScriptComponent>(cpp_script);*/
 
 	/*anim = mScene.AddEntity("Anim");
 	SkeletalMeshComponent* mesh = renderer.m_skMeshs.AddComponent(anim->ID);
@@ -362,12 +419,12 @@ void Rogy::StartUp()
 	mesh->mesh = resManager.mMeshs.LoadSkeletalModel("res\\mag.fbx");
 	mesh->material = renderer.materials.GetMaterialN("");*/
 
-	/*Entity* disp = mScene.AddEntity("Displacement");
-	Displacement* d = renderer.mDisplacements.AddComponent(disp->ID);
+	/*Entity* disp = mScene.AddEntity("Terrain");
+	Terrain* d = renderer.mDisplacements.AddComponent(disp->ID);
 	d->Init();
 	d->mat0 = renderer.LoadMaterial("Mat1.mat");
 	d->mat1 = renderer.LoadMaterial("Mat2.mat");
-	disp->AddComponent<Displacement>(d);
+	disp->AddComponent<Terrain>(d);
 	disp->DontDestroyOnLoad();*/
 
 	/*renderer.postProc.Use = true;
@@ -388,10 +445,12 @@ void Rogy::StartUp()
 	wpn_mesh->mesh = resManager.mMeshs.CreateModel(std::string("res\\FPS\\akBody.fbx"))->GetFirstMesh();
 	wpn_mesh->material = renderer.materials.GetMaterialN("");*/
 }
-
+// ---------------------------------------------------------------
 void Rogy::MainLoop()
 {
 	if (!Init_succes) return;
+
+	m_PhysicsWorld.grv = m_PhysicsWorld.GetGravity();
 
 	StartUp();
 
@@ -426,10 +485,14 @@ void Rogy::MainLoop()
 		// per-frame time logic
 		// ----------------------------------------
 		float currentFrame = (float)glfwGetTime();
+		time = (float)glfwGetTime();
+		renderer.CurrentTime = time;
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		FPS = (int)(1.0f / deltaTime);
 		renderer.fps = FPS;
+		m_PhysicsWorld.IsPlaying = IsPlaying();
+		PhyDeltaTime = m_PhysicsWorld.TimeStep;
 
 		m_Input.Update(deltaTime);
 		// Prepare for the new frame
@@ -466,8 +529,14 @@ void Rogy::MainLoop()
 		m_PhysicsWorld.update();
 		if (IsPlaying())
 			m_PhysicsWorld.StepSimulation(deltaTime);
+
+		if (IsPlaying())
+			m_ScriptManager.OnPreTick(deltaTime);
+
 		/* Update scene entities */
 		mScene.Root.Update(deltaTime);
+		if (IsPlaying())
+			m_ScriptManager.OnTick(deltaTime);
 		UpdateEntity(&mScene.Root);
 		/* Update camera */
 		renderer.UpdateGameCamera();
@@ -493,16 +562,25 @@ void Rogy::MainLoop()
 
 #ifdef EDITOR_MODE
 
-		if (!mScene.game_view && !gizHovred)
+		if (!mScene.game_view && !gizHovred && !mScene.edit_grass && !ImGui::GetIO().WantCaptureMouse)
 		{
-			if (m_Input.GetMouseButtonDown(0) && m_Input.GetKey(RKey::KEY_LCTRL))
+			if (m_Input.GetMouseButtonDown(0) /*&& m_Input.GetKey(RKey::KEY_LCTRL)*/)
 			{
+				bool diselect_others = !m_Input.GetKey(RKey::KEY_LCTRL);
+
 				int mouseX = int(m_Input.GetMouseXPos() - MainViewport.left_pos);
 				int mouseY = int(m_Input.GetMouseYPos() - MainViewport.top_pos - 57);
 				if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)MainViewport.weight && mouseY < MainViewport.weight) {
 					glm::vec4 data = renderer.Get3dPosition(mouseX, mouseY);
 					EnttID entID = (EnttID)data.w;
-					editor.s_hierarchy.SetSelection(entID);
+					Entity* s_ent = mScene.FindEntity(entID);
+					if (s_ent != nullptr) 
+					{
+						if(s_ent->parent != nullptr && !s_ent->parent->IsRoot() && editor.s_hierarchy.GetSelected() != s_ent->parent->ID)
+							editor.s_hierarchy.SetSelection(s_ent->parent->ID, diselect_others, true);
+						else
+							editor.s_hierarchy.SetSelection(entID, diselect_others, true);
+					}
 				}
 			}
 		}
@@ -516,12 +594,12 @@ void Rogy::MainLoop()
 				if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)MainViewport.weight && mouseY < MainViewport.weight) {
 					glm::vec4 data = renderer.Get3dPosition(mouseX, mouseY);
 
-					std::vector<Displacement*> disps = renderer.mDisplacements.GetComponents();
+					std::vector<Terrain*> disps = renderer.mDisplacements.GetComponents();
 					for (size_t i = 0; i < disps.size(); i++)
 					{
 						if (disps[i]->entid == mScene.editDisp)
 						{
-							Displacement* disp = disps[i]; 
+							Terrain* disp = disps[i]; 
 							if (disp->useOneHeight == true)
 							{
 								disp->useOneHeight = false;
@@ -562,9 +640,11 @@ void Rogy::MainLoop()
 			ddGizmos->mvpMatrix = renderer.MainCam.GetProjectionMatrix() * renderer.MainCam.GetViewMatrix();
 			ddGizmos->scr_w = (int)MainViewport.weight;
 			ddGizmos->scr_h = (int)MainViewport.height;
+			renderer.Grid = (EditorMode && mScene.show_grid);
 			if (EditorMode) {
-				if (mScene.show_grid)
-					dd::xzSquareGrid(-50.0f, 50.0f, -1.0f, 1.0f, dd::colors::Gray);
+
+				//if (mScene.show_grid)
+					//dd::xzSquareGrid(-50.0f, 50.0f, -1.0f, 1.0f, dd::colors::Gray);
 				// Debug physics
 				//m_PhysicsWorld.dynamicsWorld->debugDrawWorld();
 				for (size_t i = 0; i < debugDrawer->LINES.size(); i++)
@@ -588,6 +668,14 @@ void Rogy::MainLoop()
 
 		// Render UI
 		// ----------------------------------------
+		//m_UI.Update();
+		if (!editor.prg_settings.loadFont.empty())
+		{
+			m_UI.LoadFont(editor.prg_settings.loadFont, editor.prg_settings.lfs);
+			ImGui::GetIO().Fonts->Build();
+			ImGui_ImplOpenGL3_CreateDeviceObjects();
+			editor.prg_settings.loadFont = "";
+		}
 		RenderUI();
 
 		// Game UI
@@ -613,6 +701,7 @@ void Rogy::MainLoop()
 	m_ScriptManager.Close();
 	Clear();
 
+	Quiting = true;
 	SaveProjectSettings();
 
 	// Close OpenGL window and terminate GLFW
@@ -659,32 +748,40 @@ void Rogy::UpdateEntity(Entity* ent)
 	bool ChangedTransform = transform.transformation_changed;
 	transform.transformation_changed = false;
 
+	ent->is_Selected = editor.s_hierarchy.IsSelected(ent->ID);
+
 	bool active = ent->Active;
 	for (size_t i = 0; i < ent->m_components.size(); i++)
 	{
+		Component* comp = ent->m_components[i];
 		// Push Renderer component to the renderer
-		if (Component::IsComponentType<RendererComponent>(ent->m_components[i]))
+		if (Component::IsComponentType<RendererComponent>(comp))
 		{
-			/*if (ent->parent->HasComponent<SkeletalMeshComponent>())
+			bool issk = false;
+			glm::mat4 mmt;
+			if (ent->parent->HasComponent<SkeletalMeshComponent>())
 			{
+				mmt = ent->parent->GetComponent<SkeletalMeshComponent>()->animator.wp;
 				glm::vec3 translation, rotation, scale;
 				LMath::DecomposeTransform(ent->parent->GetComponent<SkeletalMeshComponent>()->animator.wp, translation, rotation, scale);
-				//ent->SetTranslation( glm::vec3(ent->parent->GetComponent<SkeletalMeshComponent>()->animator.wp[3]));
+				ent->SetTranslation( glm::vec3(ent->parent->GetComponent<SkeletalMeshComponent>()->animator.wp[3]));
 				ent->SetTranslation(translation);
 				ent->SetRotation(rotation);
 				ent->transform.UpdateTransform();
-			}*/
-			if (!active) continue;
-			RendererComponent* rc = Component::QuickCast<RendererComponent>(ent->m_components[i]);
+			}
+			//if (!active) continue;
+			RendererComponent* rc = Component::QuickCast<RendererComponent>(comp);
 			if (rc->mesh) {
 				rc->enabled = ent->Active;
 				rc->IsStatic = ent->Static;
-			
+				rc->drawOutline = ent->is_Selected;
+
 				if (ChangedTransform) {
 					rc->position = transform.GetWorldPosition();
 					rc->transform = transform.GetTransform();
 					rc->bbox = rc->mesh->bbox;
-					rc->bbox.Transform(rc->transform, rc->position);
+					//rc->bbox.Transform(rc->transform, rc->position);
+					rc->bbox.Transform(rc->transform, transform.up(), transform.right(), transform.forward(), transform.Scale);
 				}
 
 				//m_nav.m_mesh = rc->mesh;
@@ -704,23 +801,24 @@ void Rogy::UpdateEntity(Entity* ent)
 					renderer.PushRender(rc->mesh, rc->material, glm::scale( ent->parent->GetComponent<SkeletalMeshComponent>()->animator.wp * rc->transform, glm::vec3(ent->parent->GetComponent<SkeletalMeshComponent>()->scale)), rc->bbox, rc->CastShadows, rc->position, rc->IsStatic, rc->lightmapPath, ent->ID);
 				}
 
-				if(rc->material->cutout)
+				/*if(rc->material->cutout)
 					renderer.PushCutoutRender(rc->mesh, rc->material, rc->transform, rc->bbox, rc->CastShadows, rc->position, rc->IsStatic, rc->lightmapPath, ent->ID);
 				else
-					renderer.PushRender(rc->mesh, rc->material, rc->transform, rc->bbox, rc->CastShadows, rc->position, rc->IsStatic, rc->lightmapPath, ent->ID);
+					renderer.PushRender(rc->mesh, rc->material, rc->transform, rc->bbox, rc->CastShadows, rc->position, rc->IsStatic, rc->lightmapPath, ent->ID);*/
+				//renderer.m_RenderBuffer.PushRenderer(rc->material->id, ent->ID);
 			}
 			continue;
 		}
 
-		if (Component::IsComponentType<Displacement>(ent->m_components[i]))
+		if (Component::IsComponentType<Terrain>(comp))
 		{
-			Displacement* disp = Component::QuickCast<Displacement>(ent->m_components[i]);
+			Terrain* disp = Component::QuickCast<Terrain>(comp);
 			disp->model = transform.GetTransform();
 			continue;
 		}
-		if (Component::IsComponentType<RigidBody>(ent->m_components[i]))
+		if (Component::IsComponentType<RigidBody>(comp))
 		{
-			RigidBody* rb = Component::QuickCast<RigidBody>(ent->m_components[i]);
+			RigidBody* rb = Component::QuickCast<RigidBody>(comp);
 			
 			if (transform.m_Last_Transform != transform.m_Transform)
 				rb->rigidBody->activate();
@@ -731,16 +829,16 @@ void Rogy::UpdateEntity(Entity* ent)
 			quat q = quat(qu.getW(), qu.getX(), qu.getY(), qu.getZ());
 			transform.SetRotation(q);
 			//transform.SetPosition(ve.getX(), ve.getY(), ve.getZ());
-			transform.SetPosition(glm::vec3(ve.getX(), ve.getY(), ve.getZ()) + rb->mOffset);
+			transform.SetPosition(glm::vec3(ve.getX(), ve.getY(), ve.getZ()) - rb->mOffset);
 
 			if(ent->is_Selected && !mScene.game_view)
 				m_PhysicsWorld.dynamicsWorld->debugDrawObject(rb->rigidBody->getWorldTransform(), rb->rigidBody->getCollisionShape(), btVector3(1, 1, 1));
 			continue;
 		}
 
-		if (Component::IsComponentType<PointLight>(ent->m_components[i]))
+		if (Component::IsComponentType<PointLight>(comp))
 		{
-			PointLight* point_light = Component::QuickCast<PointLight>(ent->m_components[i]);
+			PointLight* point_light = Component::QuickCast<PointLight>(comp);
 			point_light->Active = active;
 			point_light->Static = ent->Static;
 			point_light->Position = transform.GetWorldPosition();
@@ -761,28 +859,34 @@ void Rogy::UpdateEntity(Entity* ent)
 			continue;
 		}
 
-		if (Component::IsComponentType<DirectionalLight>(ent->m_components[i]))
+		if (Component::IsComponentType<DirectionalLight>(comp))
 		{
-			DirectionalLight* dir_light = Component::QuickCast<DirectionalLight>(ent->m_components[i]);
+			DirectionalLight* dir_light = Component::QuickCast<DirectionalLight>(comp);
 			dir_light->Active = active;
 			dir_light->Direction = transform.forward();
 			continue;
 		}
 
-		if (Component::IsComponentType<SpotLight>(ent->m_components[i]))
+		if (Component::IsComponentType<SpotLight>(comp))
 		{
-			SpotLight* spot_light = Component::QuickCast<SpotLight>(ent->m_components[i]);
+			SpotLight* spot_light = Component::QuickCast<SpotLight>(comp);
 			spot_light->Active = active;
 			spot_light->Static = ent->Static;
 			spot_light->Direction = transform.forward();
 			spot_light->Position = transform.GetWorldPosition();
 			continue;
 		}
-		if (Component::IsComponentType<ReflectionProbe>(ent->m_components[i]))
+		if (Component::IsComponentType<ReflectionProbe>(comp))
 		{
-			ReflectionProbe* ref_probe = Component::QuickCast<ReflectionProbe>(ent->m_components[i]);
+			ReflectionProbe* ref_probe = Component::QuickCast<ReflectionProbe>(comp);
 			ref_probe->Active = active;
 			ref_probe->Position = transform.GetWorldPosition();
+
+			if (ref_probe->use_scale)
+			{
+				ref_probe->box.BoxMin = -transform.Scale;
+				ref_probe->box.BoxMax = transform.Scale;
+			}
 
 			if (!mScene.game_view && ent->is_Selected)
 			{
@@ -801,58 +905,71 @@ void Rogy::UpdateEntity(Entity* ent)
 					(bbMins[2] + bbMaxs[2]) * 0.5f
 				};
 				dd::aabb(bbMins, bbMaxs, dd::colors::Gray);
+
+
+				renderer.AddGuizmoBox(ref_probe->Position, ref_probe->GetBBox().BoxMin, ref_probe->GetBBox().BoxMax);
 			}
 			continue;
 		}
 
-		if (Component::IsComponentType<BillboardComponent>(ent->m_components[i]))
+		if (Component::IsComponentType<BillboardComponent>(comp))
 		{
-			BillboardComponent* bb = Component::QuickCast<BillboardComponent>(ent->m_components[i]);
+			BillboardComponent* bb = Component::QuickCast<BillboardComponent>(comp);
 			bb->pos = transform.GetWorldPosition();
 			bb->dir = transform.forward();
 			continue;
 		}
-		if (Component::IsComponentType<ParticleSystem>(ent->m_components[i]))
+		if (Component::IsComponentType<ParticleSystem>(comp))
 		{
-			ParticleSystem* bb = Component::QuickCast<ParticleSystem>(ent->m_components[i]);
+			ParticleSystem* bb = Component::QuickCast<ParticleSystem>(comp);
 			bb->TargetPos = transform.GetWorldPosition();
 			bb->Direction = transform.forward();
 			continue;
 		}
 		// Update Camera info
-		if (Component::IsComponentType<CameraComponent>(ent->m_components[i]))
+		if (Component::IsComponentType<CameraComponent>(comp))
 		{
-			CameraComponent* cam = Component::QuickCast<CameraComponent>(ent->m_components[i]);
+			CameraComponent* cam = Component::QuickCast<CameraComponent>(comp);
 			cam->position = transform.GetWorldPosition();
 			cam->right = transform.right();
 			cam->direction = transform.forward();
 			cam->up = transform.up();
 			continue;
 		}
-		if (Component::IsComponentType<RAudioSource>(ent->m_components[i]))
+		if (Component::IsComponentType<RAudioSource>(comp))
 		{
-			RAudioSource* audio = Component::QuickCast<RAudioSource>(ent->m_components[i]);
+			RAudioSource* audio = Component::QuickCast<RAudioSource>(comp);
 			audio->SetPosition(transform.GetWorldPosition());
 			continue;
 		}
-		if (Component::IsComponentType<SkeletalMeshComponent>(ent->m_components[i]))
+		if (Component::IsComponentType<SkeletalMeshComponent>(comp))
 		{
-			SkeletalMeshComponent* anim = Component::QuickCast<SkeletalMeshComponent>(ent->m_components[i]);
+			SkeletalMeshComponent* anim = Component::QuickCast<SkeletalMeshComponent>(comp);
 			anim->position = ent->transform.GetWorldPosition();
 			anim->transform = transform.GetTransform();
+
 			continue;
 		}
-		if (Component::IsComponentType<NativeScriptComponent>(ent->m_components[i]))
+		if (Component::IsComponentType<NativeScriptComponent>(comp))
 		{
-			NativeScriptComponent* nsc = Component::QuickCast<NativeScriptComponent>(ent->m_components[i]);
+			NativeScriptComponent* nsc = Component::QuickCast<NativeScriptComponent>(comp);
 			if (!nsc->Instance)
 			{
 				nsc->Instance = nsc->InstantiateScript();
 				nsc->Instance->m_entity = ent;
 				nsc->Instance->OnCreate();
 			}
-
-			nsc->Instance->OnUpdate(deltaTime);
+			if(IsPlaying())
+				nsc->Instance->OnUpdate(deltaTime);
+			continue;
+		}
+		if (Component::IsComponentType<TerrainCollider>(comp))
+		{
+			TerrainCollider* mterrain = Component::QuickCast<TerrainCollider>(comp);
+			glm::vec3 s = ent->transform.GetLocalScale();
+			//mterrain->shape->setLocalScaling(btVector3(s.x, s.y, s.z));
+			if (ent->Active && ent->is_Selected && !mScene.game_view)
+				m_PhysicsWorld.dynamicsWorld->debugDrawObject(mterrain->body->getWorldTransform(), mterrain->body->getCollisionShape(), btVector3(1, 1, 1));
 			continue;
 		}
 	}
@@ -912,7 +1029,7 @@ void Rogy::QueueSpawnList()
 		else if (mScene.m_requests[i] == SR_LOAD_SCENE)
 		{
 			if(!IsPlaying())
-				m_Debug.Log(("Loading Scene: " + mScene.path));
+				m_Debug.Log(("Loading: " + mScene.name));
 			LoadScene(mScene.path.c_str());
 			break;
 		}
@@ -920,12 +1037,7 @@ void Rogy::QueueSpawnList()
 		{
 			SaveScene(mScene.path.c_str());
 			if (!IsPlaying())
-				m_Debug.Log(("Scene Saved : " + mScene.path));
-			break;
-		}
-		else if (mScene.m_requests[i] == SR_BAKE_NAV)
-		{
-			//m_nav.NavMeshBuild();
+				m_Debug.Log(("Saved: " + mScene.name));
 			break;
 		}
 		else if (mScene.m_requests[i] == SR_SPAWN_AT_MOUSE)
@@ -1068,10 +1180,18 @@ size_t Rogy::LoadAndSpawnEntity(YAML::Node &scnNode, YAML::Node &entNode, Entity
 
 				if (rb->m_CollisionType == RCollisionShapeType::MESH_COLLIDER) 
 				{
-					Model* mdl = resManager.mMeshs.CreateModel(rb->mesh_path);
-					Mesh* amesh = &mdl->meshes[0];
+					if (ent->HasComponent<RendererComponent>()) {
+						btTriangleMesh* m = m_PhysicsWorld.GetMeshCollider(ent->GetComponent<RendererComponent>()->mesh);
+						ent->GetComponent<RigidBody>()->SetCollisionMesh(m, ent->GetComponent<RendererComponent>()->mesh->path, ent->GetComponent<RendererComponent>()->mesh->index);
+					}
+					/*Model* mdl = resManager.mMeshs.CreateModel(rb->mesh_path);
+					int inddx = 0;
+					if ((rb->mesh_index + 1) > mdl->meshes.size())
+						inddx = rb->mesh_index;
+					Mesh* amesh = &mdl->meshes[inddx];
 					btTriangleMesh* m = m_PhysicsWorld.GetMeshCollider(amesh);
-					rb->SetCollisionMesh(m, amesh->path);
+					if(m != nullptr)
+						rb->SetCollisionMesh(m, amesh->path, rb->mesh_index);*/
 				}
 				ent->SetScale(ent->transform.GetLocalScale());
 			}
@@ -1199,6 +1319,7 @@ void Rogy::SaveScene(const char* path, bool temp)
 
 void Rogy::LoadScene(const char* path, bool temp)
 {
+	m_PhysicsWorld.SetGravity(m_PhysicsWorld.grv);
 	ClearScene();
 
 	if (!temp) {
@@ -1465,21 +1586,31 @@ void Rogy::RenderUI()
 				// Entity transform
 				glm::mat4 transform = ent->transform.GetTransform();
 
+				glm::vec3 oldScale = ent->transform.GetLocalScale();
+
+				float bounds[] = { -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f };
+				float boundsSnap[] = { editor.snaping, editor.snaping, editor.snaping };
+
 				ImGuizmo::Manipulate(glm::value_ptr(renderer.MainCam.GetViewMatrix()), glm::value_ptr(renderer.MainCam.GetProjectionMatrix()),
-					editor.mCurrentGizmoOperation, editor.mCurrentGizmoMode, glm::value_ptr(transform), nullptr, nullptr);
+					editor.mCurrentGizmoOperation, editor.mCurrentGizmoMode, glm::value_ptr(transform), nullptr, (float*)&glm::vec3(editor.snaping)
+				, editor.BoundSizing ? bounds : NULL, (editor.snaping > 0.0f) ? boundsSnap : NULL);
 
 				gizHovred = ImGuizmo::IsOver();
 
-				// Translate only -- other things were buggy
-				if (ImGuizmo::IsUsing()) 
+				if (ImGuizmo::IsUsing())
 				{
 					//ent->SetTranslation(glm::vec3(transform[3]));
 					glm::vec3 translation, rotation, scale;
-					LMath::DecomposeTransform(transform, translation, rotation, scale);
+					float matrixTranslation[3], matrixRotation[3], matrixScale[3];
 
-					//glm::vec3 deltaRotation = rotation - ent->transform.Angels;
+					ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), matrixTranslation, matrixRotation, matrixScale);
+
+					translation = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
+					rotation = glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]);
+					scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
+
 					ent->SetTranslation(translation);
-					//ent->transform.SetAngels(ent->transform.Angels + deltaRotation);
+					ent->SetRotation(rotation);
 					ent->SetScale(scale);
 				}
 			}
@@ -1509,22 +1640,33 @@ void Rogy::SaveProjectSettings()
 	mProjectSettings.CascadeSplits[1] = renderer.m_ShadowMapper.CascadeSplits[1];
 	mProjectSettings.CascadeSplits[2] = renderer.m_ShadowMapper.CascadeSplits[2];
 
-	std::ofstream os("core\\ProjectSettings", std::ios::binary);
+	mProjectSettings.CaptureResulotion = renderer.GetCaptureResolution();
+	mProjectSettings.ReflectionProbeLimit = renderer.ibl.ReflectionProbeLimit;
+	mProjectSettings.useDepthPrePass = renderer.DepthPrePass;
+	mProjectSettings.useInstancing = renderer.UseInstancing;
+	mProjectSettings.useInstancingForShadows = renderer.UseInstancingForShadows;
+
+	std::ofstream os(ProjectResourcesFolder + "\\ProjectSettings", std::ios::binary);
 	cereal::BinaryOutputArchive ar(os);
 	ar(mProjectSettings);
 	os.close();
 
-	os.open("core\\InputSettings", std::ios::binary);
+	os.open(ProjectResourcesFolder + "\\InputSettings", std::ios::binary);
 	cereal::BinaryOutputArchive ar2(os);
 	m_Input.serializeSave<cereal::BinaryOutputArchive>(ar2);
 	os.close();
+
+	if (!Quiting)
+	{
+
+	}
 }
 void Rogy::LoadProjectSettings()
 {
 	m_PlayerPrefs.Load();
 
 	std::filebuf fb;
-	if (fb.open("core\\ProjectSettings", std::ios::in))
+	if (fb.open(ProjectResourcesFolder + "\\ProjectSettings", std::ios::in))
 	{
 		std::istream is(&fb);
 		cereal::BinaryInputArchive ar(is);
@@ -1532,7 +1674,7 @@ void Rogy::LoadProjectSettings()
 		fb.close();
 	}
 
-	if (fb.open("core\\InputSettings", std::ios::in))
+	if (fb.open(ProjectResourcesFolder + "\\InputSettings", std::ios::in))
 	{
 		std::istream is(&fb);
 		cereal::BinaryInputArchive ar(is);
@@ -1548,6 +1690,17 @@ void Rogy::LoadProjectSettings()
 	renderer.m_ShadowMapper.CascadeSplits[0] = mProjectSettings.CascadeSplits[0];
 	renderer.m_ShadowMapper.CascadeSplits[1] = mProjectSettings.CascadeSplits[1];
 	renderer.m_ShadowMapper.CascadeSplits[2] = mProjectSettings.CascadeSplits[2];
+
+	renderer.SetCaptureResolution(mProjectSettings.CaptureResulotion);
+	renderer.ibl.ReflectionProbeLimit = mProjectSettings.ReflectionProbeLimit;
+	renderer.UseInstancing = mProjectSettings.useInstancing;
+	renderer.UseInstancingForShadows = mProjectSettings.useInstancingForShadows;
+	renderer.DepthPrePass = mProjectSettings.useDepthPrePass;
+	renderer.m_SpotShadowMapper.MaxShadowCount = mProjectSettings.SpotShadowsLimit;
+
+
+	//if (renderer.m_ShadowMapper.SHADOW_MAP_CASCADE_COUNT > 3)
+		//renderer.m_ShadowMapper.SHADOW_MAP_CASCADE_COUNT = 3;
 }
 
 // ---------------------------------------------------------------
@@ -1577,7 +1730,8 @@ void Rogy::BindEngineForScript()
 {
 	/* Bind all the input keys to Lua in namespace "RKey" */
 	RKey::BindKeyToNamespace(m_ScriptManager.L, "RKey");
-	
+
+	//EngineAPI_LUA::RegisterAPI<Rogy>(m_ScriptManager.L);
 	luabridge::getGlobalNamespace(m_ScriptManager.L)
 		//SceneManager
 		.beginClass<SceneManager>("SceneManager")
@@ -1630,6 +1784,14 @@ void Rogy::BindEngineForScript()
 		.addFunction("GetString", &PlayerPrefs::GetString)
 		.endClass()
 		
+		.beginNamespace("Time")
+		.addVariable("time", &this->time, false)
+		.addVariable("deltaTime", &this->deltaTime, false)
+		.addVariable("PhyDeltaTime", &this->PhyDeltaTime, false)
+		.addVariable("frameRateLimit", &this->frameRateLimit)
+		.addVariable("FPS", &this->FPS)
+		.endNamespace()
+
 		.beginNamespace("Mathf")
 		.addFunction("Clamp", &LMath::Clamp)
 		.addFunction("Abs", &LMath::Abs)
@@ -1637,6 +1799,8 @@ void Rogy::BindEngineForScript()
 		.addFunction("PI", &LMath::PI)
 		.addFunction("Random", &Random::Range)
 		.addFunction("Sqrt", &LMath::Sqrt)
+		.addFunction("LerpV", &LMath::LerpV)
+		.addFunction("Lerp", &LMath::Lerp)
 		.endNamespace()
 
 		// Vector3
@@ -1653,11 +1817,17 @@ void Rogy::BindEngineForScript()
 		.addFunction("__le", &Vec3Helper::LessOrEq)
 		.addFunction("__eq", &Vec3Helper::Equale)
 		.addFunction("GetType", &Vec3Helper::__gettype)
+		.addStaticFunction("Down", &Vec3Helper::VecDown)
+		.addStaticFunction("Left", &Vec3Helper::VecLeft)
 		.addStaticFunction("Up", &Vec3Helper::VecUp)
 		.addStaticFunction("Right", &Vec3Helper::VecRight)
 		.addStaticFunction("Forward", &Vec3Helper::VecForward)
 		.addStaticFunction("Vec3F", &Vec3Helper::Vec3F)
 		.addStaticFunction("Lerp", &Vec3Helper::Lerp)
+		.addStaticFunction("Distance", &Vec3Helper::Distance)
+		.addStaticFunction("Normalize", &Vec3Helper::Normalize)
+		.addStaticFunction("CrossProduct", &Vec3Helper::CrossProduct)
+		.addStaticFunction("ProjectOnPlane", &Vec3Helper::ProjectOnPlane)
 		.endClass()
 
 		// Vector2
@@ -1687,7 +1857,7 @@ void Rogy::BindEngineForScript()
 			.addFunction("GetWorldPosition", &Transform::GetWorldPosition)
 			.addFunction("SetWorldPosition", &Transform::SetWorldPosition)
 			.addFunction("GetScale", &Transform::GetLocalScale)
-			.addFunction("SetScale", &Transform::GetLocalScale)
+			.addFunction("SetScale", &Transform::SetLocalScale)
 			.addFunction("GetAngels", &Transform::GetEurlerAngels)
 			.addFunction("SetAngels", &Transform::SetAngels)
 			.addFunction("Forward", &Transform::forward)
@@ -1705,9 +1875,21 @@ void Rogy::BindEngineForScript()
 			.addFunction("SetAngels", &RigidBody::SetAngels)
 			.addFunction("AddForce", &RigidBody::AddForce)
 			.addFunction("AddCentralForce", &RigidBody::AddCentralForce)
+			.addFunction("SetGravity", &RigidBody::SetGravity)
+			.addFunction("SetGravityY", &RigidBody::SetGravityY)
+			.addFunction("GetGravity", &RigidBody::GetGravity)
+			.addFunction("GetScale", &RigidBody::GetScale)
+			.addFunction("SetScale", &RigidBody::SetScale)
+			.addFunction("SetFriction", &RigidBody::SetFriction)
+			.addFunction("GetFriction", &RigidBody::GetFriction)
+			.addFunction("SetBounciness", &RigidBody::SetBounciness)
+			.addFunction("GetBounciness", &RigidBody::GetBounciness)
+			.addFunction("Activate", &RigidBody::Activate)
+			.addFunction("ApplyImpulse", &RigidBody::ApplyImpulse)
 		.endClass()
 
 		.beginClass<PointLight>("PointLight")
+			.addProperty("Enabled", &PointLight::enabled)
 			.addProperty("Intensity", &PointLight::Intensity)
 			.addProperty("Color", &PointLight::Color)
 			.addProperty("Raduis", &PointLight::Raduis)
@@ -1716,6 +1898,7 @@ void Rogy::BindEngineForScript()
 		.endClass()
 
 		.beginClass<SpotLight>("SpotLight")
+			.addProperty("Enabled", &SpotLight::enabled)
 			.addProperty("Intensity", &SpotLight::Intensity)
 			.addProperty("Color", &SpotLight::Color)
 			.addProperty("Raduis", &SpotLight::Raduis)
@@ -1791,9 +1974,16 @@ void Rogy::BindEngineForScript()
 			.addFunction("GetVolume", &RAudioSource::GetVolume)
 		.endClass()
 
+		.beginClass<UIWidgetImage>("UIWidgetImage")
+		.addProperty("Enabled", &UIWidgetImage::Enabled)
+		.addProperty("name", &UIWidgetImage::name)
+		.addProperty("Alpha", &UIWidgetImage::Alpha)
+		.endClass()
+
 		.beginClass<UIWidgetText>("UIWidgetText")
 		.addProperty("Enabled", &UIWidgetText::Enabled)
 		.addProperty("name", &UIWidgetText::name)
+		.addProperty("Position", &UIWidgetText::Position)
 		.addProperty("text", &UIWidgetText::text)
 		.endClass()
 
@@ -1809,9 +1999,13 @@ void Rogy::BindEngineForScript()
 		.endClass()
 
 		.beginClass<UIWidget>("UIWidget")
+		.addProperty("Alpha", &UIWidget::Alpha)
+		.addProperty("Position", &UIWidget::Position)
+		.addProperty("Enabled", &UIWidget::enabled)
 		.addFunction("GetText", &UIWidget::GetWidgetWithName<UIWidgetText>)
 		.addFunction("GetButton", &UIWidget::GetWidgetWithName<UIWidgetButton>)
 		.addFunction("GetBar", &UIWidget::GetWidgetWithName<UIWidgetProgressBar>)
+		.addFunction("GetImage", &UIWidget::GetWidgetWithName<UIWidgetImage>)
 		.endClass()
 		
 		// --------------------------------------------------------------------------
@@ -1836,6 +2030,10 @@ void Rogy::BindEngineForScript()
 		.addFunction("Rotate", &Entity::Rotate)
 		.addFunction("GetScriptIndex", &Entity::GetScriptInstance)
 		.addFunction("GetChildWithTag", &Entity::GetChildWithTag)
+		.addFunction("GetParentWithTag", &Entity::GetParentWithTag)
+		.addFunction("Broadcast", &Entity::InvokeScriptFunc)
+		.addProperty("ContactPos", &Entity::ContactPos)
+		.addProperty("ContactNormal", &Entity::ContactNormal)
 
 		.addFunction("GetParticleSystem", &Entity::GetComponent<ParticleSystem>)
 		.addFunction("GetAudioSource", &Entity::GetComponent<RAudioSource>)
@@ -1878,6 +2076,7 @@ void Rogy::BindEngineForScript()
 		.beginClass<PhysicsWorld>("PhysicsWorld")
 		.addFunction("Raycast", &PhysicsWorld::Raycast)
 		.addFunction("RayTest", &PhysicsWorld::RayTest)
+		.addFunction("CheckSphere", &PhysicsWorld::CheckSphere)
 		.addFunction("GetGravity", &PhysicsWorld::GetGravity)
 		.addFunction("SetGravity", &PhysicsWorld::SetGravity)
 		.endClass();

@@ -32,7 +32,6 @@ public:
 			{
 				T* comp = components[i];
 				components.erase(components.begin() + i);
-				std::cout << "SkeletalMeshComponentr \n";
 				delete comp;
 			}
 		}

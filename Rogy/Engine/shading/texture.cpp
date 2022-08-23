@@ -55,7 +55,7 @@ std::string Texture::getTexPath()
 	return this->TPath;
 }
 
-bool Texture::setTexture(const char* texPath, std::string tex_Name, bool texFlip, bool keepData)
+bool Texture::setTexture(const char* texPath, std::string tex_Name, bool texFlip, bool keepData, bool redOnly)
 {
     this->texType = GL_TEXTURE_2D;
 
@@ -74,8 +74,15 @@ bool Texture::setTexture(const char* texPath, std::string tex_Name, bool texFlip
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisoFilterLevel);  // Request the maximum level of anisotropy the GPU used can support and use it
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, this->anisoFilterLevel);
 
+	int desiredChannels = 0;
+	if (redOnly)
+		desiredChannels = 1;
+
     int width, height, numComponents;
-    unsigned char* texData = stbi_load(tempPath.c_str(), &width, &height, &numComponents, 0);
+    unsigned char* texData = stbi_load(tempPath.c_str(), &width, &height, &numComponents, desiredChannels);
+
+	if (redOnly)
+		numComponents = 1;
 
     this->texWidth = width;
     this->texHeight = height;
@@ -123,6 +130,7 @@ void Texture::setTextureHDR(const char* texPath, std::string texName, bool texFl
     this->texType = GL_TEXTURE_2D;
 
     std::string tempPath = std::string(texPath);
+	TPath = tempPath;
 
     if(texFlip)
         stbi_set_flip_vertically_on_load(true);

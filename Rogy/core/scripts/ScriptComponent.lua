@@ -12,6 +12,7 @@ Asset = {
 	Prefab = "Prefab"
 }
 
+
 function Prepare_ScriptSide(scene, input, phy, debuger, audio)
 	Scene = scene;
 	Input = input;
@@ -24,8 +25,9 @@ function Prepare_ScriptSide2(pprefs)
 	PlayerPrefs = pprefs;
 end
 
-function ScriptComponent()
-	return Class:extend({})
+function ScriptComponent(props)
+	if props == nil then props = {} end
+	return Class:extend(props)
 end
 
 -- Editor Utilities ------
@@ -62,3 +64,5 @@ function SetVec3XYZ(bb, var_name, idx, val)
 	end
 	bb[var_name].z = val;
 end
+
+-- https://github.com/sulai/Lib-Pico8/blob/master/lang.lua -- enum

@@ -23,9 +23,15 @@ void RAudioSource::Play()
 		if (!Overlap && IsPlaying())
 			Stop();
 		is_playing = true;
-		handle = gSoloud->play3d(mClip->gWave, pos.x, pos.y, pos.z, 0.0f, 0.0f, 0.0f, volume);
-		gSoloud->set3dSourceAttenuation(handle, SoLoud::AudioSource::LINEAR_DISTANCE, 1.0f);
-		gSoloud->set3dSourceMinMaxDistance(handle, minD, maxD);
+
+		if(Is2D)
+			handle = gSoloud->play(mClip->gWave, volume);
+		else 
+		{
+			handle = gSoloud->play3d(mClip->gWave, pos.x, pos.y, pos.z, 0.0f, 0.0f, 0.0f, volume);
+			gSoloud->set3dSourceAttenuation(handle, SoLoud::AudioSource::LINEAR_DISTANCE, 1.0f);
+			gSoloud->set3dSourceMinMaxDistance(handle, minD, maxD);
+		}
 		gSoloud->setLooping(handle, Looping);
 		gSoloud->setFilterParameter(handle, 2, 0, EchoFilter);
 	}

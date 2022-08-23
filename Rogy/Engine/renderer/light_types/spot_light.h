@@ -25,11 +25,11 @@ public:
 	bool  Static = false;
 	bool  baked = false;
 
-	unsigned int shadow_index = -1;
+	int shadow_index = -1;
 	bool visible = true;
 	bool inFrustum = false;
 
-	bool  Active = true; // is entity active?
+	bool  Active = true; // is entity active? 
 
 	bool isActive()
 	{

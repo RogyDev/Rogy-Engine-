@@ -92,6 +92,7 @@ public:
 			ent->name += " (Clone)";
 			ent->SetTranslation(position);
 			ent->SetRotation(rot);
+			ent->transform.UpdateTransform();
 		}
 		return ent;
 	}
@@ -103,7 +104,7 @@ public:
 public:
 	bool is_playing = false;
 	bool game_view = false;
-	bool show_grid = true;
+	bool show_grid = false;
 	bool edit_grass = false;
 
 private:

@@ -14,14 +14,44 @@ void ShadowMapper::Init()
 
 	CascadesSplitsCalc = false;
 
-	for (size_t i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++)
+	glGenFramebuffers(1, &depthMapFBO);
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, TEXEL_SIZE, TEXEL_SIZE * SHADOW_MAP_CASCADE_COUNT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER::CSM:: Framebuffer is not complete!";
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//std::cout << "INIT CSM.." << SHADOW_MAP_CASCADE_COUNT << "|" << TEXEL_SIZE << "\n";
+
+for (size_t i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++)
 	{
-		cascades.push_back(ShadowCascade());
+		cascades.emplace_back();
 		ShadowCascade* sc = &cascades[cascades.size() - 1];
 		
+		if (sc == nullptr)
+		{
+			std::cout << "nullptr in CSM.. weired!\n";
+			continue;
+		}
 		sc->TEXEL_SIZE = TEXEL_SIZE;// / (i + 1);
-
-		glGenFramebuffers(1, &sc->depthMapFBO);
+		
+		/*glGenFramebuffers(1, &sc->depthMapFBO);
 		glGenTextures(1, &sc->depthMap);
 		glBindTexture(GL_TEXTURE_2D, sc->depthMap);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, sc->TEXEL_SIZE, sc->TEXEL_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -37,12 +67,12 @@ void ShadowMapper::Init()
 		glBindFramebuffer(GL_FRAMEBUFFER, sc->depthMapFBO);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, sc->depthMap, 0);
 		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-
+		glReadBuffer(GL_NONE);*/
+		
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+		
 	}
-
+	
 
 	if (SHADOW_MAP_CASCADE_COUNT == 1)
 		cascades[0].cascadeSplitFar = Shadow_Distance;
@@ -64,13 +94,18 @@ void ShadowMapper::Clear()
 {
 	if (initalized)
 	{
+		glDeleteFramebuffers(1, &depthMapFBO);
+		glDeleteTextures(1, &depthMap);
 		for (size_t i = 0; i < cascades.size(); i++)
 		{
-			glDeleteFramebuffers(1, &cascades[i].depthMapFBO);
-			glDeleteTextures(1, &cascades[i].depthMap);
+			//glDeleteFramebuffers(1, &cascades[i].depthMapFBO);
+			//glDeleteTextures(1, &cascades[i].depthMap);
 		}
 		cascades.clear();
 		cascades.shrink_to_fit();
+
+		glDeleteFramebuffers(1, &depthMapFBO);
+		glDeleteTextures(1, &depthMap);
 	}
 }
 
@@ -80,8 +115,9 @@ void ShadowMapper::Bind(int sc_index)
 	//glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glViewport(0, 0, sc->TEXEL_SIZE, sc->TEXEL_SIZE);
+	//glViewport(0, 0, sc->TEXEL_SIZE, sc->TEXEL_SIZE);
 	glBindFramebuffer(GL_FRAMEBUFFER, sc->depthMapFBO);
+	//glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//glCullFace(GL_FRONT);
 }
@@ -111,57 +147,102 @@ void ShadowMapper::SetShadowDistance(unsigned int dist)
 }
 unsigned int ShadowMapper::GetShadowDistance()
 {
-	return Shadow_Distance;
+	return (unsigned int)Shadow_Distance;
 }
 
-void ShadowMapper::CalcOrthoProjs(Camera* inCam, DirectionalLight* light)
+
+std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view)
 {
-	/*if (!CascadesSplitsCalc)
+	const auto inv = glm::inverse(proj * view);
+
+	std::vector<glm::vec4> frustumCorners;
+	for (unsigned int x = 0; x < 2; ++x)
 	{
-		CascadesSplitsCalc = true;
-
-		
-		for (uint32_t i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++) {
-			cascades[i].cascadeSplitFar = (float)Shadow_Distance * CascadeSplits[i];
-			std::cout << "csm : [" << i << "] -> " << CascadeSplits[i] << " | d = " << cascades[i].cascadeSplitFar << "\n";
+		for (unsigned int y = 0; y < 2; ++y)
+		{
+			for (unsigned int z = 0; z < 2; ++z)
+			{
+				const glm::vec4 pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
+				frustumCorners.push_back(pt / pt.w);
+			}
 		}
+	}
 
-		cascadeSplits = new float[SHADOW_MAP_CASCADE_COUNT];
+	return frustumCorners;
+}
 
-		float nearClip = inCam->NearView;
-		float farClip = (float)Shadow_Distance;
-		float clipRange = farClip - nearClip;
+glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane, int SCR_WIDTH, int SCR_HEIGHT, Camera* camera, glm::vec3 lightDir)
+{
+	//const float nearPlane = camera->NearView;
+	//const float farPlane = camera->FarView;
 
-		float minZ = nearClip;
-		float maxZ = nearClip + clipRange;
+	const auto proj = glm::perspective(
+		glm::radians(camera->FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, nearPlane,
+		farPlane);
+	const auto corners = getFrustumCornersWorldSpace(proj, camera->GetViewMatrix());
 
-		float range = maxZ - minZ;
-		float ratio = maxZ / minZ;
+	glm::vec3 center = glm::vec3(0, 0, 0);
+	for (const auto& v : corners)
+	{
+		center += glm::vec3(v);
+	}
+	center /= corners.size();
 
-		std::cout << "csm ----------------------------\n";
-		// Calculate split depths based on view camera furstum
-		// Based on method presentd in https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch10.html
-		for (uint32_t i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++) {
-			float p = (i + 1) / static_cast<float>(SHADOW_MAP_CASCADE_COUNT);
-			float log = minZ * std::pow(ratio, p);
-			float uniform = minZ + range * p;
-			float d = 0.95f * (log - uniform) + uniform * 1.5f;
-			cascadeSplits[i] = (d - nearClip) / clipRange;
-			cascades[i].cascadeSplitFar = d;
-			std::cout << "csm : [" << i << "] -> " << cascadeSplits[i]  << " | d = " << d << "\n";
-		}
-	}*/
+	const auto lightView = glm::lookAt(center + lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
 
+	float minX = std::numeric_limits<float>::max();
+	float maxX = std::numeric_limits<float>::min();
+	float minY = std::numeric_limits<float>::max();
+	float maxY = std::numeric_limits<float>::min();
+	float minZ = std::numeric_limits<float>::max();
+	float maxZ = std::numeric_limits<float>::min();
+	for (const auto& v : corners)
+	{
+		const auto trf = lightView * v;
+		minX = std::min(minX, trf.x);
+		maxX = std::max(maxX, trf.x);
+		minY = std::min(minY, trf.y);
+		maxY = std::max(maxY, trf.y);
+		minZ = std::min(minZ, trf.z);
+		maxZ = std::max(maxZ, trf.z);
+	}
 
-	/*glm::vec3 camPos = inCam->transform.Position;
-	glm::vec3 camDir = inCam->transform.forward();
+	// Tune this parameter according to the scene
+	constexpr float zMult = 10.0f;
+	if (minZ < 0)
+	{
+		minZ *= zMult;
+	}
+	else
+	{
+		minZ /= zMult;
+	}
+	if (maxZ < 0)
+	{
+		maxZ /= zMult;
+	}
+	else
+	{
+		maxZ *= zMult;
+	}
 
-	glm::vec3 center = camPos + camDir * 50.0f;
-	glm::vec3 light_pos = center - camDir * ((inCam->FarView - inCam->NearView) / 2.0f);
-	glm::vec3 right = glm::cross(camDir, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::vec3 up = inCam->transform.up();
-	glm::mat4 modelview = glm::lookAt(inCam->transform.Position, center, up);*/
+	const glm::mat4 lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
 
+	return lightProjection * lightView;
+}
+void ShadowMapper::CalcOrthoProjs(int SCR_WIDTH, int SCR_HEIGHT, Camera* inCam, DirectionalLight* light)
+{
+	float lastSplitDist = 0.01f;
+	for (size_t i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++)
+	{
+		float splitFar = cascades[i].cascadeSplitFar;
+		cascades[i].LightViewProjection = getLightSpaceMatrix(lastSplitDist, splitFar, SCR_WIDTH, SCR_HEIGHT, inCam, light->Direction);
+		lastSplitDist = cascades[i].cascadeSplitFar;
+	}
+}
+
+void ShadowMapper::CalcOrthoProjss(Camera* inCam, DirectionalLight* light)
+{
 	// Calculate orthographic projection matrix for each cascade
 	float lastSplitDist = 0.01f;
 	
@@ -207,7 +288,7 @@ void ShadowMapper::CalcOrthoProjs(Camera* inCam, DirectionalLight* light)
 		glm::vec3 minO = glm::vec3(INFINITY, INFINITY, INFINITY);
 		glm::vec3 maxO = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
 
-		for (auto& vec : arr)
+		for (glm::vec3& vec : arr)
 		{
 			minO = glm::min(minO, vec);
 			maxO = glm::max(maxO, vec);
@@ -241,90 +322,6 @@ void ShadowMapper::CalcOrthoProjs(Camera* inCam, DirectionalLight* light)
 
 		glm::mat4 lightOrthoMatrix = glm::ortho(minO.x, maxO.x, minO.y, maxO.y, near-100, far+100);
 		cascades[i].LightViewProjection = lightOrthoMatrix * lightViewMatrix;
-	/*	float splitNear = lastSplitDist;
-		float splitFar = cascades[i].cascadeSplitFar;
-		
-		std::cout << splitNear << "|" << splitFar << "\n";
-		glm::mat4 proj = glm::perspective(glm::radians(inCam->FOV), inCam->aspectRatio, splitNear, splitFar);
-
-		Frustum fr;
-		glm::mat4 invCam = (proj * inCam->GetViewMatrix());
-		fr.Update(invCam);
-
-		glm::vec3 frustumCorners[8] = {
-			fr.m_points[0],
-			fr.m_points[1],
-			fr.m_points[2],
-			fr.m_points[3],
-			fr.m_points[4],
-			fr.m_points[5],
-			fr.m_points[6],
-			fr.m_points[7],
-		};
-
-		glm::vec3 lightDir = normalize(-light->Direction);
-
-		// Get frustum center
-		glm::vec3 frustumCenter = glm::vec3(0.0f);
-		for (uint32_t i = 0; i < 8; i++)
-			frustumCenter += frustumCorners[i];
-		frustumCenter /= 8.0f;
-		/*
-		// construct the view matrix
-		float dist = glm::max(splitFar - splitNear, glm::distance(frustumCorners[5], frustumCorners[6]));
-		glm::mat4 viewMat = glm::lookAt(glm::vec3(frustumCenter) - lightDir * dist, glm::vec3(frustumCenter), glm::vec3(0.0f, 1.0f, 0.0f));
-		
-		// transform split vertices to the light view space
-		glm::vec4 splitVerticesLS[8];
-		for (size_t i = 0; i < 8; ++i) {
-			splitVerticesLS[i] = viewMat * glm::vec4(frustumCorners[i], 0.f);
-		}
-
-		// find the frustum bounding box in viewspace
-		glm::vec4 min = splitVerticesLS[0];
-		glm::vec4 max = splitVerticesLS[0];
-		for (size_t i = 1; i < 8; ++i) {
-			min = glm::min(min, splitVerticesLS[i]);
-			max = glm::max(max, splitVerticesLS[i]);
-		}
-
-		viewMat = glm::lookAt(frustumCenter - lightDir * -min.z, frustumCenter, inCam->transform.up());
-
-		// and create an orthogonal projection matrix with the corners
-		float nearOffset = 10.0f;
-		float farOffset = 20.0f;
-		//glm::mat4 projMat = glm::ortho(min.x, max.x, min.y, max.y, -max.z - nearOffset, -min.z + farOffset);
-		glm::mat4 projMat = glm::ortho(min.x, max.x, min.y, max.y, min.z, -min.z + (max-min).z);
-		static const glm::mat4 offsetMat = glm::mat4(glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.5f, 0.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-		
-		cascades[i].LightViewProjection = projMat * viewMat;
-		
-		
-		float radius = 0.0f;
-		for (uint32_t i = 0; i < 8; i++) {
-			float distance = glm::length(frustumCorners[i] - frustumCenter);
-			radius = glm::max(radius, distance);
-		}
-		radius = std::ceil(radius * 16.0f) / 16.0f;
-
-		float qStep = (float)radius;
-		frustumCenter.x = std::round(frustumCenter.x / qStep) * qStep;
-		frustumCenter.y = std::round(frustumCenter.y / qStep) * qStep;
-		frustumCenter.z = std::round(frustumCenter.z / qStep) * qStep;
-
-		glm::vec3 maxExtents = glm::vec3(radius);
-		glm::vec3 minExtents = -maxExtents;
-
-		//glm::vec3 lightDir = normalize(-light->Direction);
-
-		//glm::mat4 lightViewMatrix = glm::lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter, inCam->transform.up());
-		glm::mat4 lightViewMatrix = glm::lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
-		//glm::mat4 lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y, 0.0f, maxExtents.z - minExtents.z);
-
-		glm::vec3 cascade_extents = maxExtents - minExtents;
-		//glm::mat4 lightViewMatrix = glm::lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter, inCam->transform.up());
-		glm::mat4 lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y, minExtents.z, -minExtents.z + cascade_extents.z*2);
-		cascades[i].LightViewProjection = lightOrthoMatrix * lightViewMatrix;*/
 
 		lastSplitDist = cascades[i].cascadeSplitFar;
 	}
@@ -545,14 +542,22 @@ SpotShadowMapper::~SpotShadowMapper()
 {
 }
 
-void SpotShadowMapper::CreateShadowMap(SpotShadowData &map)
+void SpotShadowMapper::Init()
 {
-	//std::cout << "CREATE SPOT SHADOW MAP" << std::endl;
-	glGenFramebuffers(1, &map.depthMapFBO);
+	if (initialized)
+	{
+		glDeleteFramebuffers(1, &depthMapFBO);
+		glDeleteTextures(1, &depthShadow);
+	}
+	std::cout << "SpotShadowMapper::Init(): " << MaxShadowCount << "\n";
+	
+	ShadowAtlasCount = glm::sqrt(MaxShadowCount);
 
-	glGenTextures(1, &map.depthShadow);
-	glBindTexture(GL_TEXTURE_2D, map.depthShadow);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, TEXEL_SIZE, TEXEL_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glGenFramebuffers(1, &depthMapFBO);
+
+	glGenTextures(1, &depthShadow);
+	glBindTexture(GL_TEXTURE_2D, depthShadow);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, TEXEL_SIZE * ShadowAtlasCount, TEXEL_SIZE * ShadowAtlasCount, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -561,25 +566,23 @@ void SpotShadowMapper::CreateShadowMap(SpotShadowData &map)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, map.depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, map.depthShadow, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthShadow, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	map.initialized = true;
+	initialized = true;
 }
 
-void SpotShadowMapper::ResetShadowResolution(unsigned int newRes)
+void SpotShadowMapper::Start()
 {
-	if (TEXEL_SIZE == newRes) return;
-	TEXEL_SIZE = newRes;
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
-	for (size_t i = 0; i < shadowMaps.size(); i++)
+	if (!ThereAreStaticLights)
 	{
-		glDeleteFramebuffers(1, &shadowMaps[i]->depthMapFBO);
-		glDeleteTextures(1, &shadowMaps[i]->depthShadow);
-		CreateShadowMap(*shadowMaps[i]);
+		glViewport(0, 0, TEXEL_SIZE * ShadowAtlasCount, TEXEL_SIZE * ShadowAtlasCount);
+		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 }
 
@@ -589,43 +592,71 @@ glm::mat4 SpotShadowMapper::Bind(int indx, glm::vec3 lightPos, glm::vec3 lightDi
 	glm::mat4 depthViewMatrix = glm::lookAt(lightPos, lightPos + lightDir, glm::vec3(0, 1, 0));
 	shadowMaps[indx]->MVP = depthProjectionMatrix * depthViewMatrix;
 
-	glViewport(0, 0, TEXEL_SIZE, TEXEL_SIZE);
-	glBindFramebuffer(GL_FRAMEBUFFER, shadowMaps[indx]->depthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
+	glViewport(shadowMaps[indx]->atlas.x * TEXEL_SIZE, shadowMaps[indx]->atlas.y * TEXEL_SIZE, TEXEL_SIZE, TEXEL_SIZE);
+
+	if (ThereAreStaticLights) 
+	{
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(shadowMaps[indx]->atlas.x * TEXEL_SIZE, shadowMaps[indx]->atlas.y * TEXEL_SIZE, TEXEL_SIZE, TEXEL_SIZE);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glDisable(GL_SCISSOR_TEST);
+	}
 
 	return shadowMaps[indx]->MVP;
 }
 
-void SpotShadowMapper::RemoveShadowMap(SpotShadowData &map)
+
+void SpotShadowMapper::ResetShadowResolution(unsigned int newRes)
 {
-	glDeleteFramebuffers(1, &map.depthMapFBO);
-	glDeleteTextures(1, &map.depthShadow);
+	if (TEXEL_SIZE == newRes) return;
+	TEXEL_SIZE = newRes;
+
+	Init();
 }
+
 
 SpotShadowData* SpotShadowMapper::CreateShadowMap()
 {
-	if (shadowMaps.size() == MAX_SPOT_SHADOWS)
+	if (shadowMaps.size() == MaxShadowCount)
 		return nullptr;
-	//std::cout << "creating shadow map : " << shadowMaps.size() << std::endl;
+
 	SpotShadowData* scm = new SpotShadowData();
-	scm->index = shadowMaps.size();
-	CreateShadowMap(*scm);
 	shadowMaps.push_back(scm);
+	scm->index = shadowMaps.size();
+	scm->index--;
+
+	unsigned int indexCounter = 0;
+	bool dobreak = false;
+	for (size_t y = 0; y < ShadowAtlasCount; y++)
+	{
+		for (size_t x= 0; x < ShadowAtlasCount; x++)
+		{
+			if (indexCounter == scm->index)
+			{
+				scm->atlas.x = x;
+				scm->atlas.y = y;
+				dobreak = true;
+				break;
+			}
+			else
+				indexCounter++;
+		}
+		if (dobreak)
+			break;
+	}
+
+	//std::cout << "Creating Spot Shadow: " << scm->index << " atlas= " << scm->atlas.x << " : " << scm->atlas.y << std::endl;
+
 	return scm;
 }
-GLuint SpotShadowMapper::GetShadowMap(int indx)
-{
-	return shadowMaps[indx]->depthShadow;
-}
-
-bool SpotShadowMapper::RemoveShadowMap(unsigned int& indx)
+bool SpotShadowMapper::RemoveShadowMap(int& indx)
 {
 	if (shadowMaps.empty() || indx == -1)
 		return false;
 
 	std::cout << "REMOVE SPOT SHADOW MAP " << indx << std::endl;
-	glDeleteFramebuffers(1, &shadowMaps[indx]->depthMapFBO);
-	glDeleteTextures(1, &shadowMaps[indx]->depthShadow);
+	//glDeleteFramebuffers(1, &shadowMaps[indx]->depthMapFBO);
+	//glDeleteTextures(1, &shadowMaps[indx]->depthShadow);
 	shadowMaps.erase(shadowMaps.begin() + indx);
 	shadowMaps.shrink_to_fit();
 	indx = -1;

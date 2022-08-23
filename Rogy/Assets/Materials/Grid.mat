@@ -1,0 +1,27 @@
+Material:
+  - type: 0
+    name: Assets\Materials\Grid.mat
+    tag: ""
+    albedo_x: 1
+    albedo_y: 1
+    albedo_z: 1
+    metallic: 0
+    roughness: 0.5
+    ao: 1
+    uv_x: 1
+    uv_y: 1
+    val1: 0
+    val2: 0
+    cutout: false
+    use_emission: false
+    emission_x: 1
+    emission_y: 1
+    emission_z: 1
+    emission_power: 1
+    use_tex_albedo: true
+    tex_albedo_name: templategrid_albedo.png
+    tex_albedo_source: Assets\Textures\templategrid_albedo.png
+    use_tex_normal: false
+    use_tex_metal: false
+    use_tex_rough: false
+    use_tex_emission: false

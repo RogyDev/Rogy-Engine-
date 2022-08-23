@@ -140,6 +140,11 @@ void RWindow::Clear()
 	glfwDestroyWindow(window);
 }
 
+void RWindow::Maximize()
+{
+	glfwMaximizeWindow(window);
+}
+
 void RWindow::SetCursorMode(CursorMode mode)
 {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

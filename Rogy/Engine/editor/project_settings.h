@@ -30,6 +30,9 @@ public:
 	Renderer* rndr = nullptr;
 	RProjectSettings* prj = nullptr;
 	InputManager* input = nullptr;
+	//UIRenderer* ui = nullptr;
+	std::string loadFont;
+	int lfs = 50;
 
 	bool isOn = false;
 
@@ -38,6 +41,8 @@ public:
 private:
 	int renameAxisIndex = 0;
 	std::string aNewAxis = "AxisName";
+	std::string aNewfont = "";
+	int aNewfontSize = 50;
 	int firstKey, secondKey;
 	bool editfirstKey = false, editsecondKey = false;
 };

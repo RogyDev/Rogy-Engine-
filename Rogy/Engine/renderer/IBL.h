@@ -18,6 +18,10 @@ public:
 	GLuint captureFBO;
 	GLuint captureRBO;
 
+	int ReflectionProbeLimit = 8;
+	int CaptureResolution = 128;
+	PBRCapture Probes;
+
 	glm::mat4 captureProjection;
 	glm::mat4 captureViews[6];
 
@@ -30,7 +34,11 @@ public:
 
 	void Init();
 
-	void LoadHDR(const char* pth, GLuint &envCubemap);
+	// ---------------------------------------------
+	void InitializeReflectionTexture();
+	void CopyCubemapAtIndex(int indx, GLuint cubemap_id);
+
+	GLuint LoadHDR(const char* pth);
 
 	void CreateCapture(GLuint envMap, PBRCapture &capture, bool removeHDR = false);
 	void DeleteCapture(PBRCapture &capture);
@@ -42,5 +50,5 @@ public:
 	void ScreenRestore(GLFWwindow *window);
 
 private:
-
+	bool shadersLoaded = false;
 };

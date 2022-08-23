@@ -56,7 +56,7 @@ void RMaterialEditor::Render()
 		PrepName("Cutout");
 		ImGui::NextColumn();
 		int tp = (int)mat->type;
-		SetWeightPrep(); ImGui::Combo("#mat_type", &tp, "Default\0Blend");
+		SetWeightPrep(); ImGui::Combo("#mat_type", &tp, "Default\0Blend\0Laser\0Hightlight");
 		mat->type = (Shader_Type)tp;
 		SetWeightPrep(); ImGui::InputText("##mat_tag", &mat->tag);
 		SetWeightPrep(); ImGui::DragFloat("##AONat", &mat->ao, 0.01f, 0, 1, "%.3g");

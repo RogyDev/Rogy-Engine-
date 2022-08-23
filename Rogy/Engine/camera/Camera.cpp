@@ -3,7 +3,7 @@
 void Camera::Initia( void )
 {
 	FarView = 1000.0f;
-	NearView = 0.01f;
+	NearView = 0.05f;
 
 	// Initial Field of View
 	FOV = 70.0f;
@@ -65,7 +65,7 @@ void Camera::Save_ini()
 	ini_transform.Rotation = transform.Rotation;
 	ini_FOV = FOV;
 	ini_NearView = NearView;
-	ini_FarView = FarView;
+	ini_FarView = 2000;
 }
 // --------------------------------------------------------------------------------------------
 void Camera::Reset_ini()
@@ -78,6 +78,6 @@ void Camera::Reset_ini()
 	transform.Rotation = ini_transform.Rotation;
 	FOV = ini_FOV;
 	NearView = ini_NearView;
-	FarView = ini_FarView;
+	FarView = 2000;
 }
 // --------------------------------------------------------------------------------------------

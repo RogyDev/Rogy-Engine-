@@ -18,6 +18,7 @@ void InputManager::Init(GLFWwindow* windo)
 
 		setIsEnabled(true);
 
+		//glfwSetJoystickCallback(window, InputManager::KeyCallback);
 		glfwSetKeyCallback(window, InputManager::KeyCallback);
 		glfwSetMouseButtonCallback(window, InputManager::MouseCallback);
 		glfwSetCursorPosCallback(window, InputManager::cursor_position_callback);

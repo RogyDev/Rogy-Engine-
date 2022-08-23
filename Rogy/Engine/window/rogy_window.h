@@ -32,6 +32,7 @@ public:
 	bool IsFullscreen();
 	void SetFullScreen(bool fullscreen);
 	void Clear();
+	void Maximize();
 
 	void SetCursorMode(CursorMode mode);
 private:

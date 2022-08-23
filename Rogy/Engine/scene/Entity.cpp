@@ -13,15 +13,20 @@ Entity::~Entity()
 	//std::cout << "Entity [" << name << "] Destroyed. \n";
 }
 // --------------------------------------------------------------------------------------------
-void Entity::OnCollision(bool enter, Entity* trgt, glm::vec3 atPos)
+void Entity::OnCollision(bool enter, Entity* trgt, glm::vec3 contactPos, glm::vec3 contactNormal)
 {
 	IsColliding = enter;
+	ContactPos = contactPos;
+	ContactNormal = contactNormal;
 	for (size_t i = 0; i < m_scripts.size(); i++)
 	{
 		if (!m_scripts[i]->hasOnCollision) continue;
 		m_scripts[i]->PrepareMethod("OnCollision");
 		lua_pushboolean(m_scripts[i]->L, enter);
-		lua_pushinteger(m_scripts[i]->L, trgt->ID);
+		if(trgt != nullptr)
+			lua_pushinteger(m_scripts[i]->L, trgt->ID);
+		else
+			lua_pushinteger(m_scripts[i]->L, -1);
 		m_scripts[i]->CallMethod(2);
 	}
 }
@@ -96,8 +101,8 @@ void Entity::SetRotation(glm::vec3 angles)
 	RigidBody* rigidbody = GetComponent<RigidBody>();
 	if (rigidbody)
 		rigidbody->SetAngels(angles);
-	else
-		transform.SetAngels(angles);
+
+	transform.SetAngels(angles);
 }
 // --------------------------------------------------------------------------------------------
 void Entity::SetScale(glm::vec3 newScale)
@@ -352,7 +357,7 @@ Entity* Entity::AddChild(Entity* mObj)
 	mObj->transform.parent = &transform;
 
 	// reset position and scale, so the entity visual transform keep the same.
-	//mObj->transform.SetPosition(mObj->transform.Position - transform.Position);
+	mObj->transform.SetPosition(mObj->transform.Position - transform.GetWorldPosition());
 	//mObj->transform.SetScale(mObj->transform.Scale / transform.Scale);
 
 	Children.push_back(mObj);
@@ -468,6 +473,19 @@ Entity* Entity::GetChildWithTag(Entity* in_obj, std::string obj_tag)
 			if (obje && obje->tag == obj_tag)
 				return obje;
 		}
+	}
+	return nullptr;
+}
+// --------------------------------------------------------------------------------------------
+Entity* Entity::GetParentWithTag(Entity* in_obj, std::string obj_tag)
+{
+	// If we are looking for this entity, return it.
+	if (in_obj->tag == obj_tag)
+		return in_obj;
+
+	if (!in_obj->IsRoot())
+	{
+		return in_obj->GetParentWithTag(in_obj->parent, obj_tag);
 	}
 	return nullptr;
 }

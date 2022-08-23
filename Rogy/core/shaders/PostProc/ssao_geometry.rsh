@@ -15,9 +15,19 @@ uniform bool invertedNormals;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform bool sky;
 
 void main()
 {
+    if(sky)
+    {
+        FragPos = aPos;
+	    mat4 rotView = mat4(mat3(view));
+	    vec4 clipPos = projection * rotView * vec4(aPos, 1.0);
+	    gl_Position = clipPos.xyww;
+        return;
+    }
+
     vec4 viewPos = view * model * vec4(aPos, 1.0);
     FragPos = viewPos.xyz; 
 	//FragPos = vec3(model * vec4(aPos, 1.0));
@@ -50,9 +60,15 @@ float LinearizeDepth(float depth)
     return (2.0 * near * far) / (far + near - z * (far - near));	
 }
 
+uniform bool sky;
 
 void main()
 {    
+    if(sky)
+    {
+        gPosition = vec3(99999.0, 99999.0, 99999.0);
+        return;
+    }
     // store the fragment position vector in the first gbuffer texture
     gPosition = FragPos;
 	

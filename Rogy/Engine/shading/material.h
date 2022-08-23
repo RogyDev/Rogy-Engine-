@@ -17,6 +17,8 @@ enum Shader_Type
 {
 	SHADER_PBR,
 	SHADER_Blend,
+	SHADER_Laser,
+	SHADER_Hightlight,
 };
 
 class Material

@@ -80,6 +80,16 @@ struct Vec3Helper
 		return (a == b);
 	}
 
+	static glm::vec3 VecDown()
+	{
+		return glm::vec3(0.0f, -1.0f, 0.0f);
+	}
+
+	static glm::vec3 VecLeft()
+	{
+		return glm::vec3(-1.0f, 0.0f, 0.0f);
+	}
+
 	static glm::vec3 VecUp()
 	{
 		return glm::vec3(0.0f, 1.0f, 0.0f);
@@ -110,6 +120,37 @@ struct Vec3Helper
 		return "VEC3";
 	}
 
+	static float Distance(glm::vec3 a, glm::vec3 b)
+	{
+		return glm::distance(a, b);
+	}
+
+	static glm::vec3 CrossProduct(glm::vec3 a, glm::vec3 rhs)
+	{
+		return glm::vec3(
+			a.y * rhs.z - a.z * rhs.y,
+			a.z * rhs.x - a.x * rhs.z,
+			a.x * rhs.y - a.y * rhs.x
+		);
+	}
+
+	static glm::vec3 Normalize(glm::vec3 v)
+	{
+		float lenSquared =(v.x * v.x) + (v.y * v.y) + (v.z * v.z);
+		if (lenSquared != 1.0f && lenSquared > 0.0f)
+		{
+			float invLen = 1.0f / glm::sqrt(lenSquared);
+			v.x *= invLen;
+			v.y *= invLen;
+			v.z *= invLen;
+		}
+		return v;
+	}
+
+	static glm::vec3 ProjectOnPlane(glm::vec3 a, glm::vec3 axis)
+	{
+		return Normalize(CrossProduct(CrossProduct(axis, a), axis));
+	}
 };
 
 
@@ -197,6 +238,7 @@ struct Vec2Helper
 	{
 		return glm::lerp(a, b, d);
 	}
+
 };
 
 #endif // ! R_VECTOR_HELPERS_H

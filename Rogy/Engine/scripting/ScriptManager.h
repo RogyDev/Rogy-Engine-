@@ -41,11 +41,13 @@ public:
 	void LoadMainScripts();
 	void Close();
 	void Update();
-	void GetScriptsInPath(const char* path);
+	void GetScriptsInPath(const char* path, bool first = false);
 
 	// Script methods
 	void BeginGame();
 	void OnTick(float dt);
+	void OnPreTick(float dt);
+	void OnPhyTick(float dt);
 
 	// Classes instances control
 	ScriptInstance* InstanceClass(const char* class_name);
@@ -64,6 +66,7 @@ public:
 	
 	lua_State *L = nullptr;
 	bool RecompilingScripts = false;
+	std::string ProjectResourcesFolder;
 
 private:
 	bool initialized = false;

@@ -19,6 +19,7 @@ class RendererComponent : public Component
 	Material*  material = nullptr;
 	bool IsStatic   = false;
 	bool CastShadows = true;
+	bool drawOutline = false;
 	BBox bbox;
 	std::string lightmapPath = "";
 
@@ -47,7 +48,8 @@ class RendererComponent : public Component
 	{
 		enabled = data["enabled"].as<bool>();
 		CastShadows = data["CastShadows"].as<bool>();
-		lightmapPath = data["lightmapPath"].as<std::string>();
+		if(data["lightmapPath"].IsDefined())
+			lightmapPath = data["lightmapPath"].as<std::string>();
 	}
 };
 

@@ -364,6 +364,31 @@ void UIRenderer::EndFrame()
 	}
 }
 
+void UIRenderer::LoadFont(std::string src, int f_size)
+{
+	std::cout << "UIRenderer::LoadFont " << src << " -- " << f_size << "\n";
+	ImFont* f = ImGui::GetIO().Fonts->AddFontFromFileTTF(src.c_str(), f_size);
+	if (f == NULL) return;
+	fonts.emplace_back(f, src);
+}
+
+ImFont * UIRenderer::GetFont(unsigned int f_indx)
+{
+	for (size_t i = 0; i < fonts.size(); i++)
+	{
+		if (i == (f_indx - 1))
+			return fonts[i].font;
+	}
+	return nullptr;
+}
+void UIRenderer::Update()
+{
+	/*if (!loadFont.empty())
+	{
+		LoadFont(loadFont, lfs);
+		loadFont = "";
+	}*/
+}
 void UIRenderer::RenderHUD(float dt)
 {
 	uiWidgets.ClearRemovedComponents();
@@ -382,20 +407,30 @@ void UIRenderer::RenderHUD(float dt)
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, wdg->FrameRounding);
 			
 			ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(wdg->color.x, wdg->color.y, wdg->color.z, wdg->color.w * wdg->Alpha));
-			ImGui::Begin("Win1" + i, NULL, winFlags);
+			std::string wn = std::to_string(i+174);
+			wn += "Win1";
+			ImGui::Begin(wn.c_str(), NULL, winFlags);
 
 			for (size_t i = 0; i < wdg->widgets.size(); i++)
 			{
 				if (!wdg->widgets[i]->Enabled)
 					continue;
-
+				bool customFont = false;
+				if (wdg->widgets[i]->fontIndex != 0)
+				{
+					ImFont* fnt = GetFont(wdg->widgets[i]->fontIndex);
+					if (fnt != nullptr) {
+						ImGui::PushFont(fnt);
+						customFont = true;
+					}
+				}
 				if (wdg->widgets[i]->type == UI_WIDGET_TEXT)
 				{
 					UIWidgetText* text = static_cast<UIWidgetText*>(wdg->widgets[i]);
 					if (text->Wrap)
 					{
-						ImVec2 pos_arg = vec2mul(vec2mul(text->Position, ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
-						ImVec2 size_arg = vec2mul(vec2mul(text->Size, ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
+						ImVec2 pos_arg = vec2mul(vec2mul(text->toIm(text->Position), ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
+						ImVec2 size_arg = vec2mul(vec2mul(text->toIm(text->Size), ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
 
 						ImGui::GetCurrentWindow()->DC.CursorPos = vec2Add(pos_arg, ImGui::GetCurrentWindow()->Pos);
 						ImGui::PushStyleColor(ImGuiCol_Text, colorWithAlpha(text->color, text->Alpha * wdg->Alpha));
@@ -407,14 +442,17 @@ void UIRenderer::RenderHUD(float dt)
 						ImGui::EndChild();
 					}
 					else
-						TextEx(text->text.c_str(), text->Position, text->Scale, colorWithAlpha(text->color, text->Alpha * wdg->Alpha));
+						TextEx(text->text.c_str(), text->toIm(text->Position), text->Scale, colorWithAlpha(text->color, text->Alpha * wdg->Alpha));
+
+					if (customFont)
+						ImGui::PopFont();
 					continue;
 				}
 				else if (wdg->widgets[i]->type == UI_WIDGET_BUTTON)
 				{
 					UIWidgetButton* button = static_cast<UIWidgetButton*>(wdg->widgets[i]);
 					ImGui::PushStyleColor(ImGuiCol_Text, button->TextColor);
-					if (ButtonEx(button->text.c_str(), button->Position, button->Size, button->Scale,
+					if (ButtonEx(button->text.c_str(), button->toIm(button->Position), button->toIm(button->Size), button->Scale,
 						button->TextAsButton, button->FrameRounding, colorWithAlpha(button->Color, button->Alpha * wdg->Alpha),
 						colorWithAlpha(button->HoveredColor, button->Alpha * wdg->Alpha), colorWithAlpha(button->PressColor, button->Alpha * wdg->Alpha),
 						colorWithAlpha(button->TextColor, button->Alpha * wdg->Alpha), button->image))
@@ -429,15 +467,15 @@ void UIRenderer::RenderHUD(float dt)
 				{
 					UIWidgetImage* image = static_cast<UIWidgetImage*>(wdg->widgets[i]);
 					if (image->image != nullptr)
-						ImageEx(image->image, image->Position, image->Size, colorWithAlpha(image->Color, image->Alpha * wdg->Alpha));
+						ImageEx(image->image, image->toIm(image->Position), image->toIm(image->Size), colorWithAlpha(image->Color, image->Alpha * wdg->Alpha));
 					else
-						FrameEx(image->Position, image->Size, colorWithAlpha(image->Color, image->Alpha * wdg->Alpha), image->FrameRounding);
+						FrameEx(image->toIm(image->Position), image->toIm(image->Size), colorWithAlpha(image->Color, image->Alpha * wdg->Alpha), image->FrameRounding);
 					continue;
 				}
 				else if (wdg->widgets[i]->type == UI_WIDGET_PROGRESSBAR)
 				{
 					UIWidgetProgressBar* pbar = static_cast<UIWidgetProgressBar*>(wdg->widgets[i]);
-					BarEx(pbar->Position, pbar->Size, colorWithAlpha(pbar->Color, pbar->Alpha * wdg->Alpha), colorWithAlpha(pbar->BarColor, pbar->Alpha * wdg->Alpha), pbar->Value, pbar->FrameRounding, pbar->RightToLeft);
+					BarEx(pbar->toIm(pbar->Position), pbar->toIm(pbar->Size), colorWithAlpha(pbar->Color, pbar->Alpha * wdg->Alpha), colorWithAlpha(pbar->BarColor, pbar->Alpha * wdg->Alpha), pbar->Value, pbar->FrameRounding, pbar->RightToLeft);
 					continue;
 				}
 				else if (wdg->widgets[i]->type == UI_WIDGET_LINE)
@@ -446,13 +484,13 @@ void UIRenderer::RenderHUD(float dt)
 					ImVec2 wpos = ImGui::GetCurrentWindow()->Pos;
 					if(!pbar->Custom)
 					{
-						pbar->Point2 = pbar->Position;
+						pbar->Point2 = pbar->toIm(pbar->Position);
 						if (pbar->VerticalLine)
 							pbar->Point2.y += pbar->Size.y;
 						else
 							pbar->Point2.x += pbar->Size.x;
 					}
-					ImVec2 pnt1 = vec2mul(vec2mul(pbar->Position, ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
+					ImVec2 pnt1 = vec2mul(vec2mul(pbar->toIm(pbar->Position), ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
 					ImVec2 pnt2 = vec2mul(vec2mul(pbar->Point2, ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
 					ImGui::GetCurrentWindow()->DrawList->AddLine(vec2Add(wpos, pnt1), vec2Add(wpos, pnt2), ImGui::GetColorU32(colorWithAlpha(pbar->Color, pbar->Alpha * wdg->Alpha)), pbar->thickness);
 					continue;
@@ -462,8 +500,8 @@ void UIRenderer::RenderHUD(float dt)
 					UIWidgetInputText* itext = static_cast<UIWidgetInputText*>(wdg->widgets[i]);
 					ImVec2 wpos = ImGui::GetCurrentWindow()->Pos;
 
-					ImVec2 pos_arg = vec2mul(vec2mul(itext->Position, ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
-					ImVec2 size_arg = vec2mul(vec2mul(itext->Size, ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
+					ImVec2 pos_arg = vec2mul(vec2mul(itext->toIm(itext->Position), ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
+					ImVec2 size_arg = vec2mul(vec2mul(itext->toIm(itext->Size), ImVec2(0.01f, 0.01f)), ImGui::GetCurrentWindow()->SizeFull);
 
 					ImGui::GetCurrentWindow()->DC.CursorPos = vec2Add(pos_arg, ImGui::GetCurrentWindow()->Pos);
 					ImGui::PushStyleColor(ImGuiCol_Text, colorWithAlpha(itext->color, itext->Alpha * wdg->Alpha));

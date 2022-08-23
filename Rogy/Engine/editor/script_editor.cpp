@@ -14,6 +14,7 @@ void Script_Editor::OpenScript(std::string path, std::string nme)
 	if (!fb.open(path, std::ios::in))
 		return;
 	fb.close();
+	scriptOpend = true;
 
 	// Load script from path
 	std::ifstream infile(path);
@@ -29,6 +30,8 @@ void Script_Editor::OpenScript(std::string path, std::string nme)
 	script_info.used = false;
 	script_info.t_editor.SetLanguageDefinition(TextEditor::LanguageDefinition::Lua());
 	script_info.t_editor.SetText(script_info.code);
+	script_info.t_editor.SetPalette(script_info.t_editor.GetDarkPalette()) ;
+	
 	m_OpenedScripts.push_back(script_info);
 }
 // --------------------------------------------------------
@@ -59,6 +62,7 @@ void Script_Editor::SaveScript(std::string path)
 // --------------------------------------------------------
 void Script_Editor::Render(ImFont* code_font)
 {
+	if (!isOn) return;
 	std::string win_title;
 	for (size_t i = 0; i < m_OpenedScripts.size(); i++)
 	{

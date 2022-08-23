@@ -17,7 +17,12 @@ namespace LMath
 		return glm::sqrt(val);
 	}
 
-	glm::vec3 Lerp(glm::vec3 from, glm::vec3 to, float speed)
+	float Lerp(float a, float b, float f)
+	{
+		return a + f * (b - a);
+	}
+
+	glm::vec3 LerpV(glm::vec3 from, glm::vec3 to, float speed)
 	{
 		return glm::lerp(from, to, speed);
 	}

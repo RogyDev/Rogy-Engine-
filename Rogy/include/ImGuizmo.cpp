@@ -928,11 +928,12 @@ namespace ImGuizmo
          return;
       float modulo = fmodf(*value, snap);
       float moduloRatio = fabsf(modulo) / snap;
-      if (moduloRatio < snapTension)
-         *value -= modulo;
-      else if (moduloRatio >(1.f - snapTension))
-         *value = *value - modulo + snap * ((*value<0.f) ? -1.f : 1.f);
+	  if (moduloRatio < snapTension)
+		  *value -= modulo;
+	  else if (moduloRatio > (1.f - snapTension))
+		  *value = *value - modulo + snap *((*value < 0.f) ? -1.f : 1.f);
    }
+
    static void ComputeSnap(vec_t& value, float *snap)
    {
       for (int i = 0; i < 3; i++)
@@ -997,7 +998,7 @@ namespace ImGuizmo
          if(radiusAxis > gContext.mRadiusSquareCenter)
            gContext.mRadiusSquareCenter = radiusAxis;
 
-         drawList->AddPolyline(circlePos, halfCircleSegmentCount, colors[3 - axis], false, 2);
+         drawList->AddPolyline(circlePos, halfCircleSegmentCount, colors[3 - axis], false, 4);
       }
       drawList->AddCircle(worldToPos(gContext.mModel.v.position, gContext.mViewProjection), gContext.mRadiusSquareCenter, colors[0], 64, 3.f);
 
@@ -1066,12 +1067,12 @@ namespace ImGuizmo
 
             if (gContext.mbUsing)
             {
-               drawList->AddLine(baseSSpace, worldDirSSpaceNoScale, 0xFF404040, 3.f);
-               drawList->AddCircleFilled(worldDirSSpaceNoScale, 6.f, 0xFF404040);
+               drawList->AddLine(baseSSpace, worldDirSSpaceNoScale, 0xFF404040, 5.f);
+               drawList->AddCircleFilled(worldDirSSpaceNoScale, 7.f, 0xFF404040);
             }
 
-            drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], 3.f);
-            drawList->AddCircleFilled(worldDirSSpace, 6.f, colors[i + 1]);
+            drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], 5.f);
+            drawList->AddCircleFilled(worldDirSSpace, 7.f, colors[i + 1]);
 
             if (gContext.mAxisFactor[i] < 0.f)
                DrawHatchedAxis(dirAxis * scaleDisplay[i]);
@@ -1125,17 +1126,17 @@ namespace ImGuizmo
          // draw axis
          if (belowAxisLimit)
          {
-            ImVec2 baseSSpace = worldToPos(dirAxis * 0.1f * gContext.mScreenFactor, gContext.mMVP);
+            ImVec2 baseSSpace = worldToPos(dirAxis * 0.07f * gContext.mScreenFactor, gContext.mMVP);
             ImVec2 worldDirSSpace = worldToPos(dirAxis * gContext.mScreenFactor, gContext.mMVP);
 
-            drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], 3.f);
+            drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], 5.f);
 
             // Arrow head begin
             ImVec2 dir(origin - worldDirSSpace);
 
             float d = sqrtf(ImLengthSqr(dir));
             dir /= d; // Normalize
-            dir *= 6.0f;
+            dir *= 9.0f;
 
             ImVec2 ortogonalDir(dir.y, -dir.x); // Perpendicular vector
             ImVec2 a(worldDirSSpace + dir);
@@ -1162,7 +1163,8 @@ namespace ImGuizmo
 
       drawList->AddCircleFilled(gContext.mScreenSquareCenter, 6.f, colors[0], 32);
 
-      if (gContext.mbUsing)
+	  // Edit : Debug info when "Using"
+      /*if (gContext.mbUsing)
       {
          ImVec2 sourcePosOnScreen = worldToPos(gContext.mMatrixOrigin, gContext.mViewProjection);
          ImVec2 destinationPosOnScreen = worldToPos(gContext.mModel.v.position, gContext.mViewProjection);
@@ -1179,7 +1181,7 @@ namespace ImGuizmo
          ImFormatString(tmps, sizeof(tmps), translationInfoMask[type - MOVE_X], deltaInfo[translationInfoIndex[componentInfoIndex]], deltaInfo[translationInfoIndex[componentInfoIndex + 1]], deltaInfo[translationInfoIndex[componentInfoIndex + 2]]);
          drawList->AddText(ImVec2(destinationPosOnScreen.x + 15, destinationPosOnScreen.y + 15), 0xFF000000, tmps);
          drawList->AddText(ImVec2(destinationPosOnScreen.x + 14, destinationPosOnScreen.y + 14), 0xFFFFFFFF, tmps);
-      }
+      }*/
    }
 
    static bool CanActivate()

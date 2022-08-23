@@ -35,6 +35,8 @@ public:
 	bool scripts_board = false;
 	bool tryingtoSpawn = false;
 
+	std::string ProjectResourcesFolder;
+
 	ViewPort_Bounds* MainViewport;
 	Scene_hierarchy s_hierarchy;
 	EditorProperty prep_editor;
@@ -47,6 +49,8 @@ public:
 
 	ImGuizmo::OPERATION mCurrentGizmoOperation;
 	ImGuizmo::MODE mCurrentGizmoMode;
+	float snaping = 0.00f;
+	bool BoundSizing = false;
 
 	int SCR_weight, SCR_height;
 

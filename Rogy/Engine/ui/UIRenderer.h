@@ -28,6 +28,16 @@ struct UIChar {
 	GLuint Advance; // Offset to advance to next glyph
 };
 
+struct UIFont {
+	ImFont* font = nullptr;
+	std::string source;
+	UIFont(ImFont* afont, std::string sorce)
+	{
+		font = afont;
+		source = sorce;
+	}
+};
+
 class UIRenderer
 {
 public:
@@ -41,8 +51,12 @@ public:
 	void RenderText(glm::vec2 &Pos, glm::vec2 &Scale, glm::vec3& color, float alpha, std::string& text);
 	float TextSize(float posX, glm::vec2 &Scale, std::string& text);
 
+	void Update();
 	void BeginFrame();
 	void EndFrame();
+
+	void LoadFont(std::string src, int f_size);
+	ImFont* GetFont(unsigned int f_indx);
 
 	ComponentArray<UIText> texts;
 
@@ -54,6 +68,7 @@ public:
 	Texture* Checked = nullptr;
 	Texture* Unchecked = nullptr;
 
+	
 	void RenderBlurFrames(unsigned int blurImage);
 	bool BlurFrame(ImVec2& pos_, glm::vec2& size_);
 private:
@@ -86,6 +101,9 @@ private:
 	glm::mat4 projection;
 	std::map<GLchar, UIChar> Characters;
 	int scr_left, scr_top, scr_weight, scr_height;
+	
+public:
+	std::vector<UIFont> fonts;
 };
 
 
