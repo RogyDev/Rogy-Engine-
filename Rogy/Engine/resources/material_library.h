@@ -76,6 +76,8 @@ public:
 
 	Shader mousePickID;
 
+	Shader Test;
+
 	// Materials
 	// -----------------------------------
 	std::vector<Material*> materials;

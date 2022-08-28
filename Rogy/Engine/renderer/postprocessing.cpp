@@ -175,23 +175,6 @@ bool RPostProcessing::Render(GLuint a, float f, float n)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		screenShader.use();
-
-		/*static glm::vec2 Pixels[9] =
-		{
-			glm::vec2(scr_w*0.50, scr_h*0.50),
-
-			glm::vec2(scr_w*0.25, scr_h*0.50),
-			glm::vec2(scr_w*0.75, scr_h*0.50),
-			glm::vec2(scr_w*0.50, scr_h*0.25),
-			glm::vec2(scr_w*0.50, scr_h*0.75),
-
-			glm::vec2(scr_w*0.25, scr_h*0.25),
-			glm::vec2(scr_w*0.25, scr_h*0.75),
-			glm::vec2(scr_w*0.75, scr_h*0.25),
-			glm::vec2(scr_w*0.75, scr_h*0.75)
-		};
-		for (int i = 0; i < 9; i++)
-			screenShader.SetVec2(("Pixels[" + std::to_string(i) + "]").c_str(), Pixels[i]);*/
 		
 		screenShader.SetFloat("p_exposure", exposure);
 
@@ -237,27 +220,12 @@ bool RPostProcessing::Render(GLuint a, float f, float n)
 		}
 
 		screenShader.SetVec2("u_resolution", (float)colorBuffer.scr_w, (float)colorBuffer.scr_h);
+
 		glActiveTexture(GL_TEXTURE0);
-
-		//glBindTexture(GL_TEXTURE_2D, tt);
-		//if (blur_use)
-		//	BluredScreen.UseTexture();
-		//else
-		//glBindTexture(GL_TEXTURE_2D, a);
-		//.SetFloat("Far", f);
-		//screenShader.SetFloat("Near", n);
-		//if(a == 8)
-
 		if (Fxaa)
 			colorBufferAA.UseTexture();
-			//glBindTexture(GL_TEXTURE_2D, RefBuffer);
 		else
 			colorBuffer.UseTexture();
-
-		//glActiveTexture(GL_TEXTURE2);
-		//HighlightTex.UseTexture();
-
-		//glBindTexture(GL_TEXTURE_2D, ScreenDepth);
 
 	//	else
 			//glBindTexture(GL_TEXTURE_2D, a);
@@ -275,20 +243,13 @@ bool RPostProcessing::Render(GLuint a, float f, float n)
 
 		screenShader.SetFloat("p_exposure", sceneExposure);
 		exposure = sceneExposure;*/
-		//verticalBlur.UseTexture();
-		//BluredScreen.UseTexture();
-
-		//glBindTexture(GL_TEXTURE_2D, colorBuffer.textureColorbuffer);
 
 		if (use_ssao)
 		{
 			glActiveTexture(GL_TEXTURE1);
-			//glBindTexture(GL_TEXTURE_2D, ssaoEffect.ssaoColorBufferBlur);
 			glBindTexture(GL_TEXTURE_2D, ssaoEffect.hBlur.textureColorbuffer);
 		}
-		//screenShader.SetFloat("p_exposure", exposure);
-		//glActiveTexture(GL_TEXTURE0);
-		//colorBuffer.UseTexture();
+
 		return true;
 	}
 	return false;

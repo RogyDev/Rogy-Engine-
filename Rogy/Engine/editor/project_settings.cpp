@@ -55,7 +55,7 @@ void Project_Settings::Render()
 	if (ImGui::CollapsingHeader("Quality", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		EditorProperty::BeginPreps("edit_proj_settings_q");
-		EditorProperty::PrepName("Sky Capture Resulotion");
+		//EditorProperty::PrepName("Sky Capture Resulotion");
 		EditorProperty::PrepName("Use Instancing");
 		EditorProperty::PrepName("Use Instancing for shadows");
 		EditorProperty::PrepName("Use Depth Pre-Pass");

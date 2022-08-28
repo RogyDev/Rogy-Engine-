@@ -14,7 +14,8 @@ void main()
 {
 	mat4 model = models[gl_InstanceID];
 	TexCoords = aTexCoords;
-	gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
+	vec4 model_aPos = model * vec4(aPos, 1.0);
+	gl_Position = lightSpaceMatrix * model_aPos;
 }
 #endif
 
@@ -26,10 +27,10 @@ uniform	sampler2D alpha;
 uniform bool use_alpha;
 void main()
 {
-	if(use_alpha)
+	//if(use_alpha)
 	{
-		if((texture(alpha, TexCoords).a) < 0.5)
-       		discard;
+		//if((texture(alpha, TexCoords).a) < 0.5)
+       	//	discard;
 
 		/*vec3 tr = texture(alpha, TexCoords).rgb;
 	 	if((tr.r) < 0.5)

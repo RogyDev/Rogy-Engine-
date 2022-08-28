@@ -52,15 +52,17 @@ void main()
 #endif
 
 	mat4 model = models[gl_InstanceID];
+	vec4 model_aPos = model * vec4(aPos, 1.0);
+
 	vs_out.TexCoords = aTexCoords * tex_uv;
 	vs_out.TexCoords2 = aTexCoords2;
 	
 	vs_out.WorldPos = aPos;
-    vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
-    vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
+    vs_out.FragPos = vec3(model_aPos);
+	vs_out.Normal = mat3(model) * aNormal;
+	//vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
 
-	vec4 viewPos = view * model * vec4(aPos, 1.0);
-
+	vec4 viewPos = view * model_aPos;
 	vs_out.FragPosS = viewPos.xyz;
 	
 	vec4 Pos = vec4(vs_out.FragPos, 1.0);
@@ -68,15 +70,15 @@ void main()
 	for (int i = 0 ; i < NUM_CASCADES ; i++) 
 		vs_out.LightSpacePos[i] = gLightWVP[i] * Pos;
 	
-	for(int i = 0 ; i < spot_shadow_count; i++)
-		vs_out.spot_MVP_SPACE[i] = spot_MVP[i] * Pos;
+	//for(int i = 0 ; i < spot_shadow_count; i++)
+		//vs_out.spot_MVP_SPACE[i] = spot_MVP[i] * Pos;
 	
 	vec3 T = normalize(vec3(model * vec4(aTangent, 0.0)));
 	vec3 B = normalize(vec3(model * vec4(aBitangent, 0.0)));
 	vec3 N = normalize(vec3(model * vec4(aNormal, 0.0)));
 	vs_out.TBN = mat3(T, B, N);
 
-    gl_Position = VP * model * vec4(aPos, 1.0);
+    gl_Position = VP * model_aPos;
 	vs_out.ClipSpacePosZ = gl_Position.z;
 }
 
@@ -260,30 +262,6 @@ vec3 gridSamplingDisk[20] = vec3[]
    vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
 );
 
-float SpotShadowCalculation(int idx, float bias, vec3 lightPos)
-{	
-	vec4 frag_pos_light = fs_in.spot_MVP_SPACE[idx];
-	vec3 projCoords = frag_pos_light.xyz / frag_pos_light.w;
-	projCoords = projCoords * 0.5 + 0.5;
-
-	float mOffset = 1.0 / spot_shadow_count_vertical;
-	projCoords.xy *= mOffset;
-	projCoords.xy += (mOffset * spot_shadow_atlas[idx]);
-
-	float shadow =  1.0 - textureProj( texSpot_shadows, vec4(projCoords.xy, projCoords.z - bias, 1.0)) ;
-	return shadow;
-}
-
-float PointShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, float bias, int shadow_index)
-{
-    vec3 fragToLight = fragPos - lightPos;
-    float closestDepth = texture(tex_shadows[shadow_index], fragToLight).r;
-    closestDepth *= far_plane;
-    float currentDepth = length(fragToLight);
-    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0; 
-    return shadow;
-}
-
 // -----------------------------------------------------------------------------------------------------------------------
 vec2 poissonDisk[16] = vec2[]( 
    vec2( -0.94201624, -0.39906216 ), 
@@ -317,7 +295,7 @@ float GetShadowBias(vec3 N)
     float bias = max(minBias * (1.0 - dot(N, dirLight.direction)), minBias);
     return bias;
 }
-/*
+
 // https://www.gamedev.net/articles/programming/graphics/contact-hardening-soft-shadows-made-fast-r4906/
 //
 vec2 VogelDiskSample(int sampleIndex, int samplesCount, float phi) {
@@ -358,19 +336,19 @@ float AvgBlockersDepthToPenumbra2(float z_shadowMapView, float avgBlockersDepth)
   return clamp(80.0f * penumbra,0.0,1.0);
   //return 80.0f * penumbra;
 }
-
+/*
 float Penumbra(float gradientNoise, vec2 shadowMapUV, float z_shadowMapView, int samplesCount, vec2 penumbraFilterMaxSize, int sh_indexX)
 {
   float avgBlockersDepth = 0.0;
   float blockersCount = 0.0;
 
-  for(int i = 0; i < samplesCount; i ++)
+  for(int i = 0; i < samplesCount; i++)
   {
     vec2 sampleUV = VogelDiskSample(i, samplesCount, gradientNoise);
     sampleUV = shadowMapUV + sampleUV * penumbraFilterMaxSize;
 
     //float sampleDepth = shadowMapTexture.SampleLevel(pointClampSampler, sampleUV, 0).x;
-	float sampleDepth = texture(shadowMaps, vec3(sampleUV, 0.0)).x;
+	float sampleDepth = 1;//texture(shadowMaps, vec3(sampleUV, 0.0)).x;
     if(sampleDepth < z_shadowMapView)
     {
       avgBlockersDepth += sampleDepth;
@@ -387,8 +365,8 @@ float Penumbra(float gradientNoise, vec2 shadowMapUV, float z_shadowMapView, int
   {
     return 0.0;
   }
-}
-*/
+}*/
+
 const vec2 poissonDisk1[64] = vec2[64]
 (
   vec2(-0.613392, 0.617481),
@@ -462,6 +440,13 @@ vec2 samplePoissonDisk(uint index)
   return poissonDisk1[index % 64];
 }
 
+float VogelGetShadow(int i, int VogelDiskSampleCount, float gradientNoise, vec2 shadowMapUV, vec2 shadowFilterMaxSize, float smoothnessRadius, vec3 projCoords, float bias)
+{
+	vec2 sampleUV = VogelDiskSample(i, VogelDiskSampleCount, gradientNoise);
+    sampleUV = shadowMapUV + sampleUV * shadowFilterMaxSize * smoothnessRadius;
+	return (1.0 - texture(shadowMaps, vec3(sampleUV, projCoords.z - bias)));
+}
+
 float ShadowCalculation(int sh_indexX, bool softS, vec3 N)
 {
 	int sh_index = sh_indexX;
@@ -470,6 +455,7 @@ float ShadowCalculation(int sh_indexX, bool softS, vec3 N)
 	
     vec3 projCoords = fs_in.LightSpacePos[sh_index].xyz;// / fs_in.LightSpacePos[sh_index].w;
     projCoords = projCoords * 0.5 + 0.5;
+
 	float shadow = 0.0;
 
 	float mOffset = 1.0 / NUM_CASCADES;
@@ -484,20 +470,75 @@ float ShadowCalculation(int sh_indexX, bool softS, vec3 N)
 	if(softS)
 	{
 //#if SHADOW_QUALITY == 2 
+		/*const int KernelSize = 2;
+		vec2 shadowMapUV = projCoords.xy;
+    	const int VogelDiskSampleCount = KernelSize * KernelSize;
+
+		float gradientNoise = InterleavedGradientNoise(gl_FragCoord.xy);
+    	vec2 shadowMapSize = textureSize(shadowMaps, 0).xy;
+    	vec2 shadowFilterMaxSize = VogelDiskScale(shadowMapSize, KernelSize);
+		//float smoothnessRadius = Penumbra(gradientNoise, shadowMapUV, z_shadowMapView, VogelDiskSampleCount, shadowFilterMaxSize, sh_indexX);//0.5;
+    	float smoothnessRadius = 0.4;
+		float shadow = 0.0f;
+
+    	//for(int i = 0; i < VogelDiskSampleCount; i++) 
+		{
+        	//vec2 sampleUV = VogelDiskSample(i, VogelDiskSampleCount, gradientNoise);
+        	//sampleUV = shadowMapUV + sampleUV * shadowFilterMaxSize * smoothnessRadius;
+			//shadow += (1.0 - texture(shadowMaps, vec3(sampleUV, projCoords.z - bias)));
+			//shadow += VogelGetShadow(i,  VogelDiskSampleCount,  gradientNoise,  shadowMapUV,  shadowFilterMaxSize,  smoothnessRadius,  projCoords,  bias);
+
+			shadow += VogelGetShadow(0,  VogelDiskSampleCount,  gradientNoise,  shadowMapUV,  shadowFilterMaxSize,  smoothnessRadius,  projCoords,  bias);
+			shadow += VogelGetShadow(1,  VogelDiskSampleCount,  gradientNoise,  shadowMapUV,  shadowFilterMaxSize,  smoothnessRadius,  projCoords,  bias);
+			shadow += VogelGetShadow(2,  VogelDiskSampleCount,  gradientNoise,  shadowMapUV,  shadowFilterMaxSize,  smoothnessRadius,  projCoords,  bias);
+			shadow += VogelGetShadow(3,  VogelDiskSampleCount,  gradientNoise,  shadowMapUV,  shadowFilterMaxSize,  smoothnessRadius,  projCoords,  bias);
+    	}
+    
+    	shadow /= float(VogelDiskSampleCount);
+    	return shadow;*/
+
 		// PCF
-		vec2 texelSize = 1.0 / textureSize(shadowMaps, 0);
+		/*vec2 texelSize = 1.0 / (textureSize(shadowMaps, 0) / NUM_CASCADES);
 
-		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(-1, -1)) * texelSize , projCoords.z - bias) ));
+		//shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(-1, -1)) * texelSize , projCoords.z - bias) ));
 		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(-1, 0)) * texelSize , projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(-1, 1)) * texelSize , projCoords.z - bias) ));
+		//shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(-1, 1)) * texelSize , projCoords.z - bias) ));
 		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(0, -1)) * texelSize , projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(0, 0)) * texelSize , projCoords.z - bias) ));
+		//shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(0, 0)) * texelSize , projCoords.z - bias) ));
 		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(0, 1)) * texelSize , projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(1, -1)) * texelSize , projCoords.z - bias) ));
+		//shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(1, -1)) * texelSize , projCoords.z - bias) ));
 		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(1, 0)) * texelSize , projCoords.z - bias) ));
-		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(1, 1)) * texelSize , projCoords.z - bias) ));
+		//shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + normalize(vec2(1, 1)) * texelSize , projCoords.z - bias) ));
 
-		shadow /= 9.0;
+		shadow /= 4.0;
+*/
+		/*for (int i = 0; i < 4; i++)
+		{
+        	int index = int(16.0*random(fs_in.FragPos.xyy, i))%16;
+			shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + poissonDisk[index]/700.0, projCoords.z - bias) ));
+    	}
+		int index = int(16.0*random(fs_in.FragPos.xyy, 0))%16;
+		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + poissonDisk[index]/700.0 , projCoords.z - bias) ));
+		index = int(16.0*random(fs_in.FragPos.xyy, 1))%16;
+		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + poissonDisk[index]/700.0, projCoords.z - bias) ));
+		index = int(16.0*random(fs_in.FragPos.xyy, 2))%16;
+		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + poissonDisk[index]/700.0, projCoords.z - bias) ));
+		index = int(16.0*random(fs_in.FragPos.xyy, 3))%16;
+		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + poissonDisk[index]/700.0, projCoords.z - bias) ));
+		*/
+
+		
+		//int index = int(16.0*random(fs_in.FragPos.xyy, 0))%16;
+		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + poissonDisk[0]/700.0 , projCoords.z - bias) ));
+		//index = int(16.0*random(fs_in.FragPos.xyy, 1))%16;
+		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + poissonDisk[1]/700.0, projCoords.z - bias) ));
+		//index = int(16.0*random(fs_in.FragPos.xyy, 2))%16;
+		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + poissonDisk[2]/700.0, projCoords.z - bias) ));
+		//index = int(16.0*random(fs_in.FragPos.xyy, 3))%16;
+		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy + poissonDisk[3]/700.0, projCoords.z - bias) ));
+		
+
+		shadow /= 4.0;
 /*
 #else
 #if SHADOW_QUALITY == 3
@@ -537,6 +578,46 @@ float ShadowCalculation(int sh_indexX, bool softS, vec3 N)
 		shadow += (1.0 - texture( shadowMaps, vec3(projCoords.xy , projCoords.z - bias) ));
     }
 	
+
+	//if(projCoords.z > 1.0)	shadow = 0.0;
+
+    return shadow;
+}
+
+
+float SpotShadowCalculation(int idx, float bias, vec3 lightPos)
+{	
+	vec4 frag_pos_light = fs_in.spot_MVP_SPACE[idx];
+	vec3 projCoords = frag_pos_light.xyz / frag_pos_light.w;
+	projCoords = projCoords * 0.5 + 0.5;
+
+	float mOffset = 1.0 / spot_shadow_count_vertical;
+	projCoords.xy *= mOffset;
+	projCoords.xy += (mOffset * spot_shadow_atlas[idx]);
+
+	float shadow =  1.0 - textureProj( texSpot_shadows, vec4(projCoords.xy, projCoords.z - bias, 1.0)) ;
+
+	/*int index = int(16.0*random(fs_in.FragPos.xyy, 0))%16;
+	float shadow = (1.0 - textureProj( texSpot_shadows, vec4(projCoords.xy + poissonDisk[index]/700.0 , projCoords.z - bias, 1.0) ));
+	index = int(16.0*random(fs_in.FragPos.xyy, 1))%16;
+	shadow += (1.0 - textureProj( texSpot_shadows, vec4(projCoords.xy + poissonDisk[index]/700.0, projCoords.z - bias, 1.0) ));
+	index = int(16.0*random(fs_in.FragPos.xyy, 2))%16;
+	shadow += (1.0 - textureProj( texSpot_shadows, vec4(projCoords.xy + poissonDisk[index]/700.0, projCoords.z - bias, 1.0) ));
+	index = int(16.0*random(fs_in.FragPos.xyy, 3))%16;
+	shadow += (1.0 - textureProj( texSpot_shadows, vec4(projCoords.xy + poissonDisk[index]/700.0, projCoords.z - bias, 1.0) ));
+
+	shadow /= 4.0;*/
+
+	return shadow;
+}
+
+float PointShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, float bias, int shadow_index)
+{
+    vec3 fragToLight = fragPos - lightPos;
+    float closestDepth = texture(tex_shadows[shadow_index], fragToLight).r;
+    closestDepth *= far_plane;
+    float currentDepth = length(fragToLight);
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0; 
     return shadow;
 }
 
@@ -650,6 +731,7 @@ vec3 CalcIBL(vec3 N, vec3 V, vec3 F0, vec3 albedo_color, float metallic_color, f
 
     vec3 kD = (1.0 - F) * (1.0 - metallic_color);
     vec3 irradiance = texture(irradianceMaps, vec4(N, probeIndx)).rgb;
+
     vec3 diffuse    = irradiance * albedo_color;
     
 	vec3 prefilteredColor = textureLod(prefilterMaps, vec4(R, probeIndx),  roughness_color * 4).rgb;      
@@ -1022,24 +1104,8 @@ void main()
 	// Ambient Lighting (IBL)
 	//--------------------------------------------
 	vec3 F0 = mix(vec3(0.04), albedo_color, metallic_color); 
-    //vec3 ambient = CalcIBL(N, V, F0, albedo_color, metallic_color, roughness_color);
-	//vec3 ambient = vec3(0.0);
 	vec3 ambient = CalcIBL(N, V, F0, albedo_color, metallic_color, roughness_color);
-	/*for(int i = 1; i < 2; i++)
-	{
-		ambient = mix(ambient, CalcIBL(N, V, F0, albedo_color, metallic_color, roughness_color, 1), insideBox3d(fs_in.FragPos, env_probe[1].mBoxMin, env_probe[1].mBoxMax));
-		//ambient = CalcIBL(N, V, F0, albedo_color, metallic_color, roughness_color, i);
-
-	}*/
-	//int constt = 0;
-	//ambient = CalcIBL(N, V, F0, albedo_color, metallic_color, roughness_color, int(insideBox3d(fs_in.FragPos, env_probe[1].mBoxMin, env_probe[1].mBoxMax)));
-	//if(insideBox3d(fs_in.FragPos, env_probe[1].mBoxMin, env_probe[1].mBoxMax) == 1)
-		//constt = 1;
-		//ambient = CalcIBL(N, V, F0, albedo_color, metallic_color, roughness_color, 1);
-	//else
-		//ambient = CalcIBL(N, V, F0, albedo_color, metallic_color, roughness_color, 0);
-
-//	ambient = CalcIBL(N, V, F0, albedo_color, metallic_color, roughness_color, constt);
+	
 
 	// Direct Lighting
 	//--------------------------------------------
@@ -1089,7 +1155,7 @@ void main()
 		// emission
 		vec3 emi = material.emission * material.emission_power;
 		if(material.use_tex_emission){
-			emi *= texture(material.tex_emission, fs_in.TexCoords).r;
+			//emi *= texture(material.tex_emission, fs_in.TexCoords).r;
 		}
 		color += emi;
 	}
@@ -1129,4 +1195,44 @@ void main()
 	//FragColor += RimColor;
 }
 
+/*
+float rand(float n){
+    return fract(sin(n) * 43758.5453123);
+}
+
+int argmax(vec3 v){
+    if (v.x >= v.y && v.x >= v.z) return 0;
+    if (v.y >= v.x && v.y >= v.z) return 1;
+    if (v.z >= v.x && v.z >= v.y) return 2;
+}
+
+int principal_dir(vec3 v){
+    int dir = argmax(abs(v));
+    dir = 2*dir + int(v[dir] < 0);
+    return dir;
+}
+
+ivec3 spatial_segment(vec3 pos){
+    pos = floor(1.f * pos);
+    return ivec3(pos);
+}
+
+vec3 segment_color(vec3 pos, vec3 N){
+    ivec3 section = spatial_segment(pos);
+    section *= ivec3(10000, 100, 1);
+    int dir = principal_dir(N);
+    float r = rand(section.x + section.y + section.z + dir);
+    float g = rand(section.x + section.y + section.z + dir + 1);
+    float b = rand(section.x + section.y + section.z + dir + 2);
+    return 0.8 * vec3(r,g,b) + 0.2;
+}
+
+
+void main()
+{
+	gPosition = fs_in.FragPosS;
+    vec3 N = normalize(fs_in.Normal);
+    FragColor = vec4(segment_color(fs_in.FragPos, N), 1.0);
+} 
+*/
 #endif // COMPILING_FS

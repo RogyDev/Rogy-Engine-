@@ -158,6 +158,7 @@ public:
 
 	// Reflection Probe
 	// ---------------------------------
+	unsigned int ReflectionBounces = 2;
 	std::vector<ReflectionProbe*> m_ReflectionProbes;
 
 	ReflectionProbe* CreateReflectionProbe(EnttID ent_id);
@@ -216,6 +217,8 @@ public:
 	void UpdateCamera();
 	// Render a Frame, Renders all the pushed render commands and environment map
 	void RenderFrame(float dt);
+
+	GLuint GenerateMaterialThumbnail(std::string mat_path);
 
 	// Renders all skeletal meshs
 	void UpdateSkeletons(float dt);

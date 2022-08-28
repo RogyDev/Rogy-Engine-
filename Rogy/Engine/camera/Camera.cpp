@@ -9,7 +9,7 @@ void Camera::Initia( void )
 	FOV = 70.0f;
 
 	Speed = 5.0f; // 5 units per second
-	MouseSpeed = 0.005f;
+	MouseSpeed = 0.003f;
 
 	MouseSeted = false;
 	temp_cam = false;

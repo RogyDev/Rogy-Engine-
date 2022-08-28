@@ -624,6 +624,15 @@ void Rogy::MainLoop()
 
 #endif
 
+		/*for (size_t i = 0; i < editor.prj_browser.thumbnails.size(); i++)
+		{
+			if (!editor.prj_browser.thumbnails[i].Loaded)
+			{
+				editor.prj_browser.thumbnails[i].thumbnail = renderer.GenerateMaterialThumbnail(editor.prj_browser.thumbnails[i].path);
+				editor.prj_browser.thumbnails[i].Loaded = true;
+				break;
+			}
+		}*/
 		renderer.RenderFrame(deltaTime);
 		
 #ifdef EDITOR_MODE
@@ -632,6 +641,7 @@ void Rogy::MainLoop()
 		{
 			lmSetIndex = 0;
 			SetEntitiesLightmapPaths(mScene.GetRoot());
+			std::cout << "FINISHED BAKING LIGHMAPS.\n";
 			lmBaked = false;
 		}
 		

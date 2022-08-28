@@ -163,12 +163,14 @@ void EProjectBrowser::Render(ImFont* icon_font)
 	size_t lineCount = (dir_files.size() / f) + 1;
 	if (lineCount < 1) f = 1;
 	size_t foffset = 0;
+	int thumbnail_index = 0;
 	for (size_t j = 0; j < lineCount; j++)
 	{
 		ImGui::Columns(f, NULL, false);
 		for (size_t i = foffset; i < foffset + f && i < dir_files.size(); i++)
 		{
 			bool selectble;
+			bool has_thumbnail = false;
 			if (icon_font != nullptr)
 			{
 				ImTextureID icn = (ImTextureID)icons["file"]->getTexID();
@@ -194,6 +196,13 @@ void EProjectBrowser::Render(ImFont* icon_font)
 				{
 					file_icon = "m";
 					icn = (ImTextureID)icons["mat"]->getTexID();
+					if (thumbnail_index < thumbnails.size())
+					{
+						if(thumbnails[thumbnail_index].Loaded)
+							icn = (ImTextureID)thumbnails[thumbnail_index].thumbnail;
+
+						thumbnail_index++;
+					}
 				}
 				else if (dir_files[i].file_type == "rscn")
 				{
@@ -961,8 +970,16 @@ void EProjectBrowser::OpenDir(const char* path)
 			std::string ftype = fname;
 			ftype = fname.substr(point_pos + 1, std::string::npos);
 
-			if(has_type)
+			if (has_type) 
+			{
 				dir_files.push_back(EFileInfo(fname, fname.substr(0, point_pos), ftype, false));
+
+				if (ftype == "mat")
+				{
+					thumbnails.emplace_back(FileThumbnail::FT_Material, (shortcurrent_dir + "\\" + fname).c_str());
+					std::cout << "thumbnail : " << (shortcurrent_dir + "\\" + fname).c_str() << "\n";
+				}
+			}
 
 			free(files[i]);
 		}

@@ -780,7 +780,7 @@ void Game_Editor::DockSpaces()
 	if (prj_browser.isOn)
 	{
 		if (prj_browser.Stick) {
-			float hig = 260;
+			float hig = SCR_height/3.5;
 			ImGui::SetNextWindowPos(ImVec2(win01_pos.x + win01_size.x, win01_pos.y + (win01_size.y - hig)), ImGuiCond_Always, window_pos_pivot);
 			//ImGui::SetNextWindowViewport(viewport->ID);
 			ImGui::SetNextWindowSize(ImVec2(SCR_weight - win01_size.x - win02_size.x, hig));

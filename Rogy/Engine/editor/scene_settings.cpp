@@ -141,6 +141,13 @@ void Scene_Settings::Render()
 
 	if (ImGui::CollapsingHeader("Lighting", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		BeginPrepsA("##lmsettingsref");
+		PrepNameA("Reflection Bounces");
+		NextPrepsA();
+		ImGui::SetNextItemWidth(ImGui::GetWindowWidth() / 2);
+		ImGui::DragInt("##Reflection Bounces", (int*)&rndr->ReflectionBounces, 1, 1, 6);
+		EndPrepsA();
+
 		if (ImGui::Button("Bake Reflection Probes", ImVec2(ImGui::GetWindowWidth(), 0)))
 			rndr->BakeAllRefProbs();
 		if (ImGui::Button("Bake Static Lights", ImVec2(ImGui::GetWindowWidth(), 0)))

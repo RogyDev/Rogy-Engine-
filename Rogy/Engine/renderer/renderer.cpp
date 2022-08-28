@@ -615,8 +615,7 @@ void Renderer::RenderFrame(float dt)
 		UpdateGlobalLightData();
 
 	UpdateReflectionProbes();
-
-
+	
 	// Update the HDR environment if needed.
 	// -------------------------------------------
 	if (skyTexChange)
@@ -641,6 +640,66 @@ void Renderer::RenderFrame(float dt)
 	// Render Particles
 	// -------------------------------------------
 	RenderParticals(MainCam, dt);
+}
+// ------------------------------------------------------------------------
+GLuint Renderer::GenerateMaterialThumbnail(std::string mat_path)
+{
+	Material* material = LoadMaterial(mat_path.c_str());
+	FrameBufferTex fb;
+	Camera tb_cam;
+	tb_cam.FOV = 60.f;
+	tb_cam.FarView = 50.f;
+	tb_cam.NearView = 0.1f;
+	tb_cam.aspectRatio = 1.0f; // 256/256 = 1
+	tb_cam.transform.Position.z = -2.3f;
+	tb_cam.ComputeMatrices();
+	glm::mat4 proj = tb_cam.GetProjectionMatrix();
+	glm::mat4 view = tb_cam.GetViewMatrix();
+	glm::vec3 viewPos = tb_cam.transform.Position;
+
+	fb.Generate(256, 256, false);
+
+	fb.Bind();
+	glViewport(0, 0, 256, 256);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+
+	/*materials.Test.use();
+	materials.Test.SetMat4("projection", proj);
+	materials.Test.SetMat4("view", view);
+	materials.Test.SetMat4("model", glm::mat4(1.0f));
+	renderSphere();*/
+	//RenderScene(tb_cam, false);
+
+	// Update VP Matrices from Main Camera
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(proj));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * 2, sizeof(glm::mat4), glm::value_ptr(proj * view));
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	materials.PbrShader.use();
+	materials.PbrShader.SetFloat("uTime", CurrentTime);
+	materials.PbrShader.SetVec3("CamPos", viewPos);
+	materials.PbrShader.SetMat4("models[0]", glm::mat4(1.0f));
+
+	glActiveTexture(GL_TEXTURE0 + TEX_IRRADIANCE_PROBES);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ibl.Probes.Irradiance);
+	glActiveTexture(GL_TEXTURE0 + TEX_PREFILTER_PROBES);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ibl.Probes.Prefiltered);
+
+	BindMaterial(&materials.PbrShader, material);
+	//glDisable(GL_CULL_FACE);
+	renderSphere();
+	//renderCube();
+	//glEnable(GL_CULL_FACE);
+	
+	
+	fb.Unbind();
+
+	RenderScene(tb_cam, false);
+	//RenderScene(MainCam, false, fb.framebuffer, 256);
+	return fb.textureColorbuffer;
 }
 // ------------------------------------------------------------------------
 void BindTexture(GLuint tex_id, GLuint tex, bool cubmap = false)
@@ -1676,10 +1735,11 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 
 				// Bind Lightmap if availiable 
 				// -------------------------------------------------------
-				if (!UseInstancing) {
+				if (UseInstancing == false) {
 					if (rc->IsStatic && rc->lightmapPath != "")
 					{
 						pbrShader->setBool("use_lightmap", true);
+						pbrShader->setInt("tex_lightmap", 6);
 						glActiveTexture(GL_TEXTURE6);
 						Get_Lightmap(rc->lightmapPath)->useTexture();
 					}
@@ -1692,6 +1752,9 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 				if (UseInstancing)
 				{
 					pbrShader->SetMat4(("models[" + std::to_string(amount) + "]").c_str(), rc->transform);
+					//pbrShader->SetMat4(("models_norm[" + std::to_string(amount) + "]").c_str(), glm::transpose(glm::inverse(rc->transform)));
+					//glUniformMatrix3fv(pbrShader->GetUniform(("models_norm[" + std::to_string(amount) + "]").c_str()), 1, GL_FALSE, 
+						//&glm::transpose(glm::inverse(rc->transform))[0][0]);
 					amount++;
 				}
 				else
@@ -2578,33 +2641,16 @@ void Renderer::EndFrame()
 			renderQuad();
 		}
 	}
-	/* Apply image effects */
-	/*postProc.ssaoEffect.shaderSSAO->setInt("gDepthMap", 4);
-		postProc.ssaoEffect.shaderSSAO->SetMat4("invProj", glm::inverse(cam.GetProjectionMatrix()));
-		BindTexture(4, fplus_renderer.depthMap);*/
-		/*glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		postProc.screenShader.use();
-		postProc.screenShader.setInt("gDepthMap", 4);
-		postProc.screenShader.SetFloat("Near", MainCam.NearView);
-		postProc.screenShader.SetFloat("Far", MainCam.FarView);
-		glActiveTexture(GL_TEXTURE4);
-		BindTexture(GL_TEXTURE_2D, fplus_renderer.depthMap); */
-		/*GLuint tex_id = csm;
-		float f, n;
-		if (csm == 0) { tex_id = m_ShadowMapper.cascades[0].depthMap; f = m_ShadowMapper.cascades[0].cascadeSplitFar; }
-		if (csm == 1) {
-			tex_id = m_ShadowMapper.cascades[1].depthMap; f = m_ShadowMapper.cascades[1].cascadeSplitFar;
-		}
-		if (csm == 2) {
-			tex_id = m_ShadowMapper.cascades[2].depthMap; f = m_ShadowMapper.cascades[2].cascadeSplitFar;
-		}*/
+	/* FXAA Antialiasing */
 	if (postProc.ApplyAA()) {
 		glViewport(0, 0, SCR_weight, SCR_height);
 		renderQuad();
 	}
 
+	/* Final Image */
 	if (postProc.Render(0, MainCam.FarView, MainCam.NearView)) {
 		glViewport(left_scr_pos, 0, SCR_weight, SCR_height);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		renderQuad();
 	}
 
@@ -2842,25 +2888,30 @@ void Renderer::UpdateReflectionProbes()
 	if (m_ReflectionProbes.empty())
 		return;
 
-	for (size_t i = 0; i < m_ReflectionProbes.size(); i++)
+	for (size_t bounces = 0; bounces < ReflectionBounces; bounces++)
 	{
-		if (m_ReflectionProbes[i]->removed)
+		for (size_t i = 0; i < m_ReflectionProbes.size(); i++)
 		{
-			RemoveReflectionProbe(m_ReflectionProbes[i]->entid);
-			continue;
-		}
+			if (m_ReflectionProbes[i]->removed)
+			{
+				RemoveReflectionProbe(m_ReflectionProbes[i]->entid);
+				continue;
+			}
 
-		if (!m_ReflectionProbes[i]->baked)
-		{
-			m_ReflectionProbes[i]->capture.Irradiance = (i + 1);
-			m_ReflectionProbes[i]->capture.Prefiltered = (i + 1);
+			if (!m_ReflectionProbes[i]->baked)
+			{
+				m_ReflectionProbes[i]->capture.Irradiance = (i + 1);
+				m_ReflectionProbes[i]->capture.Prefiltered = (i + 1);
 
-			GLuint cubemap = RenderToCubemap(m_ReflectionProbes[i]->Position
-				, ibl.CaptureResolution
-				, 0.01f, 300, m_ReflectionProbes[i]->static_only);
-			ibl.CreateCapture(cubemap, m_ReflectionProbes[i]->capture, false);
-			glDeleteTextures(1, &cubemap);
-			m_ReflectionProbes[i]->baked = true;
+				GLuint cubemap = RenderToCubemap(m_ReflectionProbes[i]->Position
+					, ibl.CaptureResolution
+					, 0.01f, 300, m_ReflectionProbes[i]->static_only);
+				ibl.CreateCapture(cubemap, m_ReflectionProbes[i]->capture, false);
+				glDeleteTextures(1, &cubemap);
+
+				if(bounces == (ReflectionBounces - 1))
+					m_ReflectionProbes[i]->baked = true;
+			}
 		}
 	}
 }
@@ -2870,24 +2921,27 @@ void Renderer::BakeReflectionProbes()
 	if (m_ReflectionProbes.empty())
 		return;
 
-	for (size_t i = 0; i < m_ReflectionProbes.size(); i++)
+	for (size_t bounces = 0; bounces < ReflectionBounces; bounces++)
 	{
-		m_ReflectionProbes[i]->capture.Irradiance = (i + 1);
-		m_ReflectionProbes[i]->capture.Prefiltered = (i + 1);
-
-		if (m_ReflectionProbes[i]->removed)
+		for (size_t i = 0; i < m_ReflectionProbes.size(); i++)
 		{
-			RemoveReflectionProbe(m_ReflectionProbes[i]->entid);
-			continue;
+			m_ReflectionProbes[i]->capture.Irradiance = (i + 1);
+			m_ReflectionProbes[i]->capture.Prefiltered = (i + 1);
+
+			if (m_ReflectionProbes[i]->removed)
+			{
+				RemoveReflectionProbe(m_ReflectionProbes[i]->entid);
+				continue;
+			}
+
+			GLuint cubemap = RenderToCubemap(m_ReflectionProbes[i]->Position
+				, ibl.CaptureResolution
+				, 0.01f, 300, m_ReflectionProbes[i]->static_only);
+
+			ibl.CreateCapture(cubemap, m_ReflectionProbes[i]->capture, false);
+			glDeleteTextures(1, &cubemap);
+			m_ReflectionProbes[i]->baked = true;
 		}
-
-		GLuint cubemap = RenderToCubemap(m_ReflectionProbes[i]->Position
-			, ibl.CaptureResolution
-			, 0.01f, 300, m_ReflectionProbes[i]->static_only);
-
-		ibl.CreateCapture(cubemap, m_ReflectionProbes[i]->capture, false);
-		glDeleteTextures(1, &cubemap);
-		m_ReflectionProbes[i]->baked = true;
 	}
 }
 // ------------------------------------------------------------------------
@@ -3199,7 +3253,7 @@ void Renderer::BakeLightMaps(int meshIndex)
 
 		for (size_t i = 0; i < m_renderers.components.size(); i++)
 		{
-			//if (!m_renderers.components[i]->IsStatic) continue;
+			if (!m_renderers.components[i]->IsStatic) continue;
 
 			materials.LM.SetMat4("u_model", m_renderers.components[i]->transform);
 			m_renderers.components[i]->mesh->Draw();
@@ -3295,6 +3349,7 @@ void Renderer::SerializeSave(YAML::Emitter& out)
 	out << YAML::Key << "AmbientLevel" << YAML::Value << AmbientLevel;
 	out << YAML::Key << "fogColor"; Transform::SerVec3(out, fogColor);
 	out << YAML::Key << "SkyColor"; Transform::SerVec3(out, SkyColor);
+	out << YAML::Key << "ReflectionBounces" << YAML::Value << ReflectionBounces;
 	out << YAML::EndMap;
 
 	out << YAML::BeginMap;
@@ -3357,6 +3412,9 @@ void Renderer::SerializeLoad(YAML::Node& out)
 		fogFar = rnder["fogFar"].as<float>();
 		AmbientLevel = rnder["AmbientLevel"].as<float>();
 		fogColor = Transform::GetVec3(rnder["fogColor"]);
+
+		if (rnder["ReflectionBounces"].IsDefined())
+			ReflectionBounces = rnder["ReflectionBounces"].as<unsigned int>();
 	}
 	auto& postp = rnderSeq[1];
 	if (postp)

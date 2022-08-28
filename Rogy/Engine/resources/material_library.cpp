@@ -22,8 +22,8 @@ void MaterialLibrary::Init()
 	ShaderGeometryPass.loadShader("core/shaders/PostProc/ssao_geometry.rsh");
 	DepthShader		  .loadShader("core/shaders/ShadowMapping/dir_shadow.rsh");
 	NonShader		  .loadShader("core/shaders/NonShader.rsh");
-	PbrShader		  .loadShader("core/shaders/iblShader.rsh");
-	//PbrShaderDisp	  .loadShader("core/shaders/iblShader.rsh", "DISPLACEMENT");
+	PbrShader		  .loadShader("core/shaders/PBR_Static.rsh");
+	//PbrShaderDisp	  .loadShader("core/shaders/PBR_Static.rsh", "DISPLACEMENT");
 	background		  .loadShader("core/shaders/background.rsh");
 	Atmosphere		  .loadShader("core/shaders/Atmosphere.rsh");
 	PointLightPass	  .loadShader("core/shaders/ShadowMapping/point_shadows_pass.rsh");
@@ -38,10 +38,11 @@ void MaterialLibrary::Init()
 	SkelShader.loadShader("core/shaders/Skeletal.rsh");
 	DepthShader_sk.loadShader("core/shaders/ShadowMapping/dir_shadow_sk.rsh");
 	mousePickID.loadShader("core\\shaders\\MousePick\\MPick.rsh");
-	PbrShader2.loadShader("core/shaders/iblShader.rsh", "DISPLACEMENT");
+	PbrShader2.loadShader("core/shaders/PBR_Static.rsh", "DISPLACEMENT");
 	GridShader.loadShader("core/shaders/Grid.rsh");
 	OutlineObject.loadShader("core/shaders/Outline.rsh");
 	OutlineScreen.loadShader("core/shaders/PostProc/OutlineStage.rsh");
+	Test.loadShader("core/shaders/Test.rsh");
 	// Prepare shaders
 	// ------------------------------------------------
 	SetShaderMatraciesPos(PbrShader);

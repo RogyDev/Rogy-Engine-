@@ -8,8 +8,8 @@
 
 #include "UIWidget.h"
 
-#include "ft2build.h"
-#include "freetype\freetype.h"
+//#include "ft2build.h"
+//#include "freetype\freetype.h"
 #include <map>
 #include "shader.h"
 
@@ -96,8 +96,8 @@ private:
 	ImGuiWindowFlags winFlags;
 	ImGuiWindowFlags childFlags;
 
-	FT_Library ft;
-	FT_Face face;
+	//FT_Library ft;
+	//FT_Face face;
 	glm::mat4 projection;
 	std::map<GLchar, UIChar> Characters;
 	int scr_left, scr_top, scr_weight, scr_height;

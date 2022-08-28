@@ -41,11 +41,34 @@ struct EFileInfo
 	}
 };
 
+struct FileThumbnail
+{
+	enum FileType {
+		FT_Material = 0,
+		FT_Texture = 1,
+		FT_Model = 2
+	};
+
+	FileType type;
+	std::string path;
+	unsigned int thumbnail;
+	bool Loaded;
+
+	FileThumbnail(FileType ftype, std::string fpath)
+	{
+		type = ftype;
+		path = fpath;
+		Loaded = false;
+	}
+};
+
 class EProjectBrowser
 {
 public:
 	EProjectBrowser();
 	~EProjectBrowser();
+
+	std::vector<FileThumbnail> thumbnails;
 
 	std::unordered_map<std::string, Texture*> icons;
 

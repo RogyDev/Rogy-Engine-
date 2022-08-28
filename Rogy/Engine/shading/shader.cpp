@@ -583,7 +583,7 @@ void Shader::SetVec2(GLuint uniform_id, float value_x, float value_y)
 /* -------------- SET BY NAME ------------------- */
 void Shader::SetMat4(const char* uniform_id, glm::mat4 value)
 {
-	SetMat4(glGetUniformLocation(Program, uniform_id), value);
+	SetMat4(GetUniform(uniform_id), value);
 }
 
 void Shader::SetVec3(const char* uniform_id, glm::vec3 value)

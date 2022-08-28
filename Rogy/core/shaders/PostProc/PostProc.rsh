@@ -305,17 +305,17 @@ vec3 FilmicToneMap(vec3 x)
   return pow(result, vec3(2.2));
 }
 
-void mainA()
-{   
-    FragColor = vec4(texture(screenTexture, TexCoords).rgb, 1.0);
-}
 void mains()
+{   
+    vec3 color = texture(screenTexture, TexCoords).rgb;
+    FragColor = vec4(color, 1.0);
+}
+void mainss()
 {   
     float depth = texture(screenTexture, TexCoords).r;
     float v = LinearizeDepth(depth) / Far;
     FragColor = vec4(v, v, v, 1.0);
 }
-
    
 void main()
 {     
