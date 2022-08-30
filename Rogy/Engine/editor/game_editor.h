@@ -25,6 +25,7 @@
 #include "editor_property.h"
 #include "project_settings.h"
 #include "material_editor.h"
+#include "project_manager.h"
 
 class Game_Editor 
 {
@@ -34,6 +35,8 @@ public:
 	
 	bool scripts_board = false;
 	bool tryingtoSpawn = false;
+
+	ImVec2 ScreenWindowPos;
 
 	std::string ProjectResourcesFolder;
 
@@ -46,6 +49,7 @@ public:
 	EProjectBrowser prj_browser;
 	Project_Settings prg_settings;
 	RMaterialEditor mat_editor;
+	ProjectManager project_manager;
 
 	ImGuizmo::OPERATION mCurrentGizmoOperation;
 	ImGuizmo::MODE mCurrentGizmoMode;

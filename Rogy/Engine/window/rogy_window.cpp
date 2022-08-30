@@ -30,6 +30,10 @@ bool RWindow::StartWindow(int SCR_weight,int SCR_height, int Major, int Minor)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Major);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Minor);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef ROGY_WINDOW_HIDE_TITLE_BAR
+	glfwWindowHint(GLFW_DECORATED, false);
+#endif // ROGY_WINDOW_HIDE_TITLE_BAR
+
 
 #ifdef __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // fix compilation on OS X
@@ -148,6 +152,12 @@ void RWindow::Maximize()
 void RWindow::SetCursorMode(CursorMode mode)
 {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void RWindow::SetWindowPos(float x, float y)
+{
+	//glfwSetCursorPos(window, (double)x, (double)y);
+	glfwSetWindowPos(window, (int)x, (int)y);
 }
 
 bool RWindow::IsFullscreen()

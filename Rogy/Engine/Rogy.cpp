@@ -562,6 +562,8 @@ void Rogy::MainLoop()
 
 #ifdef EDITOR_MODE
 
+		//window.SetWindowPos(editor.ScreenWindowPos.x, editor.ScreenWindowPos.y);
+
 		if (!mScene.game_view && !gizHovred && !mScene.edit_grass && !ImGui::GetIO().WantCaptureMouse)
 		{
 			if (m_Input.GetMouseButtonDown(0) /*&& m_Input.GetKey(RKey::KEY_LCTRL)*/)

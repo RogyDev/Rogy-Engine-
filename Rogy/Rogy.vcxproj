@@ -33,6 +33,7 @@
     <ClCompile Include="Engine\editor\game_editor.cpp" />
     <ClCompile Include="Engine\editor\material_editor.cpp" />
     <ClCompile Include="Engine\editor\project_browser.cpp" />
+    <ClCompile Include="Engine\editor\project_manager.cpp" />
     <ClCompile Include="Engine\editor\project_settings.cpp" />
     <ClCompile Include="Engine\editor\scene_hierarchy.cpp" />
     <ClCompile Include="Engine\editor\scene_settings.cpp" />
@@ -320,6 +321,7 @@
     <ClInclude Include="Engine\editor\game_editor.h" />
     <ClInclude Include="Engine\editor\material_editor.h" />
     <ClInclude Include="Engine\editor\project_browser.h" />
+    <ClInclude Include="Engine\editor\project_manager.h" />
     <ClInclude Include="Engine\editor\project_settings.h" />
     <ClInclude Include="Engine\editor\scene_hierarchy.h" />
     <ClInclude Include="Engine\editor\scene_settings.h" />

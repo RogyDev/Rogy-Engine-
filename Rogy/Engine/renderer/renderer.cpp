@@ -2144,6 +2144,39 @@ void Renderer::RenderScene(Camera& cam, bool static_only, GLuint target_frambuff
 		// ------------------------
 		postProc.ssaoEffect.Bind(proj);
 		postProc.ssaoEffect.shaderSSAO->SetVec3("camPos", MainCam.transform.Position);
+
+/*
+* postProc.ssaoEffect.shaderSSAO->SetVec3("clipInfo", glm::vec3(cam.NearView, cam.FarView, 0.5f * (SCR_height / (2.0f * tanf(cam.FOV * 0.5f)))));
+		float fovRad = cam.FOV;// glm::radians(cam.FOV);
+		glm::vec2 FocalLen, InvFocalLen, UVToViewA, UVToViewB, LinMAD;
+
+		FocalLen[0] = 1.0f / tanf(fovRad * 0.5f) * ((float)postProc.ssaoEffect.vBlur.scr_w / (float)postProc.ssaoEffect.vBlur.scr_h);
+		FocalLen[1] = 1.0f / tanf(fovRad * 0.5f);
+		InvFocalLen[0] = 1.0f / FocalLen[0];
+		InvFocalLen[1] = 1.0f / FocalLen[1];
+
+		UVToViewA[0] = -2.0f * InvFocalLen[0];
+		UVToViewA[1] = -2.0f * InvFocalLen[1];
+		UVToViewB[0] = 1.0f * InvFocalLen[0];
+		UVToViewB[1] = 1.0f * InvFocalLen[1];
+
+		float near = cam.NearView, far = cam.FarView;
+		LinMAD[0] = (near - far) / (2.0f * near * far);
+		LinMAD[1] = (near + far) / (2.0f * near * far);
+
+		postProc.ssaoEffect.shaderSSAO->SetVec2("FocalLen", FocalLen);
+		postProc.ssaoEffect.shaderSSAO->SetVec2("UVToViewA", UVToViewA);
+		postProc.ssaoEffect.shaderSSAO->SetVec2("UVToViewB", UVToViewB);
+		postProc.ssaoEffect.shaderSSAO->SetVec2("LinMAD", LinMAD);
+
+		glm::vec2 ao_res = glm::vec2((float)postProc.ssaoEffect.vBlur.scr_w, (float)postProc.ssaoEffect.vBlur.scr_h);
+		postProc.ssaoEffect.shaderSSAO->SetVec2("AORes", ao_res);
+		ao_res.x = 1.0f / ao_res.x;
+		ao_res.y = 1.0f / ao_res.y;
+		postProc.ssaoEffect.shaderSSAO->SetVec2("InvAORes", ao_res);
+		postProc.ssaoEffect.shaderSSAO->SetVec2("NoiseScale", glm::vec2(8.0f/4.0f, 8.0f /4.0f));
+		*/
+
 		BindTexture(5, postProc.colorBuffer.gPosition);
 		BindTexture(7, postProc.ssaoEffect.noiseTexture);
 		//glBindTexture(GL_TEXTURE_2D, 7);

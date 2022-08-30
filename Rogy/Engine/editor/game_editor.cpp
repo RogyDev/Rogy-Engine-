@@ -90,7 +90,9 @@ bool Game_Editor::Init(char* glsl_version, GLFWwindow* window, bool platform_sup
 	prep_editor.mat_editor = &mat_editor;
 	prj_browser.scr_editor = &code_editor;
 	prj_browser.mat_editor = &mat_editor;
-	
+	project_manager.Init(RGetCurrentPath());
+	prj_browser.Init();
+	project_manager.logoID = (ImTextureID)prj_browser.icons["scn"]->getTexID();
 	viewport = ImGui::GetMainViewport();
 	io.FontGlobalScale = 0.5f;
 	return true;
@@ -147,6 +149,7 @@ void Game_Editor::start()
 	//prj_browser.Render(texBig);
 	prg_settings.Render();
 	mat_editor.Render();
+	project_manager.Render();
 
 	/*ImGui::SetNextWindowPos(ImVec2(200, 200));
 	ImGui::SetNextWindowBgAlpha(0.0f);
@@ -306,6 +309,7 @@ void Game_Editor::ToolBar()
 
 	if (ImGui::BeginMainMenuBar())
 	{
+
 		if (ImGui::BeginMenu("File"))
 		{
 			// Disabling fullscreen would allow the window to be moved to the front of other windows,
@@ -329,6 +333,11 @@ void Game_Editor::ToolBar()
 			if (ImGui::MenuItem("Save Scene As"))
 			{
 				ImGuiFileDialog::Instance()->OpenModal("SaveScnModel", "Save Scene", ".rscn\0", ".");
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Projects"))
+			{
+				project_manager.isOn = true;
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Exit")) {

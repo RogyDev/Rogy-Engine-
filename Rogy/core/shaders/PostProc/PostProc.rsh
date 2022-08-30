@@ -185,6 +185,7 @@ vec3 aces(vec3 hdrColor){
 }
 
 vec3 cineon(vec3 hdrColor){
+    hdrColor *= p_exposure;
 	vec3 shiftedColor = max(vec3(0.0), hdrColor - 0.004);
 	return (shiftedColor * (6.2 * shiftedColor + 0.5)) / (shiftedColor * (6.2 * shiftedColor + 1.7) + 0.06);
 }

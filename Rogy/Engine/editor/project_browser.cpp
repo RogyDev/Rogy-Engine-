@@ -91,9 +91,9 @@ void EProjectBrowser::Init()
 	icons["file"] = new Texture();
 	icons["file"]->setTexture("core\\editor\\FileIcon.png", "file");
 
-	current_dir = RGetCurrentPath();
-	res_dir = current_dir + "\\";
-	res_dir += ProjectDir;
+	//current_dir = RGetCurrentPath();
+	//res_dir = current_dir + "\\";
+	//res_dir += ProjectDir;
 	folder_name = "New Folder";
 	scr_name = "NewScript";
 	mat_name = "NewMaterial";
@@ -113,14 +113,21 @@ void EProjectBrowser::Init()
 		"function XXX:OnUpdate(dt)\n    \n"
 		"end\n";
 
+	/*current_dir = RGetCurrentPath();
+	res_dir = current_dir + "\\";
+	res_dir += ProjectDir;
 	OpenDir(res_dir.c_str());
+	initialized = true;*/
 }
 // --------------------------------------------------------
 void EProjectBrowser::Render(ImFont* icon_font)
 {
-	if (!initialized)
+	if (!initialized) 
 	{
-		Init();
+		current_dir = RGetCurrentPath();
+		res_dir = current_dir + "\\";
+		res_dir += ProjectDir;
+		OpenDir(res_dir.c_str());
 		initialized = true;
 	}
 
@@ -976,8 +983,8 @@ void EProjectBrowser::OpenDir(const char* path)
 
 				if (ftype == "mat")
 				{
-					thumbnails.emplace_back(FileThumbnail::FT_Material, (shortcurrent_dir + "\\" + fname).c_str());
-					std::cout << "thumbnail : " << (shortcurrent_dir + "\\" + fname).c_str() << "\n";
+					//thumbnails.emplace_back(FileThumbnail::FT_Material, (shortcurrent_dir + "\\" + fname).c_str());
+					//std::cout << "thumbnail : " << (shortcurrent_dir + "\\" + fname).c_str() << "\n";
 				}
 			}
 

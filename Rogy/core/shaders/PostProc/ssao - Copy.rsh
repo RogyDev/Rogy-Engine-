@@ -99,7 +99,7 @@ void main()
     //vec3 normal = texture(gNormal, TexCoords).rgb;
 	vec3 normal = normalize(cross(dFdx(position), dFdy(position)));
 
-	vec2 randomTexCoordScale = TexCoords * (u_resolution.xy / vec2(8.0f));
+	vec2 randomTexCoordScale = TexCoords * (u_resolution.xy / vec2(4.0f));
 	//int index = int(16.0*random(TexCoords.xyy, 0))%16;
 	//vec2 randomTexCoordScale = poissonDisk[index]/700.0;
 	//vec2 randomTexCoordScale = u_resolution;

@@ -923,6 +923,9 @@
     <ClCompile Include="Engine\physics\TerrainCollider.cpp">
       <Filter>Engine\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\editor\project_manager.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ImGuizmo.h">
@@ -1923,6 +1926,9 @@
     </ClInclude>
     <ClInclude Include="Engine\physics\TerrainCollider.h">
       <Filter>Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\editor\project_manager.h">
+      <Filter>Engine\Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

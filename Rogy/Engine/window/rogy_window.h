@@ -7,6 +7,8 @@
 #include <iostream>
 #include <string>
 
+//i#define ROGY_WINDOW_HIDE_TITLE_BAR
+
 enum CursorMode
 {
 	CM_DISABLED = GLFW_CURSOR_DISABLED,
@@ -35,6 +37,7 @@ public:
 	void Maximize();
 
 	void SetCursorMode(CursorMode mode);
+	void SetWindowPos(float x, float y);
 private:
 	int last_win_pos_x, last_win_pos_y;
 	int scr_w, scr_h;

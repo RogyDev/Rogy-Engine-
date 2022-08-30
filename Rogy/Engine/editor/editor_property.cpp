@@ -387,8 +387,10 @@ void EditorProperty::scriptC_editor(Entity &obj, ScriptInstance* script)
 	{
 		bool is_on = ImGui::CollapsingHeader((script->class_name + "  (Script)").c_str(), ImGuiTreeNodeFlags_DefaultOpen);
 
+		std::string popupTag = script->class_name; popupTag += "ScriptComponentSettings";
+
 		if (ImGui::IsItemClicked(1))
-			ImGui::OpenPopup("rmoveScr");
+			ImGui::OpenPopup(popupTag.c_str());
 
 		if (is_on)
 		{
@@ -485,7 +487,7 @@ void EditorProperty::scriptC_editor(Entity &obj, ScriptInstance* script)
 			ImGui::Separator();
 		}
 
-		if (ImGui::BeginPopup("rmoveScr"))
+		if (ImGui::BeginPopup(popupTag.c_str()))
 		{
 			if (ImGui::MenuItem("Remove component"))
 			{

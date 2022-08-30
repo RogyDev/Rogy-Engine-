@@ -25,7 +25,7 @@ out VS_OUT {
 	mat3 TBN;
 	vec4 LightSpacePos[NUM_CASCADES];
 	float ClipSpacePosZ;
-	vec4 spot_MVP_SPACE[16];
+	//vec4 spot_MVP_SPACE[16];
 	vec3 FragPosS;
 #ifdef DISPLACEMENT
 	float Blend;
@@ -42,8 +42,8 @@ layout (std140) uniform Matrices
 uniform mat4 models[100];
 uniform vec2 tex_uv;
 uniform mat4 gLightWVP[NUM_CASCADES];
-uniform mat4 spot_MVP[16];
-uniform int spot_shadow_count;
+//uniform mat4 spot_MVP[16];
+//uniform int spot_shadow_count;
 
 void main()
 {
@@ -67,8 +67,8 @@ void main()
 	
 	vec4 Pos = vec4(vs_out.FragPos, 1.0);
 	
-	for (int i = 0 ; i < NUM_CASCADES ; i++) 
-		vs_out.LightSpacePos[i] = gLightWVP[i] * Pos;
+	//for (int i = 0 ; i < NUM_CASCADES ; i++) 
+		//vs_out.LightSpacePos[i] = gLightWVP[i] * Pos;
 	
 	//for(int i = 0 ; i < spot_shadow_count; i++)
 		//vs_out.spot_MVP_SPACE[i] = spot_MVP[i] * Pos;
@@ -201,7 +201,7 @@ in VS_OUT {
 	mat3 TBN;
 	vec4 LightSpacePos[NUM_CASCADES];
 	float ClipSpacePosZ;
-	vec4 spot_MVP_SPACE[16];
+	//vec4 spot_MVP_SPACE[16];
 	vec3 FragPosS;
 
 #ifdef DISPLACEMENT
@@ -447,13 +447,17 @@ float VogelGetShadow(int i, int VogelDiskSampleCount, float gradientNoise, vec2 
 	return (1.0 - texture(shadowMaps, vec3(sampleUV, projCoords.z - bias)));
 }
 
+uniform mat4 gLightWVP[NUM_CASCADES];
+
 float ShadowCalculation(int sh_indexX, bool softS, vec3 N)
 {
 	int sh_index = sh_indexX;
 	//float bias = dirLight.Bias;
 	float bias = max(dirLight.Bias * (1.0 - dot(N, dirLight.direction)), 0.0001);
 	
-    vec3 projCoords = fs_in.LightSpacePos[sh_index].xyz;// / fs_in.LightSpacePos[sh_index].w;
+    //vec3 projCoords = fs_in.LightSpacePos[sh_index].xyz;// / fs_in.LightSpacePos[sh_index].w;
+	vec4 LightSpacePos = gLightWVP[sh_index] * vec4(fs_in.FragPos, 1.0);
+	vec3 projCoords = LightSpacePos.xyz;
     projCoords = projCoords * 0.5 + 0.5;
 
 	float shadow = 0.0;
@@ -584,10 +588,12 @@ float ShadowCalculation(int sh_indexX, bool softS, vec3 N)
     return shadow;
 }
 
+uniform mat4 spot_MVP[16];
 
 float SpotShadowCalculation(int idx, float bias, vec3 lightPos)
 {	
-	vec4 frag_pos_light = fs_in.spot_MVP_SPACE[idx];
+	vec4 frag_pos_light = spot_MVP[idx] * vec4(fs_in.FragPos, 1.0);
+	//vec4 frag_pos_light = fs_in.spot_MVP_SPACE[idx];
 	vec3 projCoords = frag_pos_light.xyz / frag_pos_light.w;
 	projCoords = projCoords * 0.5 + 0.5;
 
