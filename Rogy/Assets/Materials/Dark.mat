@@ -1,23 +1,23 @@
 Material:
   - type: 0
-    name: Assets\Materials\Light.mat
+    name: Assets\Materials\Dark.mat
     tag: ""
-    albedo_x: 1
-    albedo_y: 1
-    albedo_z: 1
+    albedo_x: 0.129032254
+    albedo_y: 0.129030958
+    albedo_z: 0.129030958
     metallic: 0
-    roughness: 0.5
+    roughness: 1
     ao: 1
     uv_x: 1
     uv_y: 1
     val1: 0
     val2: 0
     cutout: false
-    use_emission: true
+    use_emission: false
     emission_x: 1
-    emission_y: 0.993760049
-    emission_z: 0.790322602
-    emission_power: 15
+    emission_y: 1
+    emission_z: 1
+    emission_power: 1
     use_tex_albedo: false
     use_tex_normal: false
     use_tex_metal: false

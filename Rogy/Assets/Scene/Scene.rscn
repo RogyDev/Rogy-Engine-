@@ -9,6 +9,7 @@ Renderer:
     AmbientLevel: 1
     fogColor: [1, 1, 1]
     SkyColor: [5.5, 13, 22.3999996]
+    ReflectionBounces: 2
   - ToneMap: 0
     vignette_use: true
     vignette_softness: 1
@@ -20,7 +21,7 @@ Renderer:
     cc_use: true
     cc_brightness: 0
     cc_saturation: 0.100000001
-    cc_contrast: 1
+    cc_contrast: 0.980000019
     use_ssao: true
     kernelSize: 10
     radius: 10
@@ -52,76 +53,28 @@ Entities:
     script_count: 0
     Scripts:
       []
-    ChildCount: 9
-  - Entity: 1
+    ChildCount: 2
+  - Entity: 11
     Root: false
     IsPrefab: false
-    name: Directional Light
+    name: Geometry
     tag: default
     Active: true
     Static: false
     m_CollMode: 0
     Transform:
       Position: [0, 0, 0]
-      Rotation: [-0.369957924, 0.249821082, 0.10399048, 0.888766825]
-      Scale: [1, 1, 1]
-      Angels: [-45.2000008, 31.3999996, 0]
-    comp_count: 1
-    Components:
-      - DirectionalLight:
-          enabled: true
-          Color: [1, 1, 1]
-          Bias: 0.00300000003
-          CastShadows: true
-          Intensity: 1
-          Soft: false
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 2
-    Root: false
-    IsPrefab: false
-    name: Cube
-    tag: default
-    Active: true
-    Static: true
-    m_CollMode: 0
-    Transform:
-      Position: [0, 2.00082445, 0]
       Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
       Angels: [0, 0, 0]
-    comp_count: 2
+    comp_count: 0
     Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: ""
-          mat_source: ""
-          HasMesh: true
-          mesh_source: core\models\cube.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 0
-          m_BodyMode: 1
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          Bounciness: 0
-          Friction: 1
-          is_trigger: false
-          is_kinematic: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-          mesh_index: 0
+      []
     script_count: 0
     Scripts:
       []
-    ChildCount: 0
-  - Entity: 3
+    ChildCount: 8
+  - Entity: 2
     Root: false
     IsPrefab: false
     name: Cube
@@ -163,7 +116,49 @@ Entities:
     Scripts:
       []
     ChildCount: 0
-  - Entity: 4
+  - Entity: 6
+    Root: false
+    IsPrefab: false
+    name: Cube
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-0.0576994419, 6.34051228, -16.8806324]
+      Rotation: [0, 0, 0, 1]
+      Scale: [15.2631826, 5.54502058, 1]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: ""
+          mat_source: ""
+          HasMesh: true
+          mesh_source: core\models\cube.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 0
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 3
     Root: false
     IsPrefab: false
     name: Cube
@@ -205,77 +200,7 @@ Entities:
     Scripts:
       []
     ChildCount: 0
-  - Entity: 5
-    Root: false
-    IsPrefab: false
-    name: Reflection Probe
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [0.654123783, 6.57607412, -22.4961967]
-      Rotation: [0, 0, 0, 1]
-      Scale: [17.1855221, 6.35351324, 7.5]
-      Angels: [0, 0, 0]
-    comp_count: 1
-    Components:
-      - ReflectionProbe:
-          box_BoxMin: [-17.1855221, -6.35351324, -7.5]
-          box_BoxMax: [17.1855221, 6.35351324, 7.5]
-          box_radius: 0
-          Intensity: 1
-          static_only: false
-          BoxProjection: true
-          Resolution: 64
-          use_scale: true
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 6
-    Root: false
-    IsPrefab: false
-    name: Sphere
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [0, 1.94611239, -21.1932526]
-      Rotation: [0, 0, 0, 1]
-      Scale: [1, 1, 1]
-      Angels: [0, 0, 0]
-    comp_count: 2
-    Components:
-      - RendererComponent:
-          enabled: true
-          CastShadows: true
-          lightmapPath: ""
-          mat_name: Reflection.mat
-          mat_source: Assets\Materials\Reflection.mat
-          HasMesh: true
-          mesh_source: core\models\sphere.fbx
-          mesh_index: 0
-      - RigidBody:
-          m_CollisionType: 1
-          m_BodyMode: 0
-          Mass: 1
-          LinerDamping: 0.00999999978
-          AngulerDamping: 0
-          Bounciness: 0
-          Friction: 1
-          is_trigger: false
-          is_kinematic: false
-          mScaleMultiplier: [1, 1, 1]
-          mOffset: [0, 0, 0]
-          mesh_path: ""
-          mesh_index: 0
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 7
+  - Entity: 1
     Root: false
     IsPrefab: false
     name: Cube
@@ -284,9 +209,9 @@ Entities:
     Static: true
     m_CollMode: 0
     Transform:
-      Position: [1.20024884, 6.34051228, -16.8806324]
+      Position: [0, 2.00082445, 0]
       Rotation: [0, 0, 0, 1]
-      Scale: [14.1315823, 5.54502106, 1]
+      Scale: [1, 1, 1]
       Angels: [0, 0, 0]
     comp_count: 2
     Components:
@@ -320,38 +245,10 @@ Entities:
   - Entity: 8
     Root: false
     IsPrefab: false
-    name: Spot Light
-    tag: default
-    Active: true
-    Static: false
-    m_CollMode: 0
-    Transform:
-      Position: [0, 4.56235266, -25.3899994]
-      Rotation: [0.390730977, 0, 0, 0.920504928]
-      Scale: [1, 0.99999994, 0.99999994]
-      Angels: [45.9999809, -0, 0]
-    comp_count: 1
-    Components:
-      - SpotLight:
-          enabled: true
-          Color: [0.998631954, 1, 0.92338711]
-          Bias: 0.000300000014
-          CastShadows: true
-          Intensity: 20000
-          Raduis: 20
-          CutOff: 40
-          OuterCutOff: 5
-    script_count: 0
-    Scripts:
-      []
-    ChildCount: 0
-  - Entity: 9
-    Root: false
-    IsPrefab: false
     name: Cube
     tag: default
     Active: true
-    Static: true
+    Static: false
     m_CollMode: 0
     Transform:
       Position: [0, 4.55999994, -25.3944302]
@@ -383,6 +280,206 @@ Entities:
           mOffset: [0, 0, 0]
           mesh_path: ""
           mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 5
+    Root: false
+    IsPrefab: false
+    name: Sphere
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [0, 1.94611239, -21.1932526]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1, 1, 1]
+      Angels: [0, 0, 0]
+    comp_count: 2
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Reflection.mat
+          mat_source: Assets\Materials\Reflection.mat
+          HasMesh: true
+          mesh_source: core\models\sphere.fbx
+          mesh_index: 0
+      - RigidBody:
+          m_CollisionType: 1
+          m_BodyMode: 1
+          Mass: 1
+          LinerDamping: 0.00999999978
+          AngulerDamping: 0
+          Bounciness: 0
+          Friction: 1
+          is_trigger: false
+          is_kinematic: false
+          mScaleMultiplier: [1, 1, 1]
+          mOffset: [0, 0, 0]
+          mesh_path: ""
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 10
+    Root: false
+    IsPrefab: false
+    name: RogyText
+    tag: default
+    Active: true
+    Static: true
+    m_CollMode: 0
+    Transform:
+      Position: [-1.59387732, 6.59718513, -15.5293674]
+      Rotation: [0.70710665, 0, 0, 0.707106948]
+      Scale: [2.5, 2.49999857, 2.49999857]
+      Angels: [89.9999771, -0, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: true
+          lightmapPath: ""
+          mat_name: Dark.mat
+          mat_source: Assets\Materials\Dark.mat
+          HasMesh: true
+          mesh_source: Assets\Meshs\rogy.glb
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 9
+    Root: false
+    IsPrefab: false
+    name: Text
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [-3.82404757, 1.01528692, 2.89923382]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1.5, 1.5, 1.5]
+      Angels: [0, -0, 0]
+    comp_count: 1
+    Components:
+      - RendererComponent:
+          enabled: true
+          CastShadows: false
+          lightmapPath: ""
+          mat_name: Dark.mat
+          mat_source: Assets\Materials\Dark.mat
+          HasMesh: true
+          mesh_source: Assets\Meshs\simpleScene.glb
+          mesh_index: 0
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 13
+    Root: false
+    IsPrefab: false
+    name: Lighting
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1, 1, 1]
+      Angels: [0, 0, 0]
+    comp_count: 0
+    Components:
+      []
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 3
+  - Entity: 7
+    Root: false
+    IsPrefab: false
+    name: Spot Light
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [0, 4.56235266, -25.3899994]
+      Rotation: [0.390730977, 0, 0, 0.920504928]
+      Scale: [1, 0.99999994, 0.99999994]
+      Angels: [45.9999809, -0, 0]
+    comp_count: 1
+    Components:
+      - SpotLight:
+          enabled: true
+          Color: [0.998631954, 1, 0.92338711]
+          Bias: 0.000300000014
+          CastShadows: true
+          Intensity: 20000
+          Raduis: 20
+          CutOff: 40
+          OuterCutOff: 5
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 4
+    Root: false
+    IsPrefab: false
+    name: Reflection Probe
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [0.654123783, 6.57607412, -22.4961967]
+      Rotation: [0, 0, 0, 1]
+      Scale: [17.1855221, 6.35351324, 7.5]
+      Angels: [0, 0, 0]
+    comp_count: 1
+    Components:
+      - ReflectionProbe:
+          box_BoxMin: [-17.1855221, -6.35351324, -7.5]
+          box_BoxMax: [17.1855221, 6.35351324, 7.5]
+          box_radius: 0
+          Intensity: 1
+          static_only: true
+          BoxProjection: true
+          Resolution: 64
+          use_scale: true
+    script_count: 0
+    Scripts:
+      []
+    ChildCount: 0
+  - Entity: 0
+    Root: false
+    IsPrefab: false
+    name: Directional Light
+    tag: default
+    Active: true
+    Static: false
+    m_CollMode: 0
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [-0.369957924, 0.249821082, 0.10399048, 0.888766825]
+      Scale: [1, 1, 1]
+      Angels: [-45.2000008, 31.3999996, 0]
+    comp_count: 1
+    Components:
+      - DirectionalLight:
+          enabled: true
+          Color: [1, 1, 1]
+          Bias: 0.00300000003
+          CastShadows: true
+          Intensity: 1
+          Soft: false
     script_count: 0
     Scripts:
       []

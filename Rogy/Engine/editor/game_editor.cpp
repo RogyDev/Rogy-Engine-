@@ -48,7 +48,7 @@ bool Game_Editor::Init(char* glsl_version, GLFWwindow* window, bool platform_sup
 
 	style.Colors[ImGuiCol_Text] = ImVec4(0.8f, 0.8f, 0.8f, 1.00f);
 	style.Colors[ImGuiCol_TitleBg] = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
-	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
 	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.23f, 0.23f, 0.23f, 1.00f);
 	style.Colors[ImGuiCol_Header] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
 	style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
@@ -452,7 +452,10 @@ void Game_Editor::ToolBar()
 		float width = ImGui::GetWindowWidth() - 300;
 		ImGui::SetCursorPosY(0);
 		ImGui::SetCursorPosX(width);
-		ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 0.6f), prg_settings.prj->GameName.c_str());
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.6f, 0.6f, 0.6f));
+		ImGui::Button(prg_settings.prj->GameName.c_str());
+		ImGui::PopStyleColor();
+		//ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 0.6f), prg_settings.prj->GameName.c_str());
 		//ImGui::SameLine(0, ImGui::GetWindowWidth() - 275);
 		
 
@@ -712,7 +715,8 @@ void Game_Editor::DownBar()
 
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.15f, 0.15f, 0.15f, 1.f));
 	ImGui::Begin("DebugInfo", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-	if (ImGui::Button("    Project Browser    ", ImVec2(0, 20)))
+	ImGui::SetCursorPosY(0);
+	if (ImGui::Button("    Project Browser    ", ImVec2(0, ImGui::GetWindowHeight())))
 		prj_browser.isOn = !prj_browser.isOn;
 	//ImGui::SameLine();
 	//ImGui::Text("%.1f FPS (%.3f ms/frame) ", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
